@@ -1,0 +1,63 @@
+# Smart Meter Anomaly Detection & Operational Rules
+# Config-driven thresholds for ward-level smart meter boards
+
+rules:
+  night_flow_leak:
+    rule_id: "SMR-LEAK-01"
+    name: "Suspected Service Connection Leak (Night Flow Anomaly)"
+    description: "Night flow (02:00 - 04:00) exceeds historical baseline"
+    ratio_threshold: 1.5
+    min_flow_lps: 0.15
+    persistence_windows: 2
+    severity: "WARNING"
+
+  continuous_flow:
+    rule_id: "SMR-CONT-02"
+    name: "Continuous Flow / Cistern Runaway"
+    description: "Zero flow not reached in any 15-minute interval across 24 hours"
+    min_zero_minutes_required: 15
+    persistence_hours: 24
+    severity: "WARNING"
+
+  high_usage_mad:
+    rule_id: "SMR-USAGE-03"
+    name: "Unusually High Ward Consumption"
+    description: "Daily volume exceeds ward baseline median by more than 3 x MAD"
+    mad_multiplier: 3.0
+    severity: "INFO"
+
+  reverse_flow:
+    rule_id: "SMR-REV-04"
+    name: "Reverse Flow / Back-siphonage Detected"
+    description: "Flow velocity negative exceeding 0.05 m/s"
+    threshold_lps: -0.05
+    severity: "CRITICAL"
+
+  tamper_event:
+    rule_id: "SMR-TAMP-05"
+    name: "Physical Enclosure Tamper / Magnetic Interference"
+    description: "Optical sensor case-open trigger or external magnetic field detected"
+    severity: "HIGH"
+
+  comms_lost:
+    rule_id: "SMR-COMM-06"
+    name: "Smart Meter Telemetry Timeout"
+    description: "No LoRaWAN/NB-IoT uplink packet received within timeout"
+    timeout_minutes: 240
+    severity: "WARNING"
+
+  low_battery:
+    rule_id: "SMR-BATT-07"
+    name: "Internal Lithium Battery Depleted"
+    description: "Internal cell voltage below nominal cut-off"
+    battery_pct_threshold: 15.0
+    severity: "INFO"
+
+diurnal_profile:
+  # 24-hour normalized multipliers (sum to 24.0)
+  hourly_factors: [
+    0.45, 0.38, 0.32, 0.35, 0.58, 0.95,
+    1.45, 1.62, 1.48, 1.25, 1.10, 1.05,
+    0.98, 0.92, 0.88, 0.90, 1.05, 1.35,
+    1.55, 1.48, 1.25, 0.95, 0.72, 0.55
+  ]

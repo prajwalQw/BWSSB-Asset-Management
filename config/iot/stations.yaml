@@ -1,0 +1,471 @@
+# Pumping Stations Topology and Hydraulic Parameters
+# Anchored to real BWSSB pumping station facilities
+# All generated simulated elements carry data_tier: "SIMULATED"
+
+stations:
+  - id: "PS_TATAGUNI"
+    name: "Tataguni Terminal Pumping Station"
+    zone: "South"
+    station_class: "high-lift"
+    coordinates: [77.5148, 12.8690]
+    site_rotation_deg: 35.0
+    suction_source: "Tataguni Clear Water Reservoir Complex"
+    discharge_target: "South Transmission Main to GLR Network"
+    tank:
+      id: "TANK_TG_01"
+      name: "Tataguni Balancing Reservoir"
+      capacity_m3: 45000.0
+      height_m: 10.0
+      diameter_m: 75.7
+      start_level_pct: 35.0
+      stop_level_pct: 88.0
+      initial_level_pct: 62.0
+      offset_m: [45.0, 15.0]
+    pumps:
+      - id: "PUMP_TG_H1"
+        tag: "H1"
+        name: "High-Lift Pump Set 1 (H1)"
+        class: "high-lift"
+        rated_power_kw: 1200.0
+        rated_voltage_v: 6600.0
+        rated_fla_a: 124.5
+        rated_speed_rpm: 1485
+        starter_type: "soft-starter"
+        inrush_factor_k: 2.0
+        start_ramp_sec: 18.0
+        power_factor_rated: 0.88
+        min_run_time_s: 300
+        min_off_time_s: 180
+        auto_control_mode: "Automatic"
+        pump_curve:
+          shutoff_head_m: 125.0
+          rated_head_m: 95.0
+          rated_flow_m3h: 3200.0
+          flow_lps_rated: 888.89
+          curve_a: 125.0
+          curve_b: 0.00000293
+        system_curve:
+          static_lift_m: 65.0
+          resistance_k: 0.00000293
+        station_relative_offset_m: [-12.0, -8.0]
+        devices:
+          flow_sensor:
+            tag: "FIT_TG_H1_SEN"
+            type: "FIT"
+            name: "H1 Discharge Sensor Element"
+            offset_m: [-6.0, -8.0]
+            accuracy_pct: 0.5
+          flow_meter:
+            tag: "FIT_TG_H1"
+            type: "FIT"
+            name: "H1 Electromagnetic Bulk Flow Meter"
+            offset_m: [2.0, -8.0]
+            pipe_dn_mm: 800
+            accuracy_pct: 0.5
+          pressure_transmitter:
+            tag: "PIT_TG_H1"
+            type: "PIT"
+            name: "H1 Discharge Pressure Transmitter"
+            offset_m: [8.0, -8.0]
+            accuracy_pct: 0.25
+          iot_board:
+            tag: "IOT_TG_H1"
+            type: "PMM"
+            name: "H1 IoT Motor & Power Intelligence Board"
+            offset_m: [-15.0, -8.0]
+            channels: ["voltage_3p", "current_3p", "vibration", "run_state"]
+
+      - id: "PUMP_TG_H2"
+        tag: "H2"
+        name: "High-Lift Pump Set 2 (H2)"
+        class: "high-lift"
+        rated_power_kw: 1200.0
+        rated_voltage_v: 6600.0
+        rated_fla_a: 124.5
+        rated_speed_rpm: 1485
+        starter_type: "soft-starter"
+        inrush_factor_k: 2.0
+        start_ramp_sec: 18.0
+        power_factor_rated: 0.88
+        min_run_time_s: 300
+        min_off_time_s: 180
+        auto_control_mode: "Automatic"
+        pump_curve:
+          shutoff_head_m: 125.0
+          rated_head_m: 95.0
+          rated_flow_m3h: 3200.0
+          flow_lps_rated: 888.89
+          curve_a: 125.0
+          curve_b: 0.00000293
+        system_curve:
+          static_lift_m: 65.0
+          resistance_k: 0.00000293
+        station_relative_offset_m: [-12.0, 0.0]
+        devices:
+          flow_sensor:
+            tag: "FIT_TG_H2_SEN"
+            type: "FIT"
+            name: "H2 Discharge Sensor Element"
+            offset_m: [-6.0, 0.0]
+            accuracy_pct: 0.5
+          flow_meter:
+            tag: "FIT_TG_H2"
+            type: "FIT"
+            name: "H2 Electromagnetic Bulk Flow Meter"
+            offset_m: [2.0, 0.0]
+            pipe_dn_mm: 800
+            accuracy_pct: 0.5
+          pressure_transmitter:
+            tag: "PIT_TG_H2"
+            type: "PIT"
+            name: "H2 Discharge Pressure Transmitter"
+            offset_m: [8.0, 0.0]
+            accuracy_pct: 0.25
+          iot_board:
+            tag: "IOT_TG_H2"
+            type: "PMM"
+            name: "H2 IoT Motor & Power Intelligence Board"
+            offset_m: [-15.0, 0.0]
+            channels: ["voltage_3p", "current_3p", "vibration", "run_state"]
+
+      - id: "PUMP_TG_H3"
+        tag: "H3"
+        name: "High-Lift Pump Set 3 (H3)"
+        class: "high-lift"
+        rated_power_kw: 1200.0
+        rated_voltage_v: 6600.0
+        rated_fla_a: 124.5
+        rated_speed_rpm: 1485
+        starter_type: "soft-starter"
+        inrush_factor_k: 2.0
+        start_ramp_sec: 18.0
+        power_factor_rated: 0.88
+        min_run_time_s: 300
+        min_off_time_s: 180
+        auto_control_mode: "Automatic"
+        pump_curve:
+          shutoff_head_m: 125.0
+          rated_head_m: 95.0
+          rated_flow_m3h: 3200.0
+          flow_lps_rated: 888.89
+          curve_a: 125.0
+          curve_b: 0.00000293
+        system_curve:
+          static_lift_m: 65.0
+          resistance_k: 0.00000293
+        station_relative_offset_m: [-12.0, 8.0]
+        devices:
+          flow_sensor:
+            tag: "FIT_TG_H3_SEN"
+            type: "FIT"
+            name: "H3 Discharge Sensor Element"
+            offset_m: [-6.0, 8.0]
+            accuracy_pct: 0.5
+          flow_meter:
+            tag: "FIT_TG_H3"
+            type: "FIT"
+            name: "H3 Electromagnetic Bulk Flow Meter"
+            offset_m: [2.0, 8.0]
+            pipe_dn_mm: 800
+            accuracy_pct: 0.5
+          pressure_transmitter:
+            tag: "PIT_TG_H3"
+            type: "PIT"
+            name: "H3 Discharge Pressure Transmitter"
+            offset_m: [8.0, 8.0]
+            accuracy_pct: 0.25
+          iot_board:
+            tag: "IOT_TG_H3"
+            type: "PMM"
+            name: "H3 IoT Motor & Power Intelligence Board"
+            offset_m: [-15.0, 8.0]
+            channels: ["voltage_3p", "current_3p", "vibration", "run_state"]
+
+    station_instruments:
+      water_quality:
+        tag: "AIT_TG_01"
+        type: "AIT"
+        name: "Tataguni WTP Online Analyser"
+        offset_m: [25.0, 0.0]
+      station_discharge_meter:
+        tag: "FIT_TG_DISCHARGE"
+        type: "FIT"
+        name: "Tataguni Common Transmission Bulk Meter"
+        pipe_dn_mm: 1200
+        offset_m: [35.0, 0.0]
+
+  - id: "PS_MOUNT_JOY_BOOSTER"
+    name: "Mount Joy Booster Pumping Station"
+    zone: "South"
+    station_class: "booster"
+    coordinates: [77.5621, 12.9372]
+    site_rotation_deg: 15.0
+    suction_source: "Mount Joy GLR"
+    discharge_target: "Hanumanthanagar & Basavanagudi Elevated Distribution"
+    tank:
+      id: "TANK_MJ_01"
+      name: "Mount Joy Ground Level Reservoir"
+      capacity_m3: 22000.0
+      height_m: 8.5
+      diameter_m: 57.4
+      start_level_pct: 30.0
+      stop_level_pct: 85.0
+      initial_level_pct: 54.0
+      offset_m: [35.0, 10.0]
+    pumps:
+      - id: "PUMP_MJ_F1"
+        tag: "F1"
+        name: "Booster Pump Set 1 (F1)"
+        class: "booster"
+        rated_power_kw: 350.0
+        rated_voltage_v: 415.0
+        rated_fla_a: 565.0
+        rated_speed_rpm: 1470
+        starter_type: "star-delta"
+        inrush_factor_k: 2.5
+        start_ramp_sec: 14.0
+        power_factor_rated: 0.86
+        min_run_time_s: 240
+        min_off_time_s: 120
+        auto_control_mode: "Automatic"
+        pump_curve:
+          shutoff_head_m: 62.0
+          rated_head_m: 45.0
+          rated_flow_m3h: 1800.0
+          flow_lps_rated: 500.0
+          curve_a: 62.0
+          curve_b: 0.00000525
+        system_curve:
+          static_lift_m: 28.0
+          resistance_k: 0.00000525
+        station_relative_offset_m: [-10.0, -5.0]
+        devices:
+          flow_sensor:
+            tag: "FIT_MJ_F1_SEN"
+            type: "FIT"
+            name: "F1 Discharge Sensor Element"
+            offset_m: [-4.0, -5.0]
+            accuracy_pct: 0.5
+          flow_meter:
+            tag: "FIT_MJ_F1"
+            type: "FIT"
+            name: "F1 Electromagnetic Bulk Flow Meter"
+            offset_m: [2.0, -5.0]
+            pipe_dn_mm: 500
+            accuracy_pct: 0.5
+          pressure_transmitter:
+            tag: "PIT_MJ_F1"
+            type: "PIT"
+            name: "F1 Discharge Pressure Transmitter"
+            offset_m: [6.0, -5.0]
+            accuracy_pct: 0.25
+          iot_board:
+            tag: "IOT_MJ_F1"
+            type: "PMM"
+            name: "F1 IoT Motor Monitoring Board"
+            offset_m: [-14.0, -5.0]
+            channels: ["voltage_3p", "current_3p", "vibration", "run_state"]
+
+      - id: "PUMP_MJ_F2"
+        tag: "F2"
+        name: "Booster Pump Set 2 (F2)"
+        class: "booster"
+        rated_power_kw: 350.0
+        rated_voltage_v: 415.0
+        rated_fla_a: 565.0
+        rated_speed_rpm: 1470
+        starter_type: "star-delta"
+        inrush_factor_k: 2.5
+        start_ramp_sec: 14.0
+        power_factor_rated: 0.86
+        min_run_time_s: 240
+        min_off_time_s: 120
+        auto_control_mode: "Automatic"
+        pump_curve:
+          shutoff_head_m: 62.0
+          rated_head_m: 45.0
+          rated_flow_m3h: 1800.0
+          flow_lps_rated: 500.0
+          curve_a: 62.0
+          curve_b: 0.00000525
+        system_curve:
+          static_lift_m: 28.0
+          resistance_k: 0.00000525
+        station_relative_offset_m: [-10.0, 5.0]
+        devices:
+          flow_sensor:
+            tag: "FIT_MJ_F2_SEN"
+            type: "FIT"
+            name: "F2 Discharge Sensor Element"
+            offset_m: [-4.0, 5.0]
+            accuracy_pct: 0.5
+          flow_meter:
+            tag: "FIT_MJ_F2"
+            type: "FIT"
+            name: "F2 Electromagnetic Bulk Flow Meter"
+            offset_m: [2.0, 5.0]
+            pipe_dn_mm: 500
+            accuracy_pct: 0.5
+          pressure_transmitter:
+            tag: "PIT_MJ_F2"
+            type: "PIT"
+            name: "F2 Discharge Pressure Transmitter"
+            offset_m: [6.0, 5.0]
+            accuracy_pct: 0.25
+          iot_board:
+            tag: "IOT_MJ_F2"
+            type: "PMM"
+            name: "F2 IoT Motor Monitoring Board"
+            offset_m: [-14.0, 5.0]
+            channels: ["voltage_3p", "current_3p", "vibration", "run_state"]
+
+    station_instruments:
+      water_quality:
+        tag: "AIT_MJ_01"
+        type: "AIT"
+        name: "Mount Joy Distribution Quality Monitor"
+        offset_m: [20.0, 0.0]
+      station_discharge_meter:
+        tag: "FIT_MJ_DISCHARGE"
+        type: "FIT"
+        name: "Mount Joy Outflow Bulk Meter"
+        pipe_dn_mm: 700
+        offset_m: [28.0, 0.0]
+
+  - id: "PS_HIGH_GROUNDS_BOOSTER"
+    name: "High Grounds Booster Pumping Station"
+    zone: "Central"
+    station_class: "booster"
+    coordinates: [77.5843, 12.9912]
+    site_rotation_deg: -10.0
+    suction_source: "High Grounds GLR Reservoir Complex"
+    discharge_target: "Central CBD / Vidhana Soudha High-Pressure Zone"
+    tank:
+      id: "TANK_HG_01"
+      name: "High Grounds Ground Level Reservoir"
+      capacity_m3: 35000.0
+      height_m: 9.0
+      diameter_m: 70.3
+      start_level_pct: 32.0
+      stop_level_pct: 86.0
+      initial_level_pct: 71.0
+      offset_m: [40.0, 12.0]
+    pumps:
+      - id: "PUMP_HG_F1"
+        tag: "F1"
+        name: "Booster Pump Set 1 (F1)"
+        class: "booster"
+        rated_power_kw: 450.0
+        rated_voltage_v: 415.0
+        rated_fla_a: 720.0
+        rated_speed_rpm: 1480
+        starter_type: "DOL"
+        inrush_factor_k: 7.0
+        start_ramp_sec: 8.0
+        power_factor_rated: 0.87
+        min_run_time_s: 300
+        min_off_time_s: 180
+        auto_control_mode: "Automatic"
+        pump_curve:
+          shutoff_head_m: 70.0
+          rated_head_m: 52.0
+          rated_flow_m3h: 2100.0
+          flow_lps_rated: 583.33
+          curve_a: 70.0
+          curve_b: 0.00000408
+        system_curve:
+          static_lift_m: 32.0
+          resistance_k: 0.00000408
+        station_relative_offset_m: [-10.0, -5.0]
+        devices:
+          flow_sensor:
+            tag: "FIT_HG_F1_SEN"
+            type: "FIT"
+            name: "F1 Discharge Sensor Element"
+            offset_m: [-4.0, -5.0]
+            accuracy_pct: 0.5
+          flow_meter:
+            tag: "FIT_HG_F1"
+            type: "FIT"
+            name: "F1 Electromagnetic Bulk Flow Meter"
+            offset_m: [2.0, -5.0]
+            pipe_dn_mm: 600
+            accuracy_pct: 0.5
+          pressure_transmitter:
+            tag: "PIT_HG_F1"
+            type: "PIT"
+            name: "F1 Discharge Pressure Transmitter"
+            offset_m: [6.0, -5.0]
+            accuracy_pct: 0.25
+          iot_board:
+            tag: "IOT_HG_F1"
+            type: "PMM"
+            name: "F1 IoT Motor Monitoring Board"
+            offset_m: [-14.0, -5.0]
+            channels: ["voltage_3p", "current_3p", "vibration", "run_state"]
+
+      - id: "PUMP_HG_F2"
+        tag: "F2"
+        name: "Booster Pump Set 2 (F2)"
+        class: "booster"
+        rated_power_kw: 450.0
+        rated_voltage_v: 415.0
+        rated_fla_a: 720.0
+        rated_speed_rpm: 1480
+        starter_type: "DOL"
+        inrush_factor_k: 7.0
+        start_ramp_sec: 8.0
+        power_factor_rated: 0.87
+        min_run_time_s: 300
+        min_off_time_s: 180
+        auto_control_mode: "Automatic"
+        pump_curve:
+          shutoff_head_m: 70.0
+          rated_head_m: 52.0
+          rated_flow_m3h: 2100.0
+          flow_lps_rated: 583.33
+          curve_a: 70.0
+          curve_b: 0.00000408
+        system_curve:
+          static_lift_m: 32.0
+          resistance_k: 0.00000408
+        station_relative_offset_m: [-10.0, 5.0]
+        devices:
+          flow_sensor:
+            tag: "FIT_HG_F2_SEN"
+            type: "FIT"
+            name: "F2 Discharge Sensor Element"
+            offset_m: [-4.0, 5.0]
+            accuracy_pct: 0.5
+          flow_meter:
+            tag: "FIT_HG_F2"
+            type: "FIT"
+            name: "F2 Electromagnetic Bulk Flow Meter"
+            offset_m: [2.0, 5.0]
+            pipe_dn_mm: 600
+            accuracy_pct: 0.5
+          pressure_transmitter:
+            tag: "PIT_HG_F2"
+            type: "PIT"
+            name: "F2 Discharge Pressure Transmitter"
+            offset_m: [6.0, 5.0]
+            accuracy_pct: 0.25
+          iot_board:
+            tag: "IOT_HG_F2"
+            type: "PMM"
+            name: "F2 IoT Motor Monitoring Board"
+            offset_m: [-14.0, 5.0]
+            channels: ["voltage_3p", "current_3p", "vibration", "run_state"]
+
+    station_instruments:
+      water_quality:
+        tag: "AIT_HG_01"
+        type: "AIT"
+        name: "High Grounds Distribution Quality Monitor"
+        offset_m: [20.0, 0.0]
+      station_discharge_meter:
+        tag: "FIT_HG_DISCHARGE"
+        type: "FIT"
+        name: "High Grounds Outflow Bulk Meter"
+        pipe_dn_mm: 800
+        offset_m: [30.0, 0.0]

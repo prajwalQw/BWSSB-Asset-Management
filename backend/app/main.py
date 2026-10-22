@@ -11,6 +11,9 @@ import logging
 from .config import SERVER_HOST, SERVER_PORT
 from .bridge.ignoapi_bridge import bridge
 from .routers import assets, water_bodies, hydraulics, telemetry, alerts, admin, pumps
+from .iot.config import IOT_ENABLED
+from .iot.router import router as iot_router
+from .iot.sim.engine import sim_engine
 
 logging.basicConfig(
     level=logging.INFO,
@@ -23,7 +26,13 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing Bengaluru Water Network Digital Twin Backend...")
     # Start background read-only IGNOAPI bridge
     await bridge.start()
+    sim_task = None
+    if IOT_ENABLED:
+        import asyncio
+        sim_task = asyncio.create_task(sim_engine.start_loop())
     yield
+    if IOT_ENABLED:
+        sim_engine.stop_loop()
     logger.info("Shutting down Digital Twin Backend...")
     await bridge.stop()
 
@@ -51,6 +60,7 @@ app.include_router(pumps.router)
 app.include_router(telemetry.router)
 app.include_router(alerts.router)
 app.include_router(admin.router)
+app.include_router(iot_router)
 
 @app.get("/healthz")
 async def health_check():

@@ -1,0 +1,61 @@
+# Documented Borewell Facts & IoT Telemetry Specifications
+# Sources, documented counts, and source conflicts (no hardcoded counts)
+
+metadata:
+  asset_class: "Public Borewells"
+  primary_jurisdiction: "Bengaluru Water Supply and Sewerage Board (BWSSB)"
+  governance: "Karnataka Groundwater Authority (KGWA) & Central Ground Water Board (CGWB)"
+
+documented_sources:
+  - id: "SRC-BW-NIE-2026"
+    title: "New Indian Express: By March '27 BWSSB to install IoT devices on 6,000 borewells"
+    publication_date: "2026-09-30"
+    author: "NIE City Express Bureau"
+    url: "https://www.newindianexpress.com/cities/bengaluru/2026/Sep/30/by-march-27-bwssb-to-install-iot-devices-on-its-6000-borewells"
+    reported_figures:
+      total_public_borewells_managed: 16000
+      active_iot_telemetry_devices_deployed: 1800
+      planned_additional_iot_deployments_by_2027: 6000
+    monitored_parameters:
+      - "groundwater_depth_m"
+      - "water_extracted_kl"
+      - "daily_pump_duration_hours"
+      - "pump_motor_on_off_status"
+      - "dry_run_prevention_flag"
+
+  - id: "SRC-BW-JICA-2026"
+    title: "JICA Data Collection Survey on Enhancement of DX Utilization for Public Sector"
+    publication_date: "2026-02-15"
+    citation: "JICA Phase 3 Supporting Report Table 2-31, p. 42"
+    url: "https://openjicareport.jica.go.jp/pdf/12300364_04.pdf"
+    reported_figures:
+      online_monitored_pilot_wells: 3000
+      monitored_coverage: "Remote on/off status, extraction volume, and energy consumption"
+
+  - id: "SRC-BW-AR-2023"
+    title: "BWSSB Annual Operations Report 2022-2023"
+    reported_figures:
+      operational_public_borewells_in_service: 2150
+      note: "Restricted to municipal drinking water borewells connected to peripheral mini-water supplies"
+
+conflict_analysis:
+  has_conflict: true
+  summary: "Conflicting numbers exist between BWSSB executive statements (1,800 active, 6,000 planned out of ~16,000 public assets), JICA DX survey (3,000 pilot monitored wells), and the 2022-23 Annual Report (2,150 operational municipal wells). The digital twin displays these source citations transparently without forcing an artificial single count."
+
+telemetry_envelope_spec:
+  signals:
+    - signal: "groundwater_depth_m"
+      unit: "m"
+      normal_range: [150.0, 320.0]
+    - signal: "extraction_volume_kl"
+      unit: "kL"
+      normal_daily_range: [10.0, 180.0]
+    - signal: "flow_pattern_lps"
+      unit: "L/s"
+      normal_range: [1.5, 8.5]
+    - signal: "pump_duration_hours"
+      unit: "h"
+      normal_daily_range: [2.0, 14.0]
+    - signal: "pump_status"
+      unit: "state"
+      states: ["OFF", "RUNNING", "DRY_RUN_LOCKOUT", "FAULT"]

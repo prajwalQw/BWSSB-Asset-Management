@@ -19,6 +19,7 @@ import { LOD_CONFIG } from './lodConfig';
 import { alongLine, offsetMetersToLngLat, getBearing } from './turfMath';
 import { buildIconAtlas, IconBounds } from './icons';
 import { SelectedAsset } from '../types';
+import { layerRegistry } from '../features/iot/registry/layerRegistry';
 
 export interface DeckOverlayProps {
   theme: BasemapTheme;
@@ -656,6 +657,11 @@ export function buildDeckLayers(props: DeckOverlayProps) {
         })
       );
     }
+  }
+
+  const extraLayers = layerRegistry.getAllLayers(props);
+  if (extraLayers.length > 0) {
+    layers.push(...extraLayers);
   }
 
   return layers;

@@ -1,0 +1,187 @@
+# Water Flow in MLD Network Model (Macro Balance Chain)
+# Flow Chain: Cauvery River -> WTPs -> High-Lift PS -> Transmission Mains -> GLRs -> Booster PS -> DMAs
+# Verified capacities cite authoritative documents. Unverified nodes are marked and excluded from totals.
+
+sources:
+  - id: "SRC_CAUVERY_RIVER"
+    name: "Cauvery River Intake (Shiva Balancing Reservoir)"
+    type: "source"
+    coordinates: [77.1652, 12.3021]
+    verified_capacity_mld: 1475.0
+    verified_citation: "JICA Phase 3 Final Report Part 4 (p. 17-9), Cauvery Stages I-IV cumulative intake"
+    status: "verified"
+
+  - id: "SRC_CAUVERY_STAGE_V"
+    name: "Cauvery Stage V Intake (T.K. Halli Expansion)"
+    type: "source"
+    coordinates: [77.1710, 12.3080]
+    verified_capacity_mld: 775.0
+    verified_citation: "BWSSB Cauvery Stage V Commissioning Report (2023), 775 MLD addition"
+    status: "verified"
+
+wtps:
+  - id: "WTP_TK_HALLI"
+    name: "T.K. Halli Water Treatment Plant"
+    coordinates: [77.2031, 12.4512]
+    stages: "Stages I, II, III, IV"
+    verified_capacity_mld: 1475.0
+    verified_citation: "JICA Phase 3 Final Report and Yokogawa 2015 Case Study (p. 1)"
+    status: "verified"
+    inlet_meter_tag: "FIT_WTP_TKH_IN"
+    outlet_meter_tag: "FIT_WTP_TKH_OUT"
+
+  - id: "WTP_HAROHALLI"
+    name: "Harohalli Intermediate Headworks"
+    coordinates: [77.4124, 12.6548]
+    stages: "Stage V Booster Stage"
+    verified_capacity_mld: 775.0
+    verified_citation: "BWSSB Cauvery Stage V DPR"
+    status: "verified"
+    inlet_meter_tag: "FIT_WTP_HARO_IN"
+    outlet_meter_tag: "FIT_WTP_HARO_OUT"
+
+  - id: "WTP_TATAGUNI"
+    name: "Tataguni Clear Water Reservoir & Treatment Complex"
+    coordinates: [77.5148, 12.8690]
+    stages: "Terminal Pumping & Chlorination"
+    verified_capacity_mld: 2250.0
+    verified_citation: "BWSSB Annual Operations Report 2022-23 (Combined terminal capacity)"
+    status: "verified"
+    inlet_meter_tag: "FIT_TG_INLET"
+    outlet_meter_tag: "FIT_TG_DISCHARGE"
+
+reservoirs_glr:
+  - id: "GLR_MOUNT_JOY"
+    name: "Mount Joy Ground Level Reservoir"
+    coordinates: [77.5621, 12.9372]
+    storage_capacity_mld: 22.0
+    verified_capacity_mld: 22.0
+    verified_citation: "Yokogawa 2015 Case Study, GLR Supervisory Specs"
+    status: "verified"
+    inlet_meter_tag: "FIT_MJ_INLET"
+    outlet_meter_tag: "FIT_MJ_DISCHARGE"
+
+  - id: "GLR_HIGH_GROUNDS"
+    name: "High Grounds Ground Level Reservoir"
+    coordinates: [77.5843, 12.9912]
+    storage_capacity_mld: 35.0
+    verified_capacity_mld: 35.0
+    verified_citation: "Yokogawa 2015 Case Study, GLR Supervisory Specs"
+    status: "verified"
+    inlet_meter_tag: "FIT_HG_INLET"
+    outlet_meter_tag: "FIT_HG_DISCHARGE"
+
+  - id: "GLR_MACHILIBETTA"
+    name: "Machilibetta Service Reservoir"
+    coordinates: [77.5312, 12.9541]
+    storage_capacity_mld: null
+    verified_capacity_mld: null
+    status: "unverified"
+    verified_citation: "Capacity not published in open verified documents"
+    inlet_meter_tag: "FIT_MB_INLET"
+    outlet_meter_tag: "FIT_MB_OUTLET"
+
+dma_zones:
+  - id: "DMA_SOUTH_BASAVANAGUDI"
+    name: "Basavanagudi - Hanumanthanagar DMA"
+    division: "South Division"
+    coordinates: [77.5700, 12.9420]
+    avg_demand_mld: 28.5
+    dma_meter_tag: "FIT_DMA_SOUTH_01"
+
+  - id: "DMA_CENTRAL_CBD"
+    name: "Central CBD Vidhana Soudha DMA"
+    division: "Central"
+    coordinates: [77.5910, 12.9780]
+    avg_demand_mld: 42.0
+    dma_meter_tag: "FIT_DMA_CENTRAL_01"
+
+  - id: "DMA_WEST_RAJAJINAGAR"
+    name: "Rajajinagar - Malleshwaram DMA"
+    division: "West Division"
+    coordinates: [77.5550, 12.9980]
+    avg_demand_mld: 36.8
+    dma_meter_tag: "FIT_DMA_WEST_01"
+
+transmission_corridors:
+  - id: "CORR_CAUVERY_TKH"
+    name: "Cauvery Raw Water Conveyance"
+    from_node: "SRC_CAUVERY_RIVER"
+    to_node: "WTP_TK_HALLI"
+    pipe_dn_mm: 2000
+    length_km: 28.5
+    design_flow_mld: 1475.0
+    coordinates:
+      - [77.1652, 12.3021]
+      - [77.1850, 12.3780]
+      - [77.2031, 12.4512]
+
+  - id: "CORR_TKH_HAROHALLI"
+    name: "T.K. Halli to Harohalli Transmission Conduit"
+    from_node: "WTP_TK_HALLI"
+    to_node: "WTP_HAROHALLI"
+    pipe_dn_mm: 1800
+    length_km: 32.4
+    design_flow_mld: 1420.0
+    coordinates:
+      - [77.2031, 12.4512]
+      - [77.3050, 12.5530]
+      - [77.4124, 12.6548]
+
+  - id: "CORR_HAROHALLI_TATAGUNI"
+    name: "Harohalli to Tataguni High-Lift Corridor"
+    from_node: "WTP_HAROHALLI"
+    to_node: "WTP_TATAGUNI"
+    pipe_dn_mm: 1800
+    length_km: 30.1
+    design_flow_mld: 1390.0
+    coordinates:
+      - [77.4124, 12.6548]
+      - [77.4650, 12.7610]
+      - [77.5148, 12.8690]
+
+  - id: "CORR_TATAGUNI_MOUNT_JOY"
+    name: "Tataguni to Mount Joy GLR Feeder"
+    from_node: "WTP_TATAGUNI"
+    to_node: "GLR_MOUNT_JOY"
+    pipe_dn_mm: 1200
+    length_km: 12.8
+    design_flow_mld: 320.0
+    coordinates:
+      - [77.5148, 12.8690]
+      - [77.5380, 12.9050]
+      - [77.5621, 12.9372]
+
+  - id: "CORR_TATAGUNI_HIGH_GROUNDS"
+    name: "Tataguni to High Grounds GLR Trunk"
+    from_node: "WTP_TATAGUNI"
+    to_node: "GLR_HIGH_GROUNDS"
+    pipe_dn_mm: 1400
+    length_km: 18.2
+    design_flow_mld: 460.0
+    coordinates:
+      - [77.5148, 12.8690]
+      - [77.5510, 12.9350]
+      - [77.5843, 12.9912]
+
+  - id: "CORR_MOUNT_JOY_BASAVANAGUDI"
+    name: "Mount Joy Booster to Basavanagudi DMA"
+    from_node: "GLR_MOUNT_JOY"
+    to_node: "DMA_SOUTH_BASAVANAGUDI"
+    pipe_dn_mm: 600
+    length_km: 2.1
+    design_flow_mld: 28.5
+    coordinates:
+      - [77.5621, 12.9372]
+      - [77.5700, 12.9420]
+
+  - id: "CORR_HIGH_GROUNDS_CBD"
+    name: "High Grounds Booster to Central CBD DMA"
+    from_node: "GLR_HIGH_GROUNDS"
+    to_node: "DMA_CENTRAL_CBD"
+    pipe_dn_mm: 800
+    length_km: 2.6
+    design_flow_mld: 42.0
+    coordinates:
+      - [77.5843, 12.9912]
+      - [77.5910, 12.9780]

@@ -1,0 +1,179 @@
+# ISA-5.1 Instrumentation & Device Types Definition
+# All thresholds, units, and accuracy standards for BWSSB IoT Digital Twin
+
+standards:
+  instrumentation_tagging: "ISA-5.1"
+  alarm_management: "ISA-18.2"
+  water_quality_limits: "IS 10500:2012 (Drinking Water - Specification)"
+  motor_standards: "IEC 60034-1"
+
+device_types:
+  flow_meter_bulk:
+    type_code: "FIT"
+    name: "Electromagnetic Bulk Flow Meter"
+    description: "Full-bore electromagnetic meter for raw and treated water transmission and DMA inlets"
+    pipe_size_range_mm:
+      min: 100
+      max: 1200
+      verified: false
+      source_note: "BWSSB Cauvery Stage V DPR and project procurement notices report 100-1000 mm with 1200 mm on major transmission conduits; unverified from a single consolidated standard document"
+    measurement_units:
+      flow_rate: ["L/s", "m3/h", "MLD"]
+      totaliser: "kL"
+    accuracy_pct: 0.5
+    signals:
+      - signal: "flow_lps"
+        unit: "L/s"
+        range: [0.0, 3500.0]
+      - signal: "flow_m3h"
+        unit: "m3/h"
+        range: [0.0, 12600.0]
+      - signal: "flow_mld"
+        unit: "MLD"
+        range: [0.0, 302.4]
+      - signal: "forward_totaliser_kl"
+        unit: "kL"
+        range: [0.0, 99999999.0]
+      - signal: "reverse_totaliser_kl"
+        unit: "kL"
+        range: [0.0, 99999999.0]
+      - signal: "net_volume_kl"
+        unit: "kL"
+        range: [0.0, 99999999.0]
+    flags:
+      - "empty_pipe"
+      - "reverse_flow"
+      - "low_signal"
+      - "coil_fault"
+
+  pressure_transmitter:
+    type_code: "PIT"
+    name: "Piezoresistive Pressure Transmitter"
+    description: "Discharge and line pressure transmitter installed at pumping stations and reservoir boundaries"
+    measurement_units:
+      pressure: "bar"
+    accuracy_pct: 0.25
+    signals:
+      - signal: "pressure_bar"
+        unit: "bar"
+        range: [0.0, 25.0]
+    alarm_thresholds:
+      low_alarm_bar: 1.5
+      low_warning_bar: 2.0
+      high_warning_bar: 16.0
+      high_alarm_bar: 18.0
+      deadband_bar: 0.2
+
+  level_sensor:
+    type_code: "LIT"
+    name: "Hydrostatic / Ultrasonic Level Transmitter"
+    description: "Liquid level monitoring for Ground Level Reservoirs (GLRs), Over Head Tanks (OHTs), and pump sumps"
+    measurement_units:
+      level_m: "m"
+      level_pct: "%"
+    accuracy_pct: 0.5
+    signals:
+      - signal: "level_m"
+        unit: "m"
+        range: [0.0, 12.0]
+      - signal: "level_pct"
+        unit: "%"
+        range: [0.0, 100.0]
+    alarm_thresholds:
+      low_low_alarm_pct: 15.0
+      low_alarm_pct: 25.0
+      high_alarm_pct: 85.0
+      high_high_alarm_pct: 95.0
+      deadband_pct: 2.0
+
+  water_quality_analyser:
+    type_code: "AIT"
+    name: "Multi-Parameter Water Quality Analyser"
+    description: "Continuous online drinking water quality monitoring at WTP outlets and GLRs"
+    standards_reference: "IS 10500:2012 Drinking Water Specification (Second Revision)"
+    signals:
+      - signal: "turbidity_ntu"
+        unit: "NTU"
+        acceptable_limit: 1.0
+        permissible_limit: 5.0
+        alarm_high: 5.0
+        range: [0.0, 20.0]
+        source: "IS 10500:2012 Table 1 Item 2"
+      - signal: "ph"
+        unit: "pH"
+        acceptable_limit_min: 6.5
+        acceptable_limit_max: 8.5
+        permissible_limit_min: 6.5
+        permissible_limit_max: 8.5
+        alarm_low: 6.5
+        alarm_high: 8.5
+        range: [4.0, 10.0]
+        source: "IS 10500:2012 Table 1 Item 3"
+      - signal: "residual_chlorine_mgl"
+        unit: "mg/L"
+        acceptable_limit_min: 0.2
+        permissible_limit_max: 1.0
+        alarm_low: 0.2
+        alarm_high: 2.0
+        range: [0.0, 5.0]
+        source: "IS 10500:2012 Table 1 Item 7"
+
+  pump_motor_monitor:
+    type_code: "PMM"
+    name: "Integrated Pump & Motor Condition Monitor"
+    description: "Electrical power quality and mechanical vibration monitor on pump driver sets"
+    signals:
+      - signal: "run_status"
+        unit: "state"
+        states: ["STOPPED", "STARTING", "RUNNING", "STOPPING", "TRIPPED"]
+      - signal: "run_hours"
+        unit: "h"
+        range: [0.0, 99999.0]
+      - signal: "starts_count"
+        unit: "count"
+        range: [0, 65535]
+      - signal: "vibration_rms_mms"
+        unit: "mm/s RMS"
+        normal_max: 4.5
+        alarm_high: 7.1
+        range: [0.0, 25.0]
+      - signal: "energy_kwh"
+        unit: "kWh"
+        range: [0.0, 9999999.0]
+      - signal: "voltage_r"
+        unit: "V"
+        range: [3000.0, 7500.0]
+      - signal: "voltage_y"
+        unit: "V"
+        range: [3000.0, 7500.0]
+      - signal: "voltage_b"
+        unit: "V"
+        range: [3000.0, 7500.0]
+      - signal: "current_r"
+        unit: "A"
+        range: [0.0, 300.0]
+      - signal: "current_y"
+        unit: "A"
+        range: [0.0, 300.0]
+      - signal: "current_b"
+        unit: "A"
+        range: [0.0, 300.0]
+      - signal: "power_factor"
+        unit: "PF"
+        range: [0.0, 1.0]
+
+  valve_position_actuator:
+    type_code: "ZT"
+    name: "Valve Position & Actuator Feedback"
+    description: "Limit switch and position transmitter on transmission and isolation valves"
+    mode: "advisory_only"
+    control_allowed: false
+    signals:
+      - signal: "position_pct"
+        unit: "%"
+        range: [0.0, 100.0]
+      - signal: "state"
+        unit: "enum"
+        states: ["CLOSED", "OPENING", "OPEN", "CLOSING", "FAULT"]
+      - signal: "remote_operable"
+        unit: "boolean"

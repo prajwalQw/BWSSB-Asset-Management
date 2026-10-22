@@ -23,6 +23,8 @@ export interface TopBarProps {
   energyMwh: number;
   energyCostLakhs: number;
   onOpenAlerts: () => void;
+  activeModule?: 'GIS' | 'IOT';
+  onModuleChange?: (module: 'GIS' | 'IOT') => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -34,6 +36,8 @@ export const TopBar: React.FC<TopBarProps> = ({
   energyMwh,
   energyCostLakhs,
   onOpenAlerts,
+  activeModule = 'GIS',
+  onModuleChange,
 }) => {
   const {
     theme,
@@ -61,6 +65,35 @@ export const TopBar: React.FC<TopBarProps> = ({
           </span>
         </div>
       </div>
+
+      {/* "GIS | IoT" Switch */}
+      {onModuleChange && (
+        <div className="flex items-center rounded-lg border border-slate-200 dark:border-slate-700 p-0.5 bg-slate-100 dark:bg-slate-800 text-xs">
+          <button
+            type="button"
+            onClick={() => onModuleChange('GIS')}
+            className={`px-2.5 py-1 rounded-md font-medium transition-all ${
+              activeModule === 'GIS'
+                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm font-bold'
+                : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
+            }`}
+          >
+            GIS
+          </button>
+          <button
+            type="button"
+            onClick={() => onModuleChange('IOT')}
+            className={`px-2.5 py-1 rounded-md font-medium transition-all flex items-center gap-1.5 ${
+              activeModule === 'IOT'
+                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm font-bold'
+                : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
+            }`}
+          >
+            <span>IoT</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          </button>
+        </div>
+      )}
 
       {/* 4 KPI Tiles */}
       <div className="hidden lg:flex items-center gap-2">

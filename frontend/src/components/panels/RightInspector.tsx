@@ -17,6 +17,7 @@ import {
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
 import { SelectedAsset, AlertItem } from '../../types';
 import { ChartContainer } from '../common/ChartContainer';
+import { sectionRegistry } from '../../features/iot/registry/sectionRegistry';
 
 export interface RightInspectorProps {
   asset: SelectedAsset | null;
@@ -174,6 +175,12 @@ export const RightInspector: React.FC<RightInspectorProps> = ({
         </div>
       </aside>
     );
+  }
+
+  // Additive section registry check
+  const customSection = sectionRegistry.renderSection(asset, onClose, onZoomTo);
+  if (customSection) {
+    return <>{customSection}</>;
   }
 
   // ---------------------------------------------------------------------------
@@ -553,7 +560,7 @@ export const RightInspector: React.FC<RightInspectorProps> = ({
               <div key={k} className="flex justify-between items-center py-0.5 border-b border-slate-100 dark:border-slate-800">
                 <span className="text-slate-500 capitalize">{k.replace(/_/g, ' ')}:</span>
                 <span className="font-mono tabular-nums text-slate-800 dark:text-slate-200 font-medium">
-                  {String(v)}
+                  {v === null || v === undefined || v === '' ? 'Not published' : String(v)}
                 </span>
               </div>
             ))}

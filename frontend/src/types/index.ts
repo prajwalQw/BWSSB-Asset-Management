@@ -64,6 +64,7 @@ export interface AlertItem {
   };
   timestamp: string;
   data_tier: DataTier;
+  source?: 'IOT' | string;
 }
 
 export interface PumpTelemetry {

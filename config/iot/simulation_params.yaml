@@ -1,0 +1,48 @@
+# Simulation Engine Parameters & Physics Model Tuning
+# Fully config-driven: no hardcoded numbers in code
+
+simulation:
+  seed: 42
+  tick_interval_sec: 1.0
+  telemetry_resolution_sec: 5.0
+  ring_buffer_depth_samples: 17280  # 24 hours at 5 s resolution
+  sqlite_snapshot_interval_sec: 60.0
+  sqlite_db_path: "data/iot_history.db"
+
+hydraulic_physics:
+  hazen_williams_c:
+    ductile_iron: 130.0
+    mild_steel: 120.0
+    hdpe: 140.0
+    cast_iron: 100.0
+  gravitational_accel_ms2: 9.80665
+  water_density_kg_m3: 1000.0
+
+noise_and_drift:
+  flow_sensor_noise_sigma_pct: 0.8
+  pressure_sensor_noise_sigma_bar: 0.05
+  voltage_noise_sigma_v: 12.0
+  current_noise_sigma_a: 1.5
+  slow_drift_rate_per_hour_pct: 0.15
+
+background_fault_rates:
+  sensor_comms_dropout_prob_per_hour: 0.002
+  sensor_stuck_value_prob_per_hour: 0.001
+  unplanned_pump_trip_prob_per_hour: 0.0005
+
+leak_detection:
+  mass_balance_window_seconds: 60
+  persistence_required_windows: 4
+  persistence_total_windows: 5
+  deadband_clear_windows: 3
+  tolerance_k_factor: 2.0  # 95% confidence interval
+  min_leak_detection_threshold_lps: 4.0
+  pressure_drop_confirmation_bar: 0.10
+  clear_ratio: 0.5
+
+water_quality_model:
+  chlorine_bulk_decay_coefficient_per_hour: 0.045
+  chlorine_wall_decay_coefficient: 0.015
+  turbidity_baseline_ntu: 0.85
+  ph_baseline: 7.35
+  ph_drift_sigma: 0.08

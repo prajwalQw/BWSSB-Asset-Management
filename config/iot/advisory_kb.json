@@ -1,0 +1,126 @@
+{
+  "alerts": {
+    "LEAK_SUSPECTED": {
+      "title": "Suspected Transmission Pipeline Leak",
+      "severity": "CRITICAL",
+      "description": "Downstream flow drop and mass balance deficiency accompanied by localized pressure drop.",
+      "likely_causes": [
+        "Circumferential pipe joint failure under ground settlement",
+        "Third-party trenching or civil utility strike",
+        "Corrosion blow-out in aged ductile iron trunk conduit"
+      ],
+      "future_consequences": [
+        "Rapid storage drawdown in downstream service reservoirs (GLRs)",
+        "Pressure deficit causing back-siphonage risk in adjacent DMAs",
+        "Sub-surface cavitation and road surface subsidence"
+      ],
+      "suggested_actions": [
+        "Dispatch acoustic correlator crew to inspect indicated uncertainty corridor",
+        "Check adjacent chamber air-release valves for hydraulic water hammer",
+        "Isolate branch butterfly valve if acoustic survey confirms significant breach"
+      ]
+    },
+    "PUMP_TRIPPED": {
+      "title": "High-Lift Pump Set Automatic Trip",
+      "severity": "CRITICAL",
+      "description": "Protection relay tripped pump driver on electrical or hydraulic fault.",
+      "likely_causes": [
+        "Thermal overload relay trip due to prolonged high discharge resistance",
+        "Severe 3-phase voltage unbalance from grid feeder",
+        "Dry-run protection interlock triggered by low suction sump level"
+      ],
+      "future_consequences": [
+        "Immediate loss of transmission throughput into distribution mains",
+        "Surge pressure oscillations in discharge header"
+      ],
+      "suggested_actions": [
+        "Verify suction sump level before attempting auto-reset",
+        "Inspect electrical switchgear for phase-to-phase insulation fault",
+        "Rotate standby pump set into primary operational duty"
+      ]
+    },
+    "DRY_RUN": {
+      "title": "Pump Suction Cavitation / Dry Run Condition",
+      "severity": "CRITICAL",
+      "description": "Suction head dropped below Net Positive Suction Head Required (NPSHr).",
+      "likely_causes": [
+        "Clear water reservoir level below emergency suction weir",
+        "Suction foot valve / strainer clogged with biological debris",
+        "Upstream treatment stage filter backwash cycle starvation"
+      ],
+      "future_consequences": [
+        "Severe mechanical seal destruction and impeller erosion",
+        "Motor stator overheating from loss of cooling flow"
+      ],
+      "suggested_actions": [
+        "Inhibit remote restart until tank level recovers above 35%",
+        "Verify suction isolation valve is 100% open"
+      ]
+    },
+    "LOW_PRESSURE": {
+      "title": "Distribution Network Low Pressure Warning",
+      "severity": "HIGH",
+      "description": "Discharge or network nodal pressure fell below contractual minimum (1.5 bar).",
+      "likely_causes": [
+        "Major burst or unmetered draw on downstream distribution trunk",
+        "Pump set operating off-curve on low-efficiency zone"
+      ],
+      "future_consequences": [
+        "Intermittent water supply to consumer terminal points",
+        "Contaminant ingress through pipeline joints under negative pressure"
+      ],
+      "suggested_actions": [
+        "Check status of intermediate booster stations",
+        "Review smart meter boards for sudden high-volume anomalies"
+      ]
+    },
+    "WATER_QUALITY_TURBIDITY": {
+      "title": "Treated Water Turbidity Limit Exceeded",
+      "severity": "HIGH",
+      "description": "Online analyser reports turbidity > 5.0 NTU (IS 10500:2012 permissible limit).",
+      "likely_causes": [
+        "Clariflocculator coagulant dosing pump failure",
+        "Rapid sand filter media breakthrough during backwash changeover"
+      ],
+      "future_consequences": [
+        "Distribution of non-potable water violating BIS drinking water standards"
+      ],
+      "suggested_actions": [
+        "Divert treated effluent to wash-water recovery sump",
+        "Verify polyaluminium chloride (PAC) dosing rate at chemical headworks"
+      ]
+    },
+    "WATER_QUALITY_CHLORINE": {
+      "title": "Free Residual Chlorine Deficit",
+      "severity": "HIGH",
+      "description": "Residual chlorine < 0.2 mg/L at reservoir outlet (IS 10500:2012 minimum limit).",
+      "likely_causes": [
+        "Gas chlorinator vacuum regulator malfunction",
+        "High organic chlorine demand in raw water inlet"
+      ],
+      "future_consequences": [
+        "Loss of biological disinfection barrier across downstream distribution mains"
+      ],
+      "suggested_actions": [
+        "Switch over to standby chlorinator manifold",
+        "Increase dosage to achieve 0.5 mg/L baseline residual at reservoir outlet"
+      ]
+    },
+    "DEVICE_OFFLINE": {
+      "title": "IoT Telemetry Communication Stale / Offline",
+      "severity": "WARNING",
+      "description": "No telemetry heartbeat received within watchdog window.",
+      "likely_causes": [
+        "Cellular / LoRaWAN gateway packet drop in sub-surface chamber",
+        "Solar charger / battery power failure at remote valve chamber"
+      ],
+      "future_consequences": [
+        "Blind spot in network mass balance and acoustic leak surveillance"
+      ],
+      "suggested_actions": [
+        "Ping gateway and verify cellular signal strength",
+        "Schedule field technician inspection on next maintenance round"
+      ]
+    }
+  }
+}

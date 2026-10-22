@@ -11,6 +11,8 @@ import {
   Database 
 } from 'lucide-react';
 import { api } from '../../services/api';
+import { IoTAdminSections } from '../../features/iot/components/IoTAdminSections';
+import { Cpu } from 'lucide-react';
 
 export interface AdminDrawerProps {
   isOpen: boolean;
@@ -18,7 +20,7 @@ export interface AdminDrawerProps {
 }
 
 export const AdminDrawer: React.FC<AdminDrawerProps> = ({ isOpen, onClose }) => {
-  const [activeSection, setActiveSection] = useState<'assets' | 'pumps' | 'sensors' | 'thresholds'>('assets');
+  const [activeSection, setActiveSection] = useState<'assets' | 'pumps' | 'sensors' | 'thresholds' | 'iot'>('assets');
   const [config, setConfig] = useState<any>({
     leak_threshold_lps: 8.5,
     min_night_flow_ratio_limit: 0.38,
@@ -99,6 +101,7 @@ export const AdminDrawer: React.FC<AdminDrawerProps> = ({ isOpen, onClose }) => 
             { id: 'pumps', label: 'Pump Ratings', icon: Zap },
             { id: 'sensors', label: 'Sensor Map', icon: Radio },
             { id: 'thresholds', label: 'Thresholds', icon: Sliders },
+            { id: 'iot', label: 'IoT System', icon: Cpu },
           ].map(({ id, label, icon: Icon }) => (
             <button
               key={id}
@@ -256,6 +259,9 @@ export const AdminDrawer: React.FC<AdminDrawerProps> = ({ isOpen, onClose }) => 
               </div>
             </div>
           )}
+
+          {/* SECTION 5: IOT SYSTEM (Additive) */}
+          {activeSection === 'iot' && <IoTAdminSections />}
 
           {/* Footer Save Button */}
           <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end">
