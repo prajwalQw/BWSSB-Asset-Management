@@ -26,6 +26,7 @@ SMART_METER_RULES_PATH = CONFIG_IOT_DIR / "smart_meter_rules.yaml"
 SIMULATION_PARAMS_PATH = CONFIG_IOT_DIR / "simulation_params.yaml"
 ADVISORY_KB_PATH = CONFIG_IOT_DIR / "advisory_kb.json"
 BOREWELLS_PATH = CONFIG_IOT_DIR / "borewells.yaml"
+DIVISION_ALIASES_PATH = CONFIG_IOT_DIR / "division_aliases.yaml"
 WARD_CONSUMPTION_CSV_PATH = RAW_DATA_DIR / "bwssb_ward_water_consumption_2026.csv"
 DIVISION_BOUNDARIES_GEOJSON_PATH = GEOJSON_DIR / "bwssb_division_boundaries.geojson"
 

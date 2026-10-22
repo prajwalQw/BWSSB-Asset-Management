@@ -239,4 +239,48 @@ same rules (React, TypeScript strict).
 
 ---
 
-*Generated: 2026-10-22*
+## D-21 · SQLite state persistence and snapshotting
+
+State is persisted to `data/iot_state.db` across restarts and client reconnections:
+- Tables: `sim_state`, `devices_latest`, `timeseries` (24 h retention window), `alerts`, `alert_events`, `injections`.
+- Snapshots: Periodic background snapshot every 30 s and synchronous snapshot on FastAPI lifespan shutdown.
+- Worker reloading: `uvicorn` is executed with `reload=False` to prevent state wiping during development.
+
+---
+
+## D-22 · Alert lifecycle specification
+
+Alerts strictly follow the ISA-18.2 compliant lifecycle:
+- States: `ACTIVE` -> `ACKNOWLEDGED` -> `CLEARED` (or `SHELVED`).
+- Alerts are never deleted on condition recovery; they transition to `CLEARED` with `cleared_at` recorded.
+- Stable identifiers derived from hashing rule ID, asset/segment ID, and time bucket.
+- Query endpoint `GET /api/v1/iot/alerts` supports status filtering and returns active alerts plus the last 24 hours of cleared history.
+
+---
+
+## D-23 · Division and ward normalization
+
+- Data source: `data/bwssb_ward_water_consumption_2026.csv` contains 198 wards.
+- Aliases mapping: `config/iot/division_aliases.yaml` maps all 9 canonical divisions and 16 GIS sub-divisions.
+- Ground truth rule: Division board totals are strictly computed as the sum of constituent ward records (`sum(w.daily_baseline_mld for w in div.wards)`).
+
+---
+
+## D-24 · Single app-level SSE telemetry stream
+
+- Only one `EventSource` connection is created at the app root level via `IoTStreamProvider`.
+- Automatic reconnect with exponential backoff (1 s, 2 s, 4 s, up to 10 s max).
+- Supports `Last-Event-ID` replay.
+- Global client state stored in `useIoTStore` (`useSyncExternalStore`) to prevent reset on route change.
+
+---
+
+## D-25 · Single Maplibre & Deck.gl overlay lifecycle
+
+- Single `<DigitalTwinMap>` canvas mounted once at root level.
+- Route transitions between GIS and IoT toggle visibility via CSS and layer provider sets without destroying WebGL context or calling `setStyle()`.
+
+---
+
+*Updated: 2026-10-22*
+

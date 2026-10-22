@@ -146,14 +146,19 @@ class PipeSegmentLeakMonitor:
             self.clear_count = 0
 
         elif self.active_alert:
+            self.active_alert.last_seen = now_epoch
             # Check clearing deadband (raw_leak_lps < 0.5 * threshold for 3 windows)
             if raw_leak_lps < (0.5 * self.threshold_lps):
                 self.clear_count += 1
                 if self.clear_count >= 3:
-                    # Auto clear
-                    self.active_alert.active = False
+                    # Auto clear: transition status to CLEARED
+                    cleared_alert = self.active_alert.model_copy()
+                    cleared_alert.status = "CLEARED"
+                    cleared_alert.active = False
+                    cleared_alert.cleared_at = now_epoch
                     self.active_alert = None
                     self.clear_count = 0
+                    return cleared_alert
             else:
                 self.clear_count = 0
 

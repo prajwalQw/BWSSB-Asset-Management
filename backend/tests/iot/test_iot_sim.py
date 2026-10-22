@@ -174,6 +174,149 @@ def test_leak_makes_downstream_flow_drop(fresh_engine):
     assert leak_alert.data_tier == "SIMULATED"
     assert leak_alert.source == "IOT"
 
-    # Reset simulation should clear the alert
+    # Reset simulation should clear active status but retain in history as CLEARED
     engine.reset_simulation()
-    assert len(engine.alerts) == 0, "Reset simulation should clear active alerts"
+    active_alerts = [a for a in engine.alerts.values() if a.active]
+    assert len(active_alerts) == 0, "Reset simulation should clear active alerts"
+    assert leak_alert.status == "CLEARED", "Cleared alert should have CLEARED status"
+    assert leak_alert.cleared_at is not None, "Cleared alert must record cleared_at timestamp"
+
+def test_state_survives_restart():
+    """
+    Test 5: State survives backend restart (save and restore via SQLite).
+    Verifies sim_clock, alerts, device latest telemetry, and injections persist.
+    """
+    engine1 = IoTSimulationEngine(seed=42)
+    engine1.sim_time = 1776850000.0
+    engine1.tick_count = 120
+
+    # Inject a leak and fault
+    engine1.inject_leak("CORR_TG_MJ", 30.0, landmark="Test Marker")
+    engine1.inject_pump_fault("PUMP_TG_H1", "OVERCURRENT")
+
+    # Snapshot to SQLite
+    engine1.snapshot_state()
+
+    # Create fresh engine instance simulating backend restart
+    engine2 = IoTSimulationEngine(seed=42)
+
+    # Verify restored state
+    assert engine2.sim_time >= 1776850000.0, f"Expected restored sim_time >= 1776850000, got {engine2.sim_time}"
+    assert "ALT-TRIP-PUMP_TG_H1" in engine2.alerts or len(engine2.alerts) > 0, "Expected alerts to be restored from SQLite"
+    assert engine2.active_injections["leak"] is not None, "Expected leak injection to be restored from SQLite"
+    assert engine2.active_injections["leak"]["leak_rate_lps"] == 30.0
+
+    # Cleanup
+    engine2.reset_simulation()
+
+def test_alert_lifecycle_active_to_cleared_persists():
+    """
+    Test 6: Alert lifecycle: ACTIVE -> ACKNOWLEDGED -> CLEARED persists.
+    Verifies stable id, first_seen, last_seen, cleared_at, acknowledged_by/at, and no deletion.
+    """
+    engine = IoTSimulationEngine(seed=42)
+    now = 1776850100.0
+    engine.sim_time = now
+
+    # Trigger pump trip alert
+    engine._raise_pump_trip_alert("PS_TATAGUNI", "PUMP_TG_H2", "BEARING_OVERHEAT")
+    alert_id = "ALT-TRIP-PUMP_TG_H2"
+
+    alert = engine.alerts.get(alert_id)
+    assert alert is not None
+    assert alert.status == "ACTIVE"
+    assert alert.first_seen > 0
+
+    # Acknowledge alert
+    ack = engine.acknowledge_alert(alert_id, operator="operator_alice")
+    assert ack is not None
+    assert ack.status == "ACKNOWLEDGED"
+    assert ack.acknowledged is True
+    assert ack.acknowledged_by == "operator_alice"
+    assert ack.acknowledged_at is not None
+
+    # Clear alert
+    clr = engine.clear_alert(alert_id)
+    assert clr is not None
+    assert clr.status == "CLEARED"
+    assert clr.active is False
+    assert clr.cleared_at is not None
+
+    # Alert must NOT be deleted from history
+    all_alerts = engine.get_alerts_list()
+    found = [a for a in all_alerts if a.alert_id == alert_id]
+    assert len(found) == 1, "Alert must persist in history and never be deleted"
+    assert found[0].status == "CLEARED"
+
+def test_leak_injection_reduces_to_flow_and_triggers_alert():
+    """
+    Test 7: Leak injection reduces To-flow by leak size and triggers alert within configured time.
+    """
+    engine = IoTSimulationEngine(seed=42)
+    corr_id = "CORR_TATAGUNI_MOUNT_JOY"
+
+    # Baseline run
+    for _ in range(5):
+        engine.tick(dt_sec=1.0)
+
+    # Get baseline flow
+    corridors, _ = engine.get_water_flow_corridors()
+    baseline_corr = next((c for c in corridors if c.id == corr_id), None)
+    assert baseline_corr is not None
+    base_flow_mld = baseline_corr.flow_mld
+
+    # Inject leak of 40 L/s = 3.456 MLD
+    leak_lps = 40.0
+    engine.inject_leak(corr_id, leak_rate_lps=leak_lps, landmark="Mile 8")
+
+    # Run 10 ticks (within 10-20s detection window)
+    for _ in range(10):
+        engine.tick(dt_sec=1.0)
+
+    # Verify flow measured at To drops
+    corridors_after, _ = engine.get_water_flow_corridors()
+    after_corr = next((c for c in corridors_after if c.id == corr_id), None)
+    assert after_corr is not None
+    assert after_corr.flow_mld < base_flow_mld, "Downstream flow must drop after leak injection"
+
+    # Verify alert triggered
+    alert = engine.alerts.get(f"ALT-LEAK-{corr_id}") or engine.alerts.get("ALT-LEAK-CORR_TG_MJ")
+    assert alert is not None
+    assert alert.status in ("ACTIVE", "ACKNOWLEDGED")
+    assert alert.estimated_loss_lps >= 30.0
+
+    # Stop leak
+    engine.stop_leak(corr_id)
+    for _ in range(5):
+        engine.tick(dt_sec=1.0)
+    assert alert.status == "CLEARED"
+
+def test_divisions_all_have_ward_rows_summing_to_totals():
+    """
+    Test 8: Every division board present in data has non-empty ward rows,
+    and ward rows strictly sum to the division baseline total shown.
+    """
+    engine = IoTSimulationEngine(seed=42)
+    divisions = engine.get_smart_meters()
+
+    # All 9 canonical divisions must exist
+    assert len(divisions) == 9, f"Expected 9 divisions, got {len(divisions)}"
+
+    total_city_mld = 0.0
+    for div in divisions:
+        assert len(div.wards) > 0, f"Division {div.division_name} must have non-empty ward list"
+        
+        # Sum of ward rows
+        ward_baseline_sum = sum(w.daily_baseline_mld for w in div.wards)
+        
+        # Must match division baseline total exactly (within float precision 0.01)
+        assert abs(div.sum_ward_consumption_mld - ward_baseline_sum) < 0.02, (
+            f"Division {div.division_name} total ({div.sum_ward_consumption_mld} MLD) "
+            f"does not match sum of ward rows ({ward_baseline_sum} MLD)"
+        )
+        total_city_mld += div.sum_ward_consumption_mld
+
+    # Total city consumption matches data.gov.in baseline (~1247.63 MLD)
+    assert 1200.0 < total_city_mld < 1300.0, f"City total {total_city_mld} MLD outside expected range"
+
+

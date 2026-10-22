@@ -19,7 +19,7 @@ import { PumpTelemetry, DeviceTelemetry, DivisionBoardSummary } from '../types';
 import { MeterBoard } from './MeterBoard';
 
 export interface IoTRightInspectorProps {
-  selectedType: 'pump' | 'flow_sensor' | 'meter' | 'tank' | 'division' | 'device' | null;
+  selectedType: 'pump' | 'station' | 'stp' | 'flow_sensor' | 'meter' | 'tank' | 'division' | 'device' | null;
   selectedPump?: PumpTelemetry | null;
   selectedDevice?: DeviceTelemetry | null;
   selectedDivision?: DivisionBoardSummary | null;

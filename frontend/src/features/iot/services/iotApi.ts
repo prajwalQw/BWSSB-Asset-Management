@@ -78,11 +78,18 @@ export const iotApi = {
     }
   },
 
-  async getAlerts(): Promise<IoTAlertItem[]> {
+  async getSnapshot() {
+    const res = await fetch(`${API_BASE}/snapshot`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  },
+
+  async getAlerts(status?: string): Promise<IoTAlertItem[]> {
     try {
+      const url = status ? `${API_BASE}/alerts?status=${encodeURIComponent(status)}` : `${API_BASE}/alerts`;
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 2500);
-      const res = await fetch(`${API_BASE}/alerts`, { signal: controller.signal });
+      const res = await fetch(url, { signal: controller.signal });
       clearTimeout(timeoutId);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
@@ -91,11 +98,44 @@ export const iotApi = {
     }
   },
 
+  async acknowledgeAlert(alertId: string, operator: string = 'OPERATOR'): Promise<IoTAlertItem> {
+    const res = await fetch(`${API_BASE}/alerts/${encodeURIComponent(alertId)}/acknowledge?operator=${encodeURIComponent(operator)}`, {
+      method: 'POST'
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  },
+
+  async snoozeAlert(alertId: string, durationS: number = 3600): Promise<IoTAlertItem> {
+    const res = await fetch(`${API_BASE}/alerts/${encodeURIComponent(alertId)}/snooze?duration_s=${durationS}`, {
+      method: 'POST'
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  },
+
+  async clearAlert(alertId: string): Promise<IoTAlertItem> {
+    const res = await fetch(`${API_BASE}/alerts/${encodeURIComponent(alertId)}/clear`, {
+      method: 'POST'
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  },
+
   async injectLeak(pipe_segment_id: string, leak_rate_lps: number, landmark?: string) {
     const res = await fetch(`${API_BASE}/simulate/leak`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ pipe_segment_id, leak_rate_lps, nearest_landmark: landmark })
+    });
+    return await res.json();
+  },
+
+  async stopLeak(pipe_segment_id?: string) {
+    const res = await fetch(`${API_BASE}/simulate/stop-leak`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pipe_segment_id })
     });
     return await res.json();
   },

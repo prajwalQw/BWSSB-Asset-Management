@@ -104,6 +104,12 @@ export interface IoTAlertItem {
   affected_elements?: string[];
   suggested_steps?: string[];
   active: boolean;
+  status?: 'ACTIVE' | 'ACKNOWLEDGED' | 'CLEARED' | 'SHELVED';
+  first_seen?: number;
+  last_seen?: number;
+  cleared_at?: number | null;
+  acknowledged_by?: string | null;
+  acknowledged_at?: number | null;
   acknowledged?: boolean;
   shelved?: boolean;
 }

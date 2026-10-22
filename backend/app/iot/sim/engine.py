@@ -29,6 +29,7 @@ from ..config import (
     SIMULATION_PARAMS_PATH,
     ADVISORY_KB_PATH,
     BOREWELLS_PATH,
+    DIVISION_ALIASES_PATH,
     WARD_CONSUMPTION_CSV_PATH,
     DIVISION_BOUNDARIES_GEOJSON_PATH,
     load_yaml,
@@ -47,6 +48,7 @@ from ..models import (
     WaterBalanceSummary
 )
 from ..bus import event_bus
+from ..storage import iot_storage
 from .ring_buffer import ring_buffer
 from .leak_detector import PipeSegmentLeakMonitor
 
@@ -68,6 +70,20 @@ class IoTSimulationEngine:
         self.sim_params = load_yaml(SIMULATION_PARAMS_PATH)
         self.advisory_kb = load_json(ADVISORY_KB_PATH)
         self.borewells_cfg = load_yaml(BOREWELLS_PATH)
+        self.division_aliases_cfg = load_yaml(DIVISION_ALIASES_PATH)
+
+        # Build division normalization lookup map
+        self.alias_to_canonical: Dict[str, str] = {}
+        self.canonical_division_info: Dict[str, Dict[str, Any]] = {}
+        for cdiv in self.division_aliases_cfg.get("canonical_divisions", []):
+            cname = cdiv["name"]
+            self.canonical_division_info[cname] = cdiv
+            for alias in cdiv.get("aliases", []):
+                self.alias_to_canonical[alias.strip().lower()] = cname
+            self.alias_to_canonical[cname.strip().lower()] = cname
+            self.alias_to_canonical[cdiv.get("key", "").strip().lower()] = cname
+            if cdiv.get("bbmp_zone"):
+                self.alias_to_canonical[cdiv["bbmp_zone"].strip().lower()] = cname
 
         # Simulation states
         self.active_injections: Dict[str, Any] = {
@@ -97,6 +113,59 @@ class IoTSimulationEngine:
         self._init_stations()
         self._init_leak_monitors()
         self._init_smart_meters()
+        self._load_persisted_state()
+
+    def normalize_division_name(self, name: str) -> str:
+        if not name:
+            return "South Division"
+        raw = str(name).strip().lower()
+        if raw in self.alias_to_canonical:
+            return self.alias_to_canonical[raw]
+        cleaned = raw.replace("_", " ").replace("-", " ").strip()
+        if cleaned in self.alias_to_canonical:
+            return self.alias_to_canonical[cleaned]
+        for alias, canon in self.alias_to_canonical.items():
+            if alias in cleaned or cleaned in alias:
+                return canon
+        return "South Division"
+
+    def _load_persisted_state(self):
+        """Restores state, active alerts and active injections from SQLite."""
+        try:
+            # 1. Restore simulation clock
+            clock_state = iot_storage.get_sim_state("sim_clock")
+            if clock_state and isinstance(clock_state, dict):
+                self.sim_time = clock_state.get("sim_time", self.sim_time)
+                self.tick_count = clock_state.get("tick_count", self.tick_count)
+                logger.info(f"Restored persisted simulation clock: tick={self.tick_count}")
+
+            # 2. Restore active & historical alerts from SQLite
+            stored_alerts = iot_storage.get_alerts(hours_history=24.0)
+            for a_dict in stored_alerts:
+                try:
+                    alert = IoTAlert(**a_dict)
+                    self.alerts[alert.alert_id] = alert
+                except Exception as ex:
+                    logger.warning(f"Error parsing stored alert {a_dict.get('alert_id')}: {ex}")
+            logger.info(f"Restored {len(self.alerts)} alerts from persistent SQLite store.")
+
+            # 3. Restore active injections
+            injections = iot_storage.get_active_injections()
+            for inj in injections:
+                itype = inj.get("injection_type")
+                params = inj.get("params", {})
+                if itype == "leak":
+                    self.active_injections["leak"] = params
+                elif itype == "pump_fault":
+                    pid = inj.get("target_id")
+                    self.active_injections["pump_faults"][pid] = params.get("fault_type", "ELECTRICAL_TRIP")
+                elif itype == "sensor_fault":
+                    tag = inj.get("target_id")
+                    self.active_injections["sensor_faults"][tag] = params.get("fault_type", "COMMS_FAILURE")
+            if injections:
+                logger.info(f"Restored {len(injections)} active injections from persistent SQLite store.")
+        except Exception as e:
+            logger.warning(f"Could not load persisted simulation state: {e}")
 
     def _init_stations(self):
         for stn in self.stations_cfg:
@@ -179,6 +248,7 @@ class IoTSimulationEngine:
             threshold_lps=5.0,
             pressure_drop_bar=0.10,
         )
+        self.leak_monitors["CORR_TATAGUNI_MOUNT_JOY"] = self.leak_monitors["CORR_TG_MJ"]
 
     def _init_smart_meters(self):
         # Load real wards CSV
@@ -188,9 +258,11 @@ class IoTSimulationEngine:
                 for _, row in df.iterrows():
                     ward_no = int(row.get("ward_no", 0))
                     w_name = str(row.get("ward_name", f"Ward {ward_no}"))
-                    div_name = str(row.get("bwssb_division", "South Division"))
+                    raw_div = str(row.get("bwssb_division", "South Division"))
+                    div_name = self.normalize_division_name(raw_div)
                     zone_name = str(row.get("bbmp_zone", "South"))
                     daily_mld = float(row.get("daily_consumption_mld", 3.5))
+                    avg_lps = (daily_mld * 1000000.0) / 86400.0
 
                     self.wards_data.append({
                         "ward_no": ward_no,
@@ -199,6 +271,7 @@ class IoTSimulationEngine:
                         "bwssb_division": div_name,
                         "meter_tag": f"SMR_W_{ward_no:03d}",
                         "daily_baseline_mld": daily_mld,
+                        "flow_lps": round(avg_lps, 2), # Always defined on startup
                         "current_day_volume_kl": round(daily_mld * 1000 * 0.5, 1),
                         "cumulative_totaliser_kl": round(self.rng.uniform(450000.0, 1800000.0), 1),
                         "battery_pct": round(self.rng.uniform(75.0, 99.0), 1),
@@ -209,21 +282,10 @@ class IoTSimulationEngine:
             except Exception as e:
                 logger.warning(f"Could not load ward consumption CSV: {e}")
 
-        # Group into divisions
-        div_coords = {
-            "South Division": [77.5750, 12.9250],
-            "North Division": [77.5920, 13.0350],
-            "West Division": [77.5450, 12.9850],
-            "East Division": [77.6400, 12.9750],
-            "Central": [77.5950, 12.9750],
-            "Bommanahalli Division": [77.6250, 12.9050],
-            "Rajarajeshwari Nagar Division": [77.5150, 12.9250],
-            "Mahadevapura Division": [77.6950, 12.9850],
-            "Dasarahalli Division": [77.5150, 13.0450],
-            "Outer Sub-Division Division": [77.6650, 13.0150]
-        }
-
-        for div_name, coords in div_coords.items():
+        # Group into all 9 canonical divisions from config/iot/division_aliases.yaml
+        for cdiv in self.division_aliases_cfg.get("canonical_divisions", []):
+            div_name = cdiv["name"]
+            coords = cdiv.get("centroid", [77.5950, 12.9750])
             self.divisions_data[div_name] = {
                 "division_name": div_name,
                 "centroid_coordinates": coords,
@@ -444,10 +506,11 @@ class IoTSimulationEngine:
                 pit_healthy=pit_healthy,
                 sim_leak_injection=sim_leak
             )
-            if leak_alert and leak_alert.active:
+            if leak_alert:
                 self.alerts[leak_alert.alert_id] = leak_alert
-            elif leak_alert and not leak_alert.active and leak_alert.alert_id in self.alerts:
-                del self.alerts[leak_alert.alert_id]
+                iot_storage.save_alert(leak_alert.model_dump())
+                if not leak_alert.active and leak_alert.status == "CLEARED":
+                    iot_storage.record_alert_event(leak_alert.alert_id, "CLEARED", {"reason": "Deadband recovery"})
 
         # 3. Smart Meter Boards Simulation (Ward & Division Updates)
         for w in self.wards_data:
@@ -459,16 +522,48 @@ class IoTSimulationEngine:
             w["current_day_volume_kl"] = round(w["current_day_volume_kl"] + vol_add_kl, 2)
             w["cumulative_totaliser_kl"] = round(w["cumulative_totaliser_kl"] + vol_add_kl, 2)
 
-        # 4. Periodic Snapshot (every 60 seconds)
-        if self.tick_count % 60 == 0:
+        # 4. Periodic Snapshot (every 30 seconds to SQLite)
+        if self.tick_count % 30 == 0:
+            self.snapshot_state()
+
+    def snapshot_state(self):
+        """Flushes simulation clock, latest telemetry, ring buffer, and alerts to SQLite."""
+        try:
+            iot_storage.set_sim_state("sim_clock", {
+                "sim_time": self.sim_time,
+                "tick_count": self.tick_count,
+                "timestamp_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(self.sim_time))
+            })
+
+            # Save device latest readings batch
+            dev_rows = []
+            now = time.time()
+            for s in self.stations_state.values():
+                for p in s["pumps"].values():
+                    pcfg = p["cfg"]
+                    tag = pcfg.get("tag", pcfg.get("id"))
+                    dev_rows.append((tag, "voltage_avg", float(p["voltage_avg"]), "V", "Good", now))
+                    dev_rows.append((tag, "current_avg", float(p["current_avg"]), "A", "Good", now))
+                    dev_rows.append((tag, "active_power_kw", float(p["active_power_kw"]), "kW", "Good", now))
+                    dev_rows.append((tag, "flow_lps", float(p["flow_lps"]), "L/s", "Good", now))
+            iot_storage.save_device_latest_batch(dev_rows)
+
             ring_buffer.snapshot_to_sqlite()
+            iot_storage.prune_old_timeseries(24.0)
+
+            for a in self.alerts.values():
+                iot_storage.save_alert(a.model_dump())
+        except Exception as e:
+            logger.warning(f"Error during state snapshot: {e}")
 
     def _raise_pump_trip_alert(self, stn_id: str, pump_id: str, fault_type: str):
         alert_id = f"ALT-TRIP-{pump_id}"
         now_epoch = time.time()
-        self.alerts[alert_id] = IoTAlert(
+        now_iso = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now_epoch))
+        alert = IoTAlert(
             alert_id=alert_id,
             rule_id="RULE-PUMP-TRIP-01",
+            asset_id=pump_id,
             category="ELECTROMECHANICAL",
             severity="CRITICAL",
             title=f"Pump {pump_id} Protection Trip ({fault_type})",
@@ -478,12 +573,18 @@ class IoTSimulationEngine:
             recommendation="Inspect protection relay annunciator. Check motor insulation resistance and rotate standby unit.",
             requires_human_approval=True,
             human_decision_status="PENDING_REVIEW",
-            timestamp=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now_epoch)),
+            status="ACTIVE",
+            first_seen=now_epoch,
+            last_seen=now_epoch,
+            timestamp=now_iso,
             timestamp_epoch=now_epoch,
             data_tier="SIMULATED",
             source="IOT",
             active=True
         )
+        self.alerts[alert_id] = alert
+        iot_storage.save_alert(alert.model_dump())
+        iot_storage.record_alert_event(alert_id, "TRIGGERED", {"fault_type": fault_type, "pump_id": pump_id})
 
     # Injections
     def inject_leak(self, pipe_segment_id: str, leak_rate_lps: float, landmark: Optional[str] = None):
@@ -494,6 +595,7 @@ class IoTSimulationEngine:
             "timestamp": time.time()
         }
         self.active_injections["leak"] = injection
+        iot_storage.save_injection("leak", pipe_segment_id, injection, active=True)
         self.injection_audit_log.append({
             "action": "INJECT_LEAK",
             "details": injection,
@@ -504,8 +606,29 @@ class IoTSimulationEngine:
         if monitor:
             monitor.window_results = [True, True, True, True]
 
+    def stop_leak(self, pipe_segment_id: Optional[str] = None):
+        target = pipe_segment_id or "CORR_TG_MJ"
+        self.active_injections["leak"] = None
+        iot_storage.clear_injection("leak", target)
+        monitor = self.leak_monitors.get(target) or self.leak_monitors.get("CORR_TG_MJ")
+        if monitor:
+            monitor.window_results = [False, False, False, False, False]
+            if monitor.active_alert:
+                monitor.active_alert.status = "CLEARED"
+                monitor.active_alert.active = False
+                monitor.active_alert.cleared_at = time.time()
+        for aid in [f"ALT-LEAK-{target}", "ALT-LEAK-CORR_TG_MJ", "ALT-LEAK-CORR_TATAGUNI_MOUNT_JOY"]:
+            if aid in self.alerts:
+                self.clear_alert(aid)
+        self.injection_audit_log.append({
+            "action": "STOP_LEAK",
+            "target": target,
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ")
+        })
+
     def inject_pump_fault(self, pump_id: str, fault_type: str):
         self.active_injections["pump_faults"][pump_id] = fault_type
+        iot_storage.save_injection("pump_fault", pump_id, {"fault_type": fault_type}, active=True)
         self.injection_audit_log.append({
             "action": "INJECT_PUMP_FAULT",
             "pump_id": pump_id,
@@ -515,6 +638,7 @@ class IoTSimulationEngine:
 
     def inject_sensor_fault(self, tag: str, fault_type: str):
         self.active_injections["sensor_faults"][tag] = fault_type
+        iot_storage.save_injection("sensor_fault", tag, {"fault_type": fault_type}, active=True)
         self.injection_audit_log.append({
             "action": "INJECT_SENSOR_FAULT",
             "device_tag": tag,
@@ -523,8 +647,17 @@ class IoTSimulationEngine:
         })
 
     def reset_simulation(self):
+        """Resets simulation faults and transitions active simulated alerts to CLEARED."""
         self.active_injections = {"leak": None, "pump_faults": {}, "sensor_faults": {}}
-        self.alerts.clear()
+        iot_storage.reset_all_injections()
+        now_epoch = time.time()
+        for a in self.alerts.values():
+            if a.active:
+                a.active = False
+                a.status = "CLEARED"
+                a.cleared_at = now_epoch
+                iot_storage.save_alert(a.model_dump())
+                iot_storage.record_alert_event(a.alert_id, "CLEARED", {"reason": "SIMULATION_RESET"})
         for m in self.leak_monitors.values():
             m.active_alert = None
             m.window_results.clear()
@@ -533,6 +666,72 @@ class IoTSimulationEngine:
             "action": "RESET_SIMULATION",
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ")
         })
+        self.snapshot_state()
+
+    # Alert Actions
+    def acknowledge_alert(self, alert_id: str, operator: str = "OPERATOR") -> Optional[IoTAlert]:
+        now_epoch = time.time()
+        alert = self.alerts.get(alert_id)
+        if not alert:
+            for a_dict in iot_storage.get_alerts():
+                if a_dict["alert_id"] == alert_id:
+                    alert = IoTAlert(**a_dict)
+                    break
+        if alert:
+            alert.status = "ACKNOWLEDGED"
+            alert.acknowledged = True
+            alert.acknowledged_by = operator
+            alert.acknowledged_at = now_epoch
+            alert.last_seen = now_epoch
+            self.alerts[alert_id] = alert
+            iot_storage.save_alert(alert.model_dump())
+            iot_storage.record_alert_event(alert_id, "ACKNOWLEDGED", {"operator": operator})
+            return alert
+        return None
+
+    def snooze_alert(self, alert_id: str, duration_s: float = 3600.0) -> Optional[IoTAlert]:
+        now_epoch = time.time()
+        alert = self.alerts.get(alert_id)
+        if alert:
+            alert.status = "SHELVED"
+            alert.shelved = True
+            alert.last_seen = now_epoch
+            self.alerts[alert_id] = alert
+            iot_storage.save_alert(alert.model_dump())
+            iot_storage.record_alert_event(alert_id, "SHELVED", {"duration_s": duration_s})
+            return alert
+        return None
+
+    def clear_alert(self, alert_id: str) -> Optional[IoTAlert]:
+        now_epoch = time.time()
+        alert = self.alerts.get(alert_id)
+        if alert:
+            alert.status = "CLEARED"
+            alert.active = False
+            alert.cleared_at = now_epoch
+            self.alerts[alert_id] = alert
+            iot_storage.save_alert(alert.model_dump())
+            iot_storage.record_alert_event(alert_id, "CLEARED", {"manual": True})
+            return alert
+        return None
+
+    def get_alerts_list(self, status: Optional[str] = None) -> List[IoTAlert]:
+        cutoff = time.time() - 86400.0
+        persisted = iot_storage.get_alerts(status=status, hours_history=24.0)
+        merged: Dict[str, IoTAlert] = {}
+        for p in persisted:
+            try:
+                alert = IoTAlert(**p)
+                merged[alert.alert_id] = alert
+            except Exception:
+                pass
+        for aid, a in self.alerts.items():
+            if not status:
+                if a.status in ("ACTIVE", "ACKNOWLEDGED") or a.last_seen >= cutoff:
+                    merged[aid] = a
+            elif a.status == status.upper():
+                merged[aid] = a
+        return sorted(list(merged.values()), key=lambda x: x.last_seen, reverse=True)
 
     # Data Accessors
     def get_stations(self) -> List[StationOverview]:
@@ -621,24 +820,25 @@ class IoTSimulationEngine:
     def get_smart_meters(self) -> List[DivisionBoardSummary]:
         results = []
         for div_name, div_info in self.divisions_data.items():
-            div_wards = [w for w in self.wards_data if w["bwssb_division"] == div_name]
+            div_wards = [w for w in self.wards_data if self.normalize_division_name(w["bwssb_division"]) == div_name]
             if not div_wards:
                 continue
 
             ward_summaries = []
             sum_ward_mld = 0.0
             for w in div_wards:
-                sum_ward_mld += w["flow_lps"] * 86400.0 / 1000000.0
+                w_mld = (w["flow_lps"] * 86400.0) / 1000000.0
+                sum_ward_mld += w_mld
                 ward_summaries.append(WardMeterSummary(
                     ward_no=w["ward_no"],
                     ward_name=w["ward_name"],
                     bbmp_zone=w["bbmp_zone"],
-                    bwssb_division=w["bwssb_division"],
+                    bwssb_division=div_name,
                     meter_tag=w["meter_tag"],
-                    flow_lps=w["flow_lps"],
-                    daily_baseline_mld=w["daily_baseline_mld"],
-                    current_day_volume_kl=w["current_day_volume_kl"],
-                    cumulative_totaliser_kl=w["cumulative_totaliser_kl"],
+                    flow_lps=round(w["flow_lps"], 1),
+                    daily_baseline_mld=round(w["daily_baseline_mld"], 2),
+                    current_day_volume_kl=round(w["current_day_volume_kl"], 1),
+                    cumulative_totaliser_kl=round(w["cumulative_totaliser_kl"], 1),
                     status=w["status"],
                     battery_pct=w["battery_pct"],
                     signal_strength_dbm=w["signal_strength_dbm"],
@@ -682,6 +882,16 @@ class IoTSimulationEngine:
                 data_tier="SIMULATED"
             ))
         return results
+
+    def get_smart_meter_division(self, division_id: str) -> Optional[DivisionBoardSummary]:
+        canonical = self.normalize_division_name(division_id)
+        for d in self.get_smart_meters():
+            if d.division_name.lower() == canonical.lower():
+                return d
+        for d in self.get_smart_meters():
+            if division_id.lower() in d.division_name.lower() or d.division_name.lower() in division_id.lower():
+                return d
+        return None
 
     def get_water_flow_corridors(self) -> Tuple[List[WaterFlowCorridor], WaterBalanceSummary]:
         corridors_raw = self.flows_cfg.get("transmission_corridors", [])
@@ -738,6 +948,7 @@ class IoTSimulationEngine:
         self.is_running = False
         if self._task and not self._task.done():
             self._task.cancel()
+        self.snapshot_state()
 
 # Global simulation engine singleton
 sim_engine = IoTSimulationEngine()

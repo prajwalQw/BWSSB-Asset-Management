@@ -17,19 +17,37 @@ import {
   PumpTelemetry,
   DeviceTelemetry
 } from './types';
+import { useIoTStore } from './store/useIoTStore';
 import { Map, GitCommit, Waves, Play } from 'lucide-react';
 
 export const IoTWorkstation: React.FC = () => {
   const { theme, flyToTarget, setFlyToTarget } = useTwinStore();
+  const {
+    stations,
+    divisions,
+    corridors,
+    waterBalance,
+    alerts,
+    selectedStation,
+    selectedPump,
+    selectedDevice,
+    selectedDivision,
+    selectedInspectorType,
+    setSelectedStation,
+    setSelectedPump,
+    setSelectedDevice,
+    setSelectedDivision,
+    setSelectedInspectorType,
+    isSimulateOpen,
+    setIsSimulateOpen,
+    acknowledgeAlertLocally,
+    snoozeAlertLocally,
+  } = useIoTStore();
 
   // Centre Segmented Control: Map | Station schematic | Water flow (MLD)
   const [centreView, setCentreView] = useState<'map' | 'schematic' | 'sankey'>('map');
 
-  // Data states
-  const [stations, setStations] = useState<StationOverview[]>([]);
-  const [divisions, setDivisions] = useState<DivisionBoardSummary[]>([]);
-  const [corridors, setCorridors] = useState<WaterFlowCorridor[]>([]);
-  const [balance, setBalance] = useState<WaterBalanceSummary>({
+  const balance = waterBalance || {
     total_inflow_mld: 2250.0,
     total_outflow_mld: 1845.0,
     storage_change_mld: 12.0,
@@ -37,48 +55,13 @@ export const IoTWorkstation: React.FC = () => {
     unaccounted_pct: 17.5,
     balanced: true,
     data_tier: 'SIMULATED'
-  });
-  const [alerts, setAlerts] = useState<IoTAlertItem[]>([]);
-
-  // Selection states
-  const [selectedStation, setSelectedStation] = useState<StationOverview | null>(null);
-  const [selectedInspectorType, setSelectedInspectorType] = useState<
-    'pump' | 'flow_sensor' | 'meter' | 'tank' | 'division' | 'device' | null
-  >(null);
-  const [selectedPump, setSelectedPump] = useState<PumpTelemetry | null>(null);
-  const [selectedDevice, setSelectedDevice] = useState<DeviceTelemetry | null>(null);
-  const [selectedDivision, setSelectedDivision] = useState<DivisionBoardSummary | null>(null);
-
-  // Simulate Popover
-  const [isSimulateOpen, setIsSimulateOpen] = useState(false);
-
-  // Load initial data
-  const loadData = async () => {
-    try {
-      const [stns, divs, flowsData, alrts] = await Promise.all([
-        iotApi.getStations(),
-        iotApi.getSmartMeters(),
-        iotApi.getMldFlows(),
-        iotApi.getAlerts()
-      ]);
-      setStations(stns);
-      if (stns.length > 0 && !selectedStation) {
-        setSelectedStation(stns[0]);
-      }
-      setDivisions(divs);
-      setCorridors(flowsData.corridors);
-      setBalance(flowsData.water_balance);
-      setAlerts(alrts);
-    } catch (e) {
-      console.error('Failed to load IoT data:', e);
-    }
   };
 
   useEffect(() => {
-    loadData();
-    const timer = setInterval(loadData, 5000);
-    return () => clearInterval(timer);
-  }, []);
+    if (stations.length > 0 && !selectedStation) {
+      setSelectedStation(stations[0]);
+    }
+  }, [stations, selectedStation, setSelectedStation]);
 
   // Handlers
   const handleSelectPump = (pumpId: string) => {
@@ -259,7 +242,7 @@ export const IoTWorkstation: React.FC = () => {
       {isSimulateOpen && (
         <IoTSimulateModal
           onClose={() => setIsSimulateOpen(false)}
-          onRefresh={loadData}
+          onRefresh={() => {}}
         />
       )}
 
@@ -271,12 +254,15 @@ export const IoTWorkstation: React.FC = () => {
           setCentreView('map');
         }}
         onAcknowledge={(id) => {
-          setAlerts((prev) => prev.map((a) => (a.alert_id === id ? { ...a, acknowledged: true } : a)));
+          acknowledgeAlertLocally(id);
+          iotApi.acknowledgeAlert(id).catch(console.error);
         }}
         onSnooze={(id) => {
-          setAlerts((prev) => prev.map((a) => (a.alert_id === id ? { ...a, shelved: true } : a)));
+          snoozeAlertLocally(id);
+          iotApi.snoozeAlert(id).catch(console.error);
         }}
       />
+
     </div>
   );
 };

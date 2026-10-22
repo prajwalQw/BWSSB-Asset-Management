@@ -74,4 +74,4 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("backend.app.main:app", host=SERVER_HOST, port=SERVER_PORT, reload=True)
+    uvicorn.run("backend.app.main:app", host=SERVER_HOST, port=SERVER_PORT, reload=False)

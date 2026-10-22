@@ -1,0 +1,785 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.65482199999997,
+          12.94054499999997
+        ]
+      },
+      "properties": {
+        "name": "\n     Hebbal 60MLD\n    ",
+        "STPId": "\n       9\n      ",
+        "STPName": "\n       Hebbal 60MLD\n      ",
+        "Latitude": "\n       12.9405\n      ",
+        "Longitude": "\n       77.6548\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       60000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.66215599999998,
+          13.04709999999998
+        ]
+      },
+      "properties": {
+        "name": "\n     Horamavu Agara 20 MLD\n    ",
+        "STPId": "\n       10\n      ",
+        "STPName": "\n       Horamavu Agara 20 MLD\n      ",
+        "Latitude": "\n       13.0471\n      ",
+        "Longitude": "\n       77.6622\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       20000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.60573099999999,
+          13.09394700000002
+        ]
+      },
+      "properties": {
+        "name": "\n     Jakkur 15 MLD\n    ",
+        "STPId": "\n       12\n      ",
+        "STPName": "\n       Jakkur 15 MLD\n      ",
+        "Latitude": "\n       13.0939\n      ",
+        "Longitude": "\n       77.6057\n      ",
+        "PlantType": "\n       Tertiary Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       15000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.64674000000004,
+          13.04551200000001
+        ]
+      },
+      "properties": {
+        "name": "\n     Rajacanal (new) 40 MLD\n    ",
+        "STPId": "\n       26\n      ",
+        "STPName": "\n       Rajacanal (new) 40 MLD\n      ",
+        "Latitude": "\n       13.0455\n      ",
+        "Longitude": "\n       77.6467\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       40000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.64617599999997,
+          13.04582800000001
+        ]
+      },
+      "properties": {
+        "name": "\n     Rajacanal (old) 40 MLD\n    ",
+        "STPId": "\n       27\n      ",
+        "STPName": "\n       Rajacanal (old) 40 MLD\n      ",
+        "Latitude": "\n       13.0458\n      ",
+        "Longitude": "\n       77.6462\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       40000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.58616599999999,
+          13.10111100000001
+        ]
+      },
+      "properties": {
+        "name": "\n     Yelahanka TTP 10 MLD\n    ",
+        "STPId": "\n       32\n      ",
+        "STPName": "\n       Yelahanka TTP 10 MLD\n      ",
+        "Latitude": "\n       13.1011\n      ",
+        "Longitude": "\n       77.5862\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       10000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.64047000000001,
+          12.91630999999999
+        ]
+      },
+      "properties": {
+        "name": "\n     Agaram 35.0 MLD\n    ",
+        "STPId": "\n       1\n      ",
+        "STPName": "\n       Agaram 35.0 MLD\n      ",
+        "Latitude": "\n       12.9163\n      ",
+        "Longitude": "\n       77.6405\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       35000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.71662600000002,
+          12.94000399999997
+        ]
+      },
+      "properties": {
+        "name": "\n     Bellandur Amani kere 90.MLD\n    ",
+        "STPId": "\n       2\n      ",
+        "STPName": "\n       Bellandur Amani kere 90.MLD\n      ",
+        "Latitude": "\n       12.94\n      ",
+        "Longitude": "\n       77.7166\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       90000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.63589000000003,
+          12.88539699999999
+        ]
+      },
+      "properties": {
+        "name": "\n     Chickbegur 5 MLD\n    ",
+        "STPId": "\n       3\n      ",
+        "STPName": "\n       Chickbegur 5 MLD\n      ",
+        "Latitude": "\n       12.8854\n      ",
+        "Longitude": "\n       77.6359\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       5000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.59360300000003,
+          12.97918600000002
+        ]
+      },
+      "properties": {
+        "name": "\n     Cubbon Park 4.0 MLD\n    ",
+        "STPId": "\n       5\n      ",
+        "STPName": "\n       Cubbon Park 4.0 MLD\n      ",
+        "Latitude": "\n       12.9792\n      ",
+        "Longitude": "\n       77.5936\n      ",
+        "PlantType": "\n       Tertiary Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       4000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.64001100000003,
+          12.97565199999998
+        ]
+      },
+      "properties": {
+        "name": "\n     Halasuru 2.0 MLD\n    ",
+        "STPId": "\n       8\n      ",
+        "STPName": "\n       Halasuru 2.0 MLD\n      ",
+        "Latitude": "\n       12.9757\n      ",
+        "Longitude": "\n       77.64\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       2000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.604156,
+          12.87193
+        ]
+      },
+      "properties": {
+        "name": "\n     Hulimavu 10 MLD\n    ",
+        "STPId": "\n       11\n      ",
+        "STPName": "\n       Hulimavu 10 MLD\n      ",
+        "Latitude": "\n       12.8719\n      ",
+        "Longitude": "\n       77.6042\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       10000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.65427599999998,
+          12.942407
+        ]
+      },
+      "properties": {
+        "name": "\n     K&C Valley 218 MLD\n    ",
+        "STPId": "\n       13\n      ",
+        "STPName": "\n       K&C Valley 218 MLD\n      ",
+        "Latitude": "\n       12.9424\n      ",
+        "Longitude": "\n       77.6543\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       218000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.65427599999998,
+          12.942407
+        ]
+      },
+      "properties": {
+        "name": "\n     K&C Valley 30MLD\n    ",
+        "STPId": "\n       14\n      ",
+        "STPName": "\n       K&C Valley 30MLD\n      ",
+        "Latitude": "\n       12.9424\n      ",
+        "Longitude": "\n       77.6543\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       30000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.65475700000002,
+          12.940599
+        ]
+      },
+      "properties": {
+        "name": "\n     K&C Valley 60 MLD\n    ",
+        "STPId": "\n       15\n      ",
+        "STPName": "\n       K&C Valley 60 MLD\n      ",
+        "Latitude": "\n       12.9406\n      ",
+        "Longitude": "\n       77.6548\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       60000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.693303,
+          13.01707099999998
+        ]
+      },
+      "properties": {
+        "name": "\n     K.R.Puram 20 MLD\n    ",
+        "STPId": "\n       16\n      ",
+        "STPName": "\n       K.R.Puram 20 MLD\n      ",
+        "Latitude": "\n       13.0171\n      ",
+        "Longitude": "\n       77.6933\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       20000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.69811600000003,
+          12.9466
+        ]
+      },
+      "properties": {
+        "name": "\n     Kadabeesanahalli 50 MLD\n    ",
+        "STPId": "\n       17\n      ",
+        "STPName": "\n       Kadabeesanahalli 50 MLD\n      ",
+        "Latitude": "\n       12.9466\n      ",
+        "Longitude": "\n       77.6981\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       50000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.77700500000003,
+          12.99659199999999
+        ]
+      },
+      "properties": {
+        "name": "\n     Kadugodi 6 MLD\n    ",
+        "STPId": "\n       18\n      ",
+        "STPName": "\n       Kadugodi 6 MLD\n      ",
+        "Latitude": "\n       12.9966\n      ",
+        "Longitude": "\n       77.777\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       5000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5838,
+          12.94516999999999
+        ]
+      },
+      "properties": {
+        "name": "\n     Lalbagh 1.5 MLD\n    ",
+        "STPId": "\n       21\n      ",
+        "STPName": "\n       Lalbagh 1.5 MLD\n      ",
+        "Latitude": "\n       12.9452\n      ",
+        "Longitude": "\n       77.5838\n      ",
+        "PlantType": "\n       Tertiary Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       1500\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.579867,
+          12.89941400000001
+        ]
+      },
+      "properties": {
+        "name": "\n     Sarakki 5 MLD\n    ",
+        "STPId": "\n       28\n      ",
+        "STPName": "\n       Sarakki 5 MLD\n      ",
+        "Latitude": "\n       12.8994\n      ",
+        "Longitude": "\n       77.5799\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       5000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.72941400000003,
+          13.02334399999999
+        ]
+      },
+      "properties": {
+        "name": "\n     Yelemallappa Chetti 15 MLD\n    ",
+        "STPId": "\n       33\n      ",
+        "STPName": "\n       Yelemallappa Chetti 15 MLD\n      ",
+        "Latitude": "\n       13.0233\n      ",
+        "Longitude": "\n       77.7294\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       15000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.51225899999997,
+          13.08305899999998
+        ]
+      },
+      "properties": {
+        "name": "\n     Chikkabanavara 5 MLD\n    ",
+        "STPId": "\n       4\n      ",
+        "STPName": "\n       Chikkabanavara 5 MLD\n      ",
+        "Latitude": "\n       13.0831\n      ",
+        "Longitude": "\n       77.5123\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       5000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.47753000000002,
+          12.89830899999999
+        ]
+      },
+      "properties": {
+        "name": "\n     Doddabele 20 MLD\n    ",
+        "STPId": "\n       6\n      ",
+        "STPName": "\n       Doddabele 20 MLD\n      ",
+        "Latitude": "\n       12.8983\n      ",
+        "Longitude": "\n       77.4775\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       20000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.47756600000004,
+          12.89813100000001
+        ]
+      },
+      "properties": {
+        "name": "\n     Doddabele 40 MLD\n    ",
+        "STPId": "\n       7\n      ",
+        "STPName": "\n       Doddabele 40 MLD\n      ",
+        "Latitude": "\n       12.8981\n      ",
+        "Longitude": "\n       77.4776\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       40000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.55765899999999,
+          12.95254400000001
+        ]
+      },
+      "properties": {
+        "name": "\n     Kempambudhi 1.0 MLD\n    ",
+        "STPId": "\n       19\n      ",
+        "STPName": "\n       Kempambudhi 1.0 MLD\n      ",
+        "Latitude": "\n       12.9525\n      ",
+        "Longitude": "\n       77.5577\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       1000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.48987999999996,
+          12.91602199999998
+        ]
+      },
+      "properties": {
+        "name": "\n     Kengeri 60 MLD\n    ",
+        "STPId": "\n       20\n      ",
+        "STPName": "\n       Kengeri 60 MLD\n      ",
+        "Latitude": "\n       12.916\n      ",
+        "Longitude": "\n       77.4899\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       60000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.50262,
+          12.92126500000002
+        ]
+      },
+      "properties": {
+        "name": "\n     Mailasandra Ph-I 75 MLD\n    ",
+        "STPId": "\n       22\n      ",
+        "STPName": "\n       Mailasandra Ph-I 75 MLD\n      ",
+        "Latitude": "\n       12.9213\n      ",
+        "Longitude": "\n       77.5026\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       75000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.49500200000001,
+          12.96784599999999
+        ]
+      },
+      "properties": {
+        "name": "\n     Mallathahalli 5.0 MLD\n    ",
+        "STPId": "\n       23\n      ",
+        "STPName": "\n       Mallathahalli 5.0 MLD\n      ",
+        "Latitude": "\n       12.9678\n      ",
+        "Longitude": "\n       77.495\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       5000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.492871,
+          13.043003
+        ]
+      },
+      "properties": {
+        "name": "\n     Nagasandra ( new) 20 MLD\n    ",
+        "STPId": "\n       24\n      ",
+        "STPName": "\n       Nagasandra ( new) 20 MLD\n      ",
+        "Latitude": "\n       13.043\n      ",
+        "Longitude": "\n       77.4929\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       20000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.49261299999999,
+          13.04275300000002
+        ]
+      },
+      "properties": {
+        "name": "\n     Nagasandra(old) 20MLD\n    ",
+        "STPId": "\n       25\n      ",
+        "STPName": "\n       Nagasandra(old) 20MLD\n      ",
+        "Latitude": "\n       13.0428\n      ",
+        "Longitude": "\n       77.4926\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       20000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.65478500000002,
+          12.940942
+        ]
+      },
+      "properties": {
+        "name": "\n     V.Valley 150 MLD\n    ",
+        "STPId": "\n       29\n      ",
+        "STPName": "\n       V.Valley 150 MLD\n      ",
+        "Latitude": "\n       12.9409\n      ",
+        "Longitude": "\n       77.6548\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       60000\n      ",
+        "Status": "\n       FALSE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.51965899999998,
+          12.93480399999998
+        ]
+      },
+      "properties": {
+        "name": "\n     V.Valley 180 MLD Secondary\n    ",
+        "STPId": "\n       30\n      ",
+        "STPName": "\n       V.Valley 180 MLD Secondary\n      ",
+        "Latitude": "\n       12.9348\n      ",
+        "Longitude": "\n       77.5197\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       150000\n      ",
+        "Status": "\n       FALSE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.51965899999998,
+          12.93480399999998
+        ]
+      },
+      "properties": {
+        "name": "\n     V.Valley 60 MLD Tertiary\n    ",
+        "STPId": "\n       31\n      ",
+        "STPName": "\n       V.Valley 60 MLD Tertiary\n      ",
+        "Latitude": "\n       12.9348\n      ",
+        "Longitude": "\n       77.5197\n      ",
+        "PlantType": "\n       Sewage Treatment Plant\n      ",
+        "TreatmentCapacity (KLD)": "\n       180000\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.58616599999999,
+          13.10111100000001
+        ]
+      },
+      "properties": {
+        "name": "\n     5th Phase Yelahanka 1 MLD ISPS\n    ",
+        "STPId": "\n       39\n      ",
+        "STPName": "\n       5th Phase Yelahanka 1 MLD ISPS\n      ",
+        "Latitude": "\n       13.1011\n      ",
+        "Longitude": "\n       77.5862\n      ",
+        "PlantType": "\n       Intermediate Sewage Pumping Station\n      ",
+        "TreatmentCapacity (KLD)": "\n       0\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.63995999999997,
+          12.92562
+        ]
+      },
+      "properties": {
+        "name": "\n     Agaram 65 MLD ISPS\n    ",
+        "STPId": "\n       34\n      ",
+        "STPName": "\n       Agaram 65 MLD ISPS\n      ",
+        "Latitude": "\n       12.9256\n      ",
+        "Longitude": "\n       77.64\n      ",
+        "PlantType": "\n       Intermediate Sewage Pumping Station\n      ",
+        "TreatmentCapacity (KLD)": "\n       0\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.64637600000002,
+          13.04494700000002
+        ]
+      },
+      "properties": {
+        "name": "\n     Karibhavanahalli 5 MLD ISPS\n    ",
+        "STPId": "\n       35\n      ",
+        "STPName": "\n       Karibhavanahalli 5 MLD ISPS\n      ",
+        "Latitude": "\n       13.0449\n      ",
+        "Longitude": "\n       77.6464\n      ",
+        "PlantType": "\n       Intermediate Sewage Pumping Station\n      ",
+        "TreatmentCapacity (KLD)": "\n       0\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.623667,
+          12.94697200000001
+        ]
+      },
+      "properties": {
+        "name": "\n     Koramangala 210 MLD ISPS\n    ",
+        "STPId": "\n       38\n      ",
+        "STPName": "\n       Koramangala 210 MLD ISPS\n      ",
+        "Latitude": "\n       12.947\n      ",
+        "Longitude": "\n       77.6237\n      ",
+        "PlantType": "\n       Intermediate Sewage Pumping Station\n      ",
+        "TreatmentCapacity (KLD)": "\n       0\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.64637600000002,
+          13.04494700000002
+        ]
+      },
+      "properties": {
+        "name": "\n     Rajacanal 20 MLD ISPS\n    ",
+        "STPId": "\n       36\n      ",
+        "STPName": "\n       Rajacanal 20 MLD ISPS\n      ",
+        "Latitude": "\n       13.0449\n      ",
+        "Longitude": "\n       77.6464\n      ",
+        "PlantType": "\n       Intermediate Sewage Pumping Station\n      ",
+        "TreatmentCapacity (KLD)": "\n       0\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.725326,
+          12.998234
+        ]
+      },
+      "properties": {
+        "name": "\n     Sadaramangala 5 MLD ISPS\n    ",
+        "STPId": "\n       37\n      ",
+        "STPName": "\n       Sadaramangala 5 MLD ISPS\n      ",
+        "Latitude": "\n       12.9982\n      ",
+        "Longitude": "\n       77.7253\n      ",
+        "PlantType": "\n       Intermediate Sewage Pumping Station\n      ",
+        "TreatmentCapacity (KLD)": "\n       0\n      ",
+        "Status": "\n       TRUE\n      "
+      }
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+# Explicit Normalization and Alias Mapping for BWSSB Divisions
+# Resolves case variations, punctuation, 'Division' suffix, BBMP zone names,
+# and GIS GeoJSON polygon IDs to canonical division names.
+
+canonical_divisions:
+  - name: "South Division"
+    key: "south_division"
+    bbmp_zone: "South"
+    centroid: [77.5750, 12.9250]
+    total_wards: 36
+    daily_baseline_mld: 282.58
+    aliases:
+      - "south"
+      - "south division"
+      - "south-1"
+      - "south-2"
+      - "central"
+      - "south west-1"
+
+  - name: "West Division"
+    key: "west_division"
+    bbmp_zone: "West"
+    centroid: [77.5450, 12.9850]
+    total_wards: 36
+    daily_baseline_mld: 303.91
+    aliases:
+      - "west"
+      - "west division"
+      - "west-1"
+      - "west-2"
+
+  - name: "East Division"
+    key: "east_division"
+    bbmp_zone: "East"
+    centroid: [77.6400, 12.9750]
+    total_wards: 25
+    daily_baseline_mld: 198.93
+    aliases:
+      - "east"
+      - "east division"
+      - "east-1"
+      - "east-2"
+
+  - name: "North Division"
+    key: "north_division"
+    bbmp_zone: "North"
+    centroid: [77.5920, 13.0350]
+    total_wards: 24
+    daily_baseline_mld: 100.17
+    aliases:
+      - "north"
+      - "north division"
+      - "north-1"
+      - "north-2"
+
+  - name: "Outer Sub-Division Division"
+    key: "outer_sub_division"
+    bbmp_zone: "Outer Sub-Division"
+    centroid: [77.6650, 13.0150]
+    total_wards: 49
+    daily_baseline_mld: 232.72
+    aliases:
+      - "outer"
+      - "outer division"
+      - "outer sub division"
+      - "outer sub-division"
+      - "outer sub-division division"
+      - "north east"
+
+  - name: "Bommanahalli Division"
+    key: "bommanahalli_division"
+    bbmp_zone: "Bommanahalli"
+    centroid: [77.6250, 12.9050]
+    total_wards: 11
+    daily_baseline_mld: 47.82
+    aliases:
+      - "bommanahalli"
+      - "bommanahalli division"
+      - "south east-1"
+      - "south east-2"
+
+  - name: "Rajarajeshwari Nagar Division"
+    key: "rajarajeshwari_nagar_division"
+    bbmp_zone: "Rajarajeshwari Nagar"
+    centroid: [77.5150, 12.9250]
+    total_wards: 7
+    daily_baseline_mld: 33.95
+    aliases:
+      - "rr nagar"
+      - "rajarajeshwari nagar"
+      - "rajarajeshwari nagar division"
+      - "south west-2"
+
+  - name: "Mahadevapura Division"
+    key: "mahadevapura_division"
+    bbmp_zone: "Mahadevapura"
+    centroid: [77.6950, 12.9850]
+    total_wards: 6
+    daily_baseline_mld: 29.31
+    aliases:
+      - "mahadevapura"
+      - "mahadevapura division"
+
+  - name: "Dasarahalli Division"
+    key: "dasarahalli_division"
+    bbmp_zone: "Dasarahalli"
+    centroid: [77.5150, 13.0450]
+    total_wards: 4
+    daily_baseline_mld: 18.24
+    aliases:
+      - "dasarahalli"
+      - "dasarahalli division"
+      - "north west-1"
+      - "north west-2"

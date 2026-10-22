@@ -86,9 +86,12 @@ class StationOverview(BaseModel):
     devices: List[DeviceStatus]
     data_tier: DataTier = "SIMULATED"
 
+AlertStatus = Literal["ACTIVE", "ACKNOWLEDGED", "CLEARED", "SHELVED"]
+
 class IoTAlert(BaseModel):
     alert_id: str
     rule_id: str
+    asset_id: Optional[str] = None
     category: str
     severity: AlertSeverity
     title: str
@@ -98,8 +101,14 @@ class IoTAlert(BaseModel):
     recommendation: str
     requires_human_approval: bool = True
     human_decision_status: str = "PENDING_REVIEW"
-    timestamp: str
-    timestamp_epoch: float
+    status: AlertStatus = "ACTIVE"
+    first_seen: float = Field(default_factory=lambda: time.time())
+    last_seen: float = Field(default_factory=lambda: time.time())
+    cleared_at: Optional[float] = None
+    acknowledged_by: Optional[str] = None
+    acknowledged_at: Optional[float] = None
+    timestamp: str = Field(default_factory=lambda: time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
+    timestamp_epoch: float = Field(default_factory=lambda: time.time())
     data_tier: DataTier = "SIMULATED"
     source: str = "IOT"
     estimated_loss_lps: Optional[float] = None

@@ -1,0 +1,875 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.6013355,
+          12.9155976
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "1",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "1",
+        "Outlet": "",
+        "PumpStationID": "1",
+        "SSID": "20",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.6073269,
+          12.9162555
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "2",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "2",
+        "Outlet": "",
+        "PumpStationID": "2",
+        "SSID": "20",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.6445163,
+          12.971895
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "3",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "3",
+        "Outlet": "",
+        "PumpStationID": "3",
+        "SSID": "115",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.621349,
+          12.9726332
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "4",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "4",
+        "Outlet": "",
+        "PumpStationID": "4",
+        "SSID": "119",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.6377438,
+          12.961467
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "5",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "5",
+        "Outlet": "",
+        "PumpStationID": "5",
+        "SSID": "37",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.6495953,
+          12.9830496
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "6",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "6",
+        "Outlet": "",
+        "PumpStationID": "6",
+        "SSID": "67",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.6496952,
+          12.9828766
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "7",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "7",
+        "Outlet": "",
+        "PumpStationID": "7",
+        "SSID": "67",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.6499754,
+          12.9824204
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "8",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "8",
+        "Outlet": "",
+        "PumpStationID": "8",
+        "SSID": "67",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.6073395,
+          12.965072
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "9",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "9",
+        "Outlet": "",
+        "PumpStationID": "9",
+        "SSID": "30",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.608115,
+          12.9648004
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "10",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "10",
+        "Outlet": "",
+        "PumpStationID": "10",
+        "SSID": "30",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.6123786,
+          12.9583232
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "11",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "11",
+        "Outlet": "",
+        "PumpStationID": "11",
+        "SSID": "70",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5916908,
+          12.9235956
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "12",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "12",
+        "Outlet": "",
+        "PumpStationID": "12",
+        "SSID": "65",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5848834,
+          12.9300985
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "13",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "13",
+        "Outlet": "",
+        "PumpStationID": "13",
+        "SSID": "66",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5863781,
+          12.9361634
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "14",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "14",
+        "Outlet": "",
+        "PumpStationID": "14",
+        "SSID": "23",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.6400136,
+          12.9759547
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "15",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "15",
+        "Outlet": "",
+        "PumpStationID": "15",
+        "SSID": "58",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5727296,
+          12.9164026
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "16",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "16",
+        "Outlet": "",
+        "PumpStationID": "16",
+        "SSID": "9",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.595422,
+          12.9139632
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "17",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "17",
+        "Outlet": "",
+        "PumpStationID": "17",
+        "SSID": "60",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5609069,
+          12.9411362
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "18",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "18",
+        "Outlet": "",
+        "PumpStationID": "18",
+        "SSID": "103",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.6214664,
+          12.9278684
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "19",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "19",
+        "Outlet": "",
+        "PumpStationID": "19",
+        "SSID": "84",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5483039,
+          12.9746611
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "20",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "20",
+        "Outlet": "",
+        "PumpStationID": "20",
+        "SSID": "53",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.4887892,
+          12.9319918
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "21",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "21",
+        "Outlet": "",
+        "PumpStationID": "21",
+        "SSID": "105",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5257988,
+          12.9638432
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "22",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "22",
+        "Outlet": "",
+        "PumpStationID": "22",
+        "SSID": "27",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5457373,
+          12.9989866
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "23",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "23",
+        "Outlet": "",
+        "PumpStationID": "23",
+        "SSID": "129",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5899651,
+          12.9867886
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "24",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "24",
+        "Outlet": "",
+        "PumpStationID": "24",
+        "SSID": "48",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5895708,
+          12.9875338
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "25",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "25",
+        "Outlet": "",
+        "PumpStationID": "25",
+        "SSID": "48",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5892142,
+          12.9874018
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "26",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "26",
+        "Outlet": "",
+        "PumpStationID": "26",
+        "SSID": "48",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5735133,
+          12.9479969
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "27",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "27",
+        "Outlet": "",
+        "PumpStationID": "27",
+        "SSID": "101",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5830473,
+          12.9714718
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "28",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "28",
+        "Outlet": "",
+        "PumpStationID": "28",
+        "SSID": "11",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5857845,
+          13.1013907
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "29",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "29",
+        "Outlet": "",
+        "PumpStationID": "29",
+        "SSID": "133",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.586267,
+          13.1009824
+        ]
+      },
+      "properties": {
+        "Capacity": "",
+        "IndentID": " ",
+        "Inlet": "",
+        "KGISPumpStationID": "30",
+        "KGISValley_SubDivisionID": "",
+        "KGISVillage110_SubDivisionID": "",
+        "OBJECTID": "30",
+        "Outlet": "",
+        "PumpStationID": "30",
+        "SSID": "133",
+        "Status": "",
+        "WorkConditionID": "0",
+        "ZoneID": "",
+        "created_date": "",
+        "created_user": "",
+        "last_edited_date": "",
+        "last_edited_user": ""
+      }
+    }
+  ]
+}

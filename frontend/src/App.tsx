@@ -12,6 +12,7 @@ import { AlertItem, SelectedAsset } from './types';
 import { IoTWorkstation } from './features/iot/IoTWorkstation';
 import { iotApi } from './features/iot/services/iotApi';
 import { mergeIoTAlertsWithTwinAlerts } from './features/iot/registry/alertAdapter';
+import { IoTStreamProvider } from './features/iot/providers/IoTStreamProvider';
 
 export const App: React.FC = () => {
   const {
@@ -168,7 +169,8 @@ export const App: React.FC = () => {
   }, [activeModule]);
 
   return (
-    <div className="h-screen w-screen overflow-hidden grid grid-rows-[56px_1fr] bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased">
+    <IoTStreamProvider>
+      <div className="h-screen w-screen overflow-hidden grid grid-rows-[56px_1fr] bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased">
       {/* 1. Top Bar 56px */}
       <TopBar
         alertsCount={alertsList.length}
@@ -240,7 +242,8 @@ export const App: React.FC = () => {
         isOpen={isAdminDrawerOpen}
         onClose={() => setIsAdminDrawerOpen(false)}
       />
-    </div>
+      </div>
+    </IoTStreamProvider>
   );
 };
 

@@ -104,10 +104,53 @@ async def get_smart_meter_division(division_id: str):
             return d
     raise HTTPException(status_code=404, detail=f"Division '{division_id}' smart meter board not found.")
 
-@router.get("/alerts", response_model=List[IoTAlert])
-async def get_iot_alerts():
+@router.get("/snapshot")
+async def get_iot_snapshot():
     check_iot_enabled()
-    return list(sim_engine.alerts.values())
+    stations = sim_engine.get_stations()
+    alerts = sim_engine.get_alerts_list()
+    smart_meters = sim_engine.get_smart_meters()
+    corridors, balance = sim_engine.get_water_flow_corridors()
+    return {
+        "ts": sim_engine.sim_time,
+        "clock_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(sim_engine.sim_time)),
+        "stations": [s.model_dump() for s in stations],
+        "alerts": [a.model_dump() for a in alerts],
+        "smart_meters": [m.model_dump() for m in smart_meters],
+        "corridors": [c.model_dump() for c in corridors],
+        "water_balance": balance.model_dump(),
+        "active_injections": sim_engine.active_injections,
+        "data_tier": "SIMULATED"
+    }
+
+@router.get("/alerts", response_model=List[IoTAlert])
+async def get_iot_alerts(status: Optional[str] = Query(None, description="ACTIVE, ACKNOWLEDGED, CLEARED, SHELVED or None for active + 24h history")):
+    check_iot_enabled()
+    return sim_engine.get_alerts_list(status=status)
+
+@router.post("/alerts/{alert_id}/acknowledge", response_model=IoTAlert)
+async def acknowledge_alert(alert_id: str, operator: str = Query("OPERATOR")):
+    check_iot_enabled()
+    alert = sim_engine.acknowledge_alert(alert_id, operator=operator)
+    if not alert:
+        raise HTTPException(status_code=404, detail=f"Alert '{alert_id}' not found")
+    return alert
+
+@router.post("/alerts/{alert_id}/snooze", response_model=IoTAlert)
+async def snooze_alert(alert_id: str, duration_s: float = Query(3600.0)):
+    check_iot_enabled()
+    alert = sim_engine.snooze_alert(alert_id, duration_s=duration_s)
+    if not alert:
+        raise HTTPException(status_code=404, detail=f"Alert '{alert_id}' not found")
+    return alert
+
+@router.post("/alerts/{alert_id}/clear", response_model=IoTAlert)
+async def clear_alert(alert_id: str):
+    check_iot_enabled()
+    alert = sim_engine.clear_alert(alert_id)
+    if not alert:
+        raise HTTPException(status_code=404, detail=f"Alert '{alert_id}' not found")
+    return alert
 
 @router.post("/simulate/leak")
 async def simulate_leak(payload: LeakInjectionRequest):
@@ -126,7 +169,20 @@ async def simulate_leak(payload: LeakInjectionRequest):
         "segment_id": payload.pipe_segment_id,
         "leak_rate_lps": payload.leak_rate_lps,
         "data_tier": "SIMULATED",
-        "active_alerts": [a.model_dump() for a in sim_engine.alerts.values()]
+        "active_alerts": [a.model_dump() for a in sim_engine.get_alerts_list(status="ACTIVE")]
+    }
+
+@router.post("/simulate/stop-leak")
+async def stop_leak(payload: Optional[Dict[str, Any]] = None):
+    check_iot_enabled()
+    seg = payload.get("pipe_segment_id") if payload else None
+    sim_engine.stop_leak(seg)
+    for _ in range(5):
+        sim_engine.tick(1.0)
+    return {
+        "status": "LEAKS_STOPPED",
+        "data_tier": "SIMULATED",
+        "active_alerts": [a.model_dump() for a in sim_engine.get_alerts_list(status="ACTIVE")]
     }
 
 @router.post("/simulate/pump-fault")
@@ -178,25 +234,29 @@ async def iot_sse_stream(request: Request):
     """
     Server-Sent Events (SSE) telemetry stream.
     Multiplexes real-time deltas and alert notifications to frontend.
+    Single backend singleton with Last-Event-ID support.
     """
     check_iot_enabled()
 
     async def event_generator():
+        last_event_id = request.headers.get("last-event-id")
         while True:
             if await request.is_disconnected():
                 break
             try:
-                # Capture current snapshot of pumps and alerts
                 stations = sim_engine.get_stations()
-                alerts = list(sim_engine.alerts.values())
+                alerts = sim_engine.get_alerts_list()
+                sim_time = sim_engine.sim_time
+                event_id = int(sim_time * 1000)
 
                 payload = {
-                    "ts": time.time(),
+                    "ts": sim_time,
+                    "clock_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(sim_time)),
                     "data_tier": "SIMULATED",
                     "stations": [s.model_dump() for s in stations],
                     "alerts": [a.model_dump() for a in alerts]
                 }
-                yield f"data: {json.dumps(payload)}\n\n"
+                yield f"id: {event_id}\ndata: {json.dumps(payload)}\n\n"
             except Exception as e:
                 logger.error(f"SSE serialization error: {e}")
             await asyncio.sleep(1.0)
@@ -210,3 +270,4 @@ async def iot_sse_stream(request: Request):
             "X-Accel-Buffering": "no"
         }
     )
+
