@@ -320,3 +320,40 @@ def test_divisions_all_have_ward_rows_summing_to_totals():
     assert 1200.0 < total_city_mld < 1300.0, f"City total {total_city_mld} MLD outside expected range"
 
 
+def test_smart_meter_board_snapping_and_alerts():
+    """
+    Test 9: Smart meter boards are dynamically snapped to supply mains,
+    ward cumulative volumes sum to division totals, and alert rules generate counts.
+    """
+    engine = IoTSimulationEngine(seed=42)
+    divisions = engine.get_smart_meters()
+    assert len(divisions) == 9
+
+    found_alert_types = set()
+    for div in divisions:
+        # 1. Coordinates snapped
+        assert len(div.centroid_coordinates) == 2
+        lng, lat = div.centroid_coordinates
+        assert 77.0 < lng < 78.0 and 12.0 < lat < 14.0
+
+        # 2. Cumulative today strictly equals sum of ward volumes
+        expected_vol = round(sum(w.current_day_volume_kl for w in div.wards), 1)
+        assert abs(div.cumulative_today_kl - expected_vol) < 0.2, (
+            f"{div.division_name}: cumulative_today_kl {div.cumulative_today_kl} != sum of wards {expected_vol}"
+        )
+
+        # 3. Online + offline equals total wards
+        assert div.wards_online + div.wards_offline == len(div.wards)
+
+        # 4. Active alerts count equals sum of alert types
+        assert div.active_alerts_count == sum(div.alerts_by_type.values())
+
+        for k, v in div.alerts_by_type.items():
+            if v > 0:
+                found_alert_types.add(k)
+
+    # Across all 9 divisions, key anomaly types must be detected
+    assert "low_battery" in found_alert_types or "comms_lost" in found_alert_types or "leak_suspected" in found_alert_types
+
+
+

@@ -108,7 +108,7 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
   onSelectPump,
 }) => {
   const [timeRange, setTimeRange] = useState<'15m' | '1h' | '6h' | '24h'>('1h');
-  const [wardSortField, setWardSortField] = useState<'ward_no' | 'flow_lps'>('flow_lps');
+  const [wardSortField, setWardSortField] = useState<'ward_no' | 'flow_lps' | 'volume' | 'alerts'>('flow_lps');
   const [selectedWard, setSelectedWard] = useState<WardMeterSummary | null>(null);
 
   if (!selectedType) {
@@ -827,16 +827,170 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
   }
 
   // ---------------------------------------------------------------------------
-  // 5. DIVISION SMART METER BOARD INSPECTOR (P4)
+  // 5. DIVISION & WARD SMART METER BOARD INSPECTOR (P4)
   // ---------------------------------------------------------------------------
   if (selectedType === 'division' && selectedDivision) {
+    if (selectedWard) {
+      const avgLps = (selectedWard.daily_baseline_mld * 1e6) / 86400;
+      const diurnalProfile = [
+        0.45, 0.38, 0.32, 0.35, 0.58, 0.95,
+        1.45, 1.62, 1.48, 1.25, 1.10, 1.05,
+        0.98, 0.92, 0.88, 0.90, 1.05, 1.35,
+        1.55, 1.48, 1.25, 0.95, 0.72, 0.55
+      ];
+      const wardHourlyTrend = diurnalProfile.map((factor, h) => {
+        const hourLabel = `${String(h).padStart(2, '0')}:00`;
+        const flow = Number((avgLps * factor).toFixed(1));
+        return { hour: hourLabel, flowLps: flow };
+      });
+
+      return (
+        <aside className="w-[380px] border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col h-full select-none z-20 overflow-y-auto p-4 text-xs space-y-4">
+          {/* Header with Back Button */}
+          <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+            <div>
+              <button
+                type="button"
+                onClick={() => setSelectedWard(null)}
+                className="text-sky-500 hover:text-sky-400 font-mono text-[11px] flex items-center gap-1 mb-1 transition-colors"
+              >
+                ← {selectedDivision.division_name}
+              </button>
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">
+                  Ward {selectedWard.ward_no}: {selectedWard.ward_name}
+                </h3>
+                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-500 border border-amber-500/30 font-bold">
+                  SIMULATED
+                </span>
+              </div>
+              <span className="text-[11px] text-slate-500 font-mono">
+                Tag: {selectedWard.meter_tag} • Zone: {selectedWard.bbmp_zone}
+              </span>
+            </div>
+            <button type="button" onClick={onClose} className="p-1 rounded text-slate-400 hover:text-slate-600">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Ward Meter Board (LCD Register) */}
+          <MeterBoard
+            meterId={selectedWard.meter_tag}
+            tag={selectedWard.meter_tag}
+            name={`Ward ${selectedWard.ward_no} Consumer Meter`}
+            flowRateLps={selectedWard.flow_lps}
+            totaliserKl={selectedWard.cumulative_totaliser_kl}
+            isOnline={selectedWard.status === 'ONLINE'}
+            hasAlarm={selectedWard.flags.length > 0}
+            unit="L/s"
+            pipeDnMm={300}
+          />
+
+          {/* Mandatory Provenance Chip */}
+          <div className="p-2 rounded bg-sky-500/10 border border-sky-500/30 text-sky-400 font-mono text-[10.5px] leading-relaxed">
+            Daily baseline: real (data.gov.in). Hourly readings: simulated.
+          </div>
+
+          {/* Diagnostics: Comms, Battery, Signal */}
+          <div className="grid grid-cols-3 gap-2">
+            <div className="p-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
+              <span className="text-[10px] text-slate-500 block uppercase font-mono">Comms</span>
+              <div className="font-mono text-xs font-bold mt-0.5 flex items-center gap-1">
+                <span className={`w-2 h-2 rounded-full ${selectedWard.status === 'ONLINE' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                <span className={selectedWard.status === 'ONLINE' ? 'text-emerald-500' : 'text-rose-500'}>
+                  {selectedWard.status}
+                </span>
+              </div>
+            </div>
+
+            <div className="p-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
+              <span className="text-[10px] text-slate-500 block uppercase font-mono">Battery</span>
+              <div className={`font-mono text-xs font-bold mt-0.5 ${selectedWard.battery_pct < 15.0 ? 'text-amber-500 font-bold' : 'text-slate-200'}`}>
+                {selectedWard.battery_pct.toFixed(1)}%
+              </div>
+            </div>
+
+            <div className="p-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
+              <span className="text-[10px] text-slate-500 block uppercase font-mono">Signal</span>
+              <div className="font-mono text-xs font-bold text-slate-200 mt-0.5">
+                {selectedWard.signal_strength_dbm.toFixed(0)} dBm
+              </div>
+            </div>
+          </div>
+
+          {/* Alert Flags / Anomaly Tags */}
+          {selectedWard.flags.length > 0 && (
+            <div className="p-2.5 rounded-lg border border-rose-500/40 bg-rose-950/20 space-y-1">
+              <span className="font-semibold text-rose-400 block text-[11px]">
+                Active Smart Meter Anomalies ({selectedWard.flags.length})
+              </span>
+              <div className="flex flex-wrap gap-1 pt-1">
+                {selectedWard.flags.map((flag) => {
+                  let badge = { text: flag, color: 'bg-rose-500/20 text-rose-300 border-rose-500/40' };
+                  if (flag === 'leak_suspected') badge = { text: 'Suspected Leak (Night Flow Rise)', color: 'bg-rose-500/20 text-rose-300 border-rose-500/40' };
+                  if (flag === 'continuous_flow') badge = { text: 'Continuous Flow (24h Runaway)', color: 'bg-amber-500/20 text-amber-300 border-amber-500/40' };
+                  if (flag === 'high_usage') badge = { text: 'Unusually High Consumption (>3x MAD)', color: 'bg-amber-500/20 text-amber-300 border-amber-500/40' };
+                  if (flag === 'reverse_flow') badge = { text: 'Reverse Flow Detected', color: 'bg-red-600/20 text-red-300 border-red-500/40' };
+                  if (flag === 'tamper_event') badge = { text: 'Enclosure Tamper Detected', color: 'bg-purple-500/20 text-purple-300 border-purple-500/40' };
+                  if (flag === 'comms_lost') badge = { text: 'LoRaWAN Uplink Timeout', color: 'bg-slate-700 text-slate-300 border-slate-600' };
+                  if (flag === 'low_battery') badge = { text: 'Lithium Battery Depleted (<15%)', color: 'bg-amber-500/20 text-amber-300 border-amber-500/40' };
+                  return (
+                    <span key={flag} className={`px-2 py-0.5 rounded text-[10px] font-mono border ${badge.color}`}>
+                      ⚠️ {badge.text}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Consumption Metrics */}
+          <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 space-y-1.5 font-mono text-[11px]">
+            <div className="flex justify-between">
+              <span className="text-slate-500">Daily Baseline (data.gov.in):</span>
+              <span className="font-bold text-slate-200">{selectedWard.daily_baseline_mld.toFixed(2)} MLD</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-500">Today's Cumulative Volume:</span>
+              <span className="font-bold text-sky-500">{Math.round(selectedWard.current_day_volume_kl).toLocaleString()} kL</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-500">Current Instantaneous Flow:</span>
+              <span className="font-bold text-emerald-500">{selectedWard.flow_lps.toFixed(1)} L/s ({((selectedWard.flow_lps * 86.4) / 1000).toFixed(2)} MLD)</span>
+            </div>
+          </div>
+
+          {/* 220px Hourly Profile Chart */}
+          <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-2.5 min-w-0" style={{ height: '220px' }}>
+            <div className="flex justify-between text-[11px] font-mono mb-1">
+              <span className="font-semibold text-sky-500">24-Hour Diurnal Demand Profile</span>
+              <span className="text-[10px] text-slate-400">Anchored to {selectedWard.daily_baseline_mld} MLD</span>
+            </div>
+            <div className="w-full h-[180px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={wardHourlyTrend} margin={{ top: 5, right: 10, left: -15, bottom: 0 }}>
+                  <XAxis dataKey="hour" tick={{ fontSize: 9 }} stroke="#64748b" interval={3} />
+                  <YAxis tick={{ fontSize: 9 }} stroke="#64748b" domain={['dataMin - 2', 'dataMax + 2']} />
+                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', fontSize: '10px' }} />
+                  <Line type="monotone" dataKey="flowLps" stroke="#38bdf8" strokeWidth={2} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </aside>
+      );
+    }
+
     const sortedWards = [...selectedDivision.wards].sort((a, b) => {
       if (wardSortField === 'flow_lps') return b.flow_lps - a.flow_lps;
+      if (wardSortField === 'volume') return b.current_day_volume_kl - a.current_day_volume_kl;
+      if (wardSortField === 'alerts') return b.flags.length - a.flags.length;
       return a.ward_no - b.ward_no;
     });
 
     return (
       <aside className="w-[380px] border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col h-full select-none z-20 overflow-y-auto p-4 text-xs space-y-4">
+        {/* Header */}
         <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
           <div>
             <div className="flex items-center gap-2">
@@ -856,7 +1010,7 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
           </button>
         </div>
 
-        {/* Division Meter Face */}
+        {/* Division Meter Face (LCD Style Register) */}
         <MeterBoard
           meterId={`DIV-${selectedDivision.division_name}`}
           tag={`DIV-${selectedDivision.division_name.slice(0, 4).toUpperCase()}`}
@@ -865,6 +1019,7 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
           totaliserKl={selectedDivision.cumulative_today_kl}
           isOnline={true}
           unit="L/s"
+          pipeDnMm={1200}
         />
 
         {/* Inflow vs Wards Consumption KPI Box */}
@@ -887,6 +1042,18 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
               {selectedDivision.apparent_loss_mld.toFixed(1)} MLD ({selectedDivision.apparent_loss_pct.toFixed(1)}%)
             </span>
           </div>
+          <div className="flex justify-between pt-1 border-t border-slate-200 dark:border-slate-800">
+            <span className="text-slate-500">Wards Operational State:</span>
+            <span className="font-bold text-slate-200">
+              <span className="text-emerald-500">{selectedDivision.wards_online} online</span> • <span className="text-rose-400">{selectedDivision.wards_offline} offline</span>
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-slate-500">Active Smart Meter Alerts:</span>
+            <span className={`font-bold ${selectedDivision.active_alerts_count > 0 ? 'text-amber-400' : 'text-emerald-500'}`}>
+              {selectedDivision.active_alerts_count} active
+            </span>
+          </div>
         </div>
 
         {/* Sortable Wards Table */}
@@ -899,74 +1066,78 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
               <button
                 type="button"
                 onClick={() => setWardSortField('flow_lps')}
-                className={`px-1.5 py-0.5 rounded ${wardSortField === 'flow_lps' ? 'bg-sky-500 text-white font-bold' : 'text-slate-400'}`}
+                className={`px-1.5 py-0.5 rounded transition-colors ${wardSortField === 'flow_lps' ? 'bg-sky-500 text-white font-bold' : 'text-slate-400 hover:text-slate-200'}`}
               >
-                By Flow
+                Flow
+              </button>
+              <button
+                type="button"
+                onClick={() => setWardSortField('volume')}
+                className={`px-1.5 py-0.5 rounded transition-colors ${wardSortField === 'volume' ? 'bg-sky-500 text-white font-bold' : 'text-slate-400 hover:text-slate-200'}`}
+              >
+                Volume
               </button>
               <button
                 type="button"
                 onClick={() => setWardSortField('ward_no')}
-                className={`px-1.5 py-0.5 rounded ${wardSortField === 'ward_no' ? 'bg-sky-500 text-white font-bold' : 'text-slate-400'}`}
+                className={`px-1.5 py-0.5 rounded transition-colors ${wardSortField === 'ward_no' ? 'bg-sky-500 text-white font-bold' : 'text-slate-400 hover:text-slate-200'}`}
               >
-                By No.
+                No.
+              </button>
+              <button
+                type="button"
+                onClick={() => setWardSortField('alerts')}
+                className={`px-1.5 py-0.5 rounded transition-colors ${wardSortField === 'alerts' ? 'bg-sky-500 text-white font-bold' : 'text-slate-400 hover:text-slate-200'}`}
+              >
+                Alerts
               </button>
             </div>
           </div>
 
-          <div className="max-h-60 overflow-y-auto space-y-1 pr-1">
+          <div className="max-h-64 overflow-y-auto space-y-1.5 pr-1">
             {sortedWards.map((w) => (
               <div
                 key={w.ward_no}
                 onClick={() => setSelectedWard(w)}
-                className="p-2 rounded-lg border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30 hover:border-sky-500 cursor-pointer flex items-center justify-between text-[11px] transition-all"
+                className="p-2.5 rounded-lg border border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30 hover:border-sky-500 cursor-pointer flex items-center justify-between text-[11px] transition-all group"
               >
-                <div>
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">
-                    W-{w.ward_no} {w.ward_name}
-                  </span>
-                  <span className="block text-[10px] text-slate-400 font-mono">
-                    Baseline: {w.daily_baseline_mld} MLD
-                  </span>
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className={`w-1.5 h-1.5 rounded-full ${w.status === 'ONLINE' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 group-hover:text-sky-400 transition-colors">
+                      W-{w.ward_no} {w.ward_name}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px] text-slate-400 font-mono">
+                    <span>Baseline: {w.daily_baseline_mld.toFixed(2)} MLD</span>
+                    <span>•</span>
+                    <span>Vol: {Math.round(w.current_day_volume_kl).toLocaleString()} kL</span>
+                  </div>
+                  {w.flags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 pt-0.5">
+                      {w.flags.map((f) => (
+                        <span key={f} className="px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[9px] font-mono">
+                          ⚠️ {f.replace('_', ' ')}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <div className="text-right font-mono">
-                  <span className="font-bold text-slate-900 dark:text-slate-100 tabular-nums block">
-                    {w.flow_lps.toFixed(1)} L/s
-                  </span>
-                  <span className="text-[10px] text-slate-500">
-                    {((w.flow_lps * 86.4) / 1000).toFixed(1)} MLD
-                  </span>
+                <div className="text-right font-mono flex items-center gap-1.5">
+                  <div>
+                    <span className="font-bold text-slate-900 dark:text-slate-100 tabular-nums block">
+                      {w.flow_lps.toFixed(1)} L/s
+                    </span>
+                    <span className="text-[10px] text-slate-500">
+                      {((w.flow_lps * 86.4) / 1000).toFixed(2)} MLD
+                    </span>
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-sky-400 transition-colors" />
                 </div>
               </div>
             ))}
           </div>
         </div>
-
-        {/* Selected Ward Detail Modal / Callout if clicked */}
-        {selectedWard && (
-          <div className="p-3 rounded-lg border border-sky-500/50 bg-sky-950/40 space-y-1.5">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-sky-400">
-                W-{selectedWard.ward_no} {selectedWard.ward_name} Meter Board
-              </span>
-              <button type="button" onClick={() => setSelectedWard(null)} className="text-slate-400 hover:text-white">
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-            <div className="p-1 rounded bg-slate-900/80 border border-slate-800 text-[10px] text-slate-300 font-mono">
-              Daily baseline: real (data.gov.in). Hourly readings: simulated.
-            </div>
-            <div className="grid grid-cols-2 gap-1 text-[11px] font-mono pt-1">
-              <div>
-                <span className="text-slate-500 block">Baseline MLD:</span>
-                <span className="font-bold text-slate-200">{selectedWard.daily_baseline_mld} MLD</span>
-              </div>
-              <div>
-                <span className="text-slate-500 block">Today's Volume:</span>
-                <span className="font-bold text-slate-200">{Math.round(selectedWard.current_day_volume_kl).toLocaleString()} kL</span>
-              </div>
-            </div>
-          </div>
-        )}
       </aside>
     );
   }

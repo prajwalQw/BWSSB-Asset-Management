@@ -38,6 +38,7 @@ from ..config import (
     DIVISION_BOUNDARIES_GEOJSON_PATH,
     PUMPING_STATIONS_GEOJSON_PATH,
     STPS_GEOJSON_PATH,
+    SUPPLY_MAINS_GEOJSON_PATH,
     load_yaml,
     load_json
 )
@@ -524,6 +525,30 @@ class IoTSimulationEngine:
                     daily_mld = float(row.get("daily_consumption_mld", 3.5))
                     avg_lps = (daily_mld * 1000000.0) / 86400.0
 
+                    status = "ONLINE"
+                    flags = []
+                    battery_pct = round(self.rng.uniform(75.0, 99.0), 1)
+                    sig_dbm = round(self.rng.uniform(-92.0, -68.0), 1)
+
+                    # Deterministic anomaly seeding according to config rules
+                    if ward_no % 47 == 0:
+                        battery_pct = round(self.rng.uniform(8.5, 14.2), 1)
+                        flags.append("low_battery")
+                    if ward_no % 63 == 0:
+                        status = "OFFLINE"
+                        sig_dbm = -118.0
+                        flags.append("comms_lost")
+                    if ward_no % 31 == 0:
+                        flags.append("leak_suspected")
+                    if ward_no % 79 == 0:
+                        flags.append("continuous_flow")
+                    if ward_no % 53 == 0:
+                        flags.append("high_usage")
+                    if ward_no % 89 == 0:
+                        flags.append("reverse_flow")
+                    if ward_no % 97 == 0:
+                        flags.append("tamper_event")
+
                     self.wards_data.append({
                         "ward_no": ward_no,
                         "ward_name": w_name,
@@ -531,21 +556,45 @@ class IoTSimulationEngine:
                         "bwssb_division": div_name,
                         "meter_tag": f"SMR_W_{ward_no:03d}",
                         "daily_baseline_mld": daily_mld,
-                        "flow_lps": round(avg_lps, 2), # Always defined on startup
+                        "flow_lps": round(avg_lps, 2),
                         "current_day_volume_kl": round(daily_mld * 1000 * 0.5, 1),
                         "cumulative_totaliser_kl": round(self.rng.uniform(450000.0, 1800000.0), 1),
-                        "battery_pct": round(self.rng.uniform(75.0, 99.0), 1),
-                        "signal_strength_dbm": round(self.rng.uniform(-92.0, -68.0), 1),
-                        "status": "ONLINE",
-                        "flags": []
+                        "battery_pct": battery_pct,
+                        "signal_strength_dbm": sig_dbm,
+                        "status": status,
+                        "flags": flags
                     })
             except Exception as e:
                 logger.warning(f"Could not load ward consumption CSV: {e}")
+
+        # Extract supply mains coordinates for snapping
+        mains_coords = []
+        if SUPPLY_MAINS_GEOJSON_PATH.exists():
+            try:
+                with open(SUPPLY_MAINS_GEOJSON_PATH, "r", encoding="utf-8") as f:
+                    mdata = json.load(f)
+                for feat in mdata.get("features", []):
+                    geom = feat.get("geometry", {})
+                    gtype = geom.get("type")
+                    if gtype == "LineString":
+                        mains_coords.extend(geom.get("coordinates", []))
+                    elif gtype == "MultiLineString":
+                        for line in geom.get("coordinates", []):
+                            mains_coords.extend(line)
+            except Exception as e:
+                logger.warning(f"Failed to load supply mains for smart meter snapping: {e}")
+
+        mains_arr = np.array(mains_coords, dtype=np.float64) if mains_coords else None
 
         # Group into all 9 canonical divisions from config/iot/division_aliases.yaml
         for cdiv in self.division_aliases_cfg.get("canonical_divisions", []):
             div_name = cdiv["name"]
             coords = cdiv.get("centroid", [77.5950, 12.9750])
+            if mains_arr is not None and len(mains_arr) > 0:
+                diff = mains_arr - np.array(coords, dtype=np.float64)
+                idx = int(np.argmin(diff[:, 0]**2 + diff[:, 1]**2))
+                coords = [round(float(mains_arr[idx][0]), 6), round(float(mains_arr[idx][1]), 6)]
+
             self.divisions_data[div_name] = {
                 "division_name": div_name,
                 "centroid_coordinates": coords,
@@ -1089,9 +1138,32 @@ class IoTSimulationEngine:
 
             ward_summaries = []
             sum_ward_mld = 0.0
+            sum_vol_today_kl = 0.0
+            wards_online = 0
+            wards_offline = 0
+            alerts_by_type: Dict[str, int] = {
+                "leak_suspected": 0,
+                "continuous_flow": 0,
+                "high_usage": 0,
+                "low_battery": 0,
+                "comms_lost": 0,
+                "reverse_flow": 0,
+                "tamper_event": 0
+            }
+
             for w in div_wards:
                 w_mld = (w["flow_lps"] * 86400.0) / 1000000.0
                 sum_ward_mld += w_mld
+                sum_vol_today_kl += w.get("current_day_volume_kl", 0.0)
+                if w.get("status") == "ONLINE":
+                    wards_online += 1
+                else:
+                    wards_offline += 1
+
+                for fl in w.get("flags", []):
+                    if fl in alerts_by_type:
+                        alerts_by_type[fl] += 1
+
                 ward_summaries.append(WardMeterSummary(
                     ward_no=w["ward_no"],
                     ward_name=w["ward_name"],
@@ -1112,8 +1184,9 @@ class IoTSimulationEngine:
 
             # Division inlet exceeds ward consumption by apparent losses (NRW ~15-28%)
             apparent_loss_pct = 18.5
-            inlet_mld = round(sum_ward_mld / (1.0 - (apparent_loss_pct / 100.0)), 2)
-            apparent_loss_mld = round(inlet_mld - sum_ward_mld, 2)
+            sum_ward_mld_round = round(sum_ward_mld, 2)
+            inlet_mld = round(sum_ward_mld_round / (1.0 - (apparent_loss_pct / 100.0)), 2)
+            apparent_loss_mld = round(inlet_mld - sum_ward_mld_round, 2)
 
             top_wards = sorted(
                 [{"ward_no": ws.ward_no, "ward_name": ws.ward_name, "mld": round(ws.flow_lps * 86400 / 1e6, 2)} for ws in ward_summaries],
@@ -1122,25 +1195,25 @@ class IoTSimulationEngine:
             )[:5]
 
             # 24-hr profiles
-            hourly_ward_sum = [round(sum_ward_mld * (f / 24.0), 2) for f in self.diurnal_factors]
+            hourly_ward_sum = [round(sum_ward_mld_round * (f / 24.0), 2) for f in self.diurnal_factors]
             hourly_inlet = [round(inlet_mld * (f / 24.0), 2) for f in self.diurnal_factors]
 
             results.append(DivisionBoardSummary(
                 division_name=div_name,
                 centroid_coordinates=div_info["centroid_coordinates"],
                 inlet_mld=inlet_mld,
-                sum_ward_consumption_mld=round(sum_ward_mld, 2),
+                sum_ward_consumption_mld=sum_ward_mld_round,
                 apparent_loss_mld=apparent_loss_mld,
                 apparent_loss_pct=apparent_loss_pct,
                 total_wards=len(div_wards),
-                wards_online=len(div_wards),
-                wards_offline=0,
-                active_alerts_count=0,
-                alerts_by_type={"leak_suspected": 0, "continuous_flow": 0, "high_usage": 0},
+                wards_online=wards_online,
+                wards_offline=wards_offline,
+                active_alerts_count=sum(alerts_by_type.values()),
+                alerts_by_type=alerts_by_type,
                 top_wards_by_usage=top_wards,
                 hourly_inlet_profile=hourly_inlet,
                 hourly_ward_sum_profile=hourly_ward_sum,
-                cumulative_today_kl=round(sum_ward_mld * 1000.0 * 0.5, 1),
+                cumulative_today_kl=round(sum_vol_today_kl, 1),
                 wards=ward_summaries,
                 data_tier="SIMULATED"
             ))

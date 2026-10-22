@@ -305,7 +305,15 @@ Alerts strictly follow the ISA-18.2 compliant lifecycle:
   - Valves & Borewells: valve % open, groundwater depth, extraction rate.
 - Cross-Module Inspect: `sectionRegistry` enables telemetry inspection directly from the GIS map while preserving source attributes, rendering "Not published" for blank parameters.
 
+## D-28 · Smart Meters: Pipeline Snapping, Anomaly Rules & Ward Profiles
+
+- Pipeline Snapping: Each canonical division centroid is dynamically snapped at initialization to the nearest supply main coordinate in `data/raw/geojson/bwssb_water_lines_gt_300mm.geojson` via Euclidean distance minimization (computed dynamically; never hardcoded).
+- Source of Truth & Totals Equality: All division-level board metrics (`sum_ward_consumption_mld`, `cumulative_today_kl`, `wards_online`, `wards_offline`, `active_alerts_count`) are strictly computed as the sum/aggregation of constituent ward records.
+- Ward Diurnal Profiles: 24-hour demand profile in the inspector is anchored to the real ward baseline (`daily_baseline_mld` from data.gov.in) with normalized diurnal curve multipliers, featuring the mandatory chip text: "Daily baseline: real (data.gov.in). Hourly readings: simulated."
+- Anomaly Detection Rules: Evaluates rules from `config/iot/smart_meter_rules.yaml` (night-flow rise leak, continuous flow runaway, high usage >3x MAD, reverse flow, enclosure tamper, comms lost, low battery <15%), displaying status chips and counting towards division alert totals.
+
 ---
 
 *Updated: 2026-10-22*
+
 

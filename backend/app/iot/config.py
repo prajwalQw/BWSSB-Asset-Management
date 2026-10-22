@@ -32,6 +32,8 @@ WARD_CONSUMPTION_CSV_PATH = RAW_DATA_DIR / "bwssb_ward_water_consumption_2026.cs
 DIVISION_BOUNDARIES_GEOJSON_PATH = GEOJSON_DIR / "bwssb_division_boundaries.geojson"
 PUMPING_STATIONS_GEOJSON_PATH = GEOJSON_DIR / "bwssb_pumping_stations.geojson"
 STPS_GEOJSON_PATH = GEOJSON_DIR / "bwssb_stp_locations.geojson"
+SUPPLY_MAINS_GEOJSON_PATH = GEOJSON_DIR / "bwssb_water_lines_gt_300mm.geojson"
+
 
 def load_yaml(path: Path) -> dict:
     if not path.exists():
