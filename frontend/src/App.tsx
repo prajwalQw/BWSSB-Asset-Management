@@ -9,10 +9,17 @@ import { useTwinStore } from './store/useTwinStore';
 import { useTwinQuery, useSSELiveTelemetry } from './hooks/useTwinQuery';
 import { api } from './services/api';
 import { AlertItem, SelectedAsset } from './types';
-import { IoTWorkstation } from './features/iot/IoTWorkstation';
 import { iotApi } from './features/iot/services/iotApi';
 import { mergeIoTAlertsWithTwinAlerts } from './features/iot/registry/alertAdapter';
 import { IoTStreamProvider } from './features/iot/providers/IoTStreamProvider';
+import { IoTLeftRail } from './features/iot/components/IoTLeftRail';
+import { IoTRightInspector } from './features/iot/components/IoTRightInspector';
+import { StationSchematic } from './features/iot/components/StationSchematic';
+import { WaterFlowSankey } from './features/iot/components/WaterFlowSankey';
+import { IoTSimulateModal } from './features/iot/components/IoTSimulateModal';
+import { IoTAlertToasts } from './features/iot/components/IoTAlertToasts';
+import { useIoTStore } from './features/iot/store/useIoTStore';
+import { Map, GitCommit, Waves, Play } from 'lucide-react';
 
 export const App: React.FC = () => {
   const {
@@ -168,6 +175,47 @@ export const App: React.FC = () => {
     }
   }, [activeModule]);
 
+  // IoT Subsystem State
+  const [iotCentreView, setIotCentreView] = useState<'map' | 'schematic' | 'sankey'>('map');
+  const iotStore = useIoTStore();
+
+  const handleSelectIoTPump = (pumpId: string) => {
+    for (const s of iotStore.stations) {
+      const p = s.pumps.find((item) => item.pump_id === pumpId);
+      if (p) {
+        iotStore.setSelectedPump(p);
+        iotStore.setSelectedInspectorType('pump');
+        return;
+      }
+    }
+  };
+
+  const handleSelectIoTDevice = (tag: string) => {
+    for (const s of iotStore.stations) {
+      const d = s.devices.find((item) => item.tag === tag);
+      if (d) {
+        iotStore.setSelectedDevice(d);
+        iotStore.setSelectedInspectorType(d.type_code === 'FIT' ? 'meter' : 'device');
+        return;
+      }
+    }
+  };
+
+  const handleSelectIoTDivision = (divName: string) => {
+    const div = iotStore.divisions.find((d) => d.division_name === divName);
+    if (div) {
+      iotStore.setSelectedDivision(div);
+      iotStore.setSelectedInspectorType('division');
+    }
+  };
+
+  const handleSelectIoTAlert = (alert: any) => {
+    if (alert.coordinates) {
+      setFlyToTarget(alert.coordinates);
+      setIotCentreView('map');
+    }
+  };
+
   return (
     <IoTStreamProvider>
       <div className="h-screen w-screen overflow-hidden grid grid-rows-[56px_1fr] bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased">
@@ -185,48 +233,182 @@ export const App: React.FC = () => {
         onModuleChange={handleModuleChange}
       />
 
-      {/* 2. Main Workstation Area: GIS Workstation or IoT Workstation */}
-      {/* Retain GIS map mounted in DOM so WebGL context, camera, and loaded network datasets are preserved */}
-      <div className={`h-full w-full overflow-hidden relative ${activeModule === 'GIS' ? 'flex' : 'hidden'}`}>
-        {/* Left Rail (300px, Collapsible) */}
-        <LeftRail
-          alerts={alertsList}
-          onFlyToAlert={handleFlyToAlert}
-          onGoToShortcut={handleGoToShortcut}
-        />
-
-        {/* Center Map Stage (Full Height) */}
-        <main className="flex-1 h-full relative overflow-hidden bg-slate-950">
-          <DigitalTwinMap
-            selectedAsset={selectedAsset}
-            onSelectAsset={setSelectedAsset}
-            activeScenario={activeScenario}
-            currentHour={12}
-            isDarkTheme={theme === 'dark' || theme === 'satellite'}
-            activeLeakPipeId={activeLeakPipeId || undefined}
-            flyToTarget={flyToTarget}
+      {/* 2. Main Workstation Area: Single persistent map with dynamic GIS/IoT sidebars */}
+      <div className="h-full w-full overflow-hidden relative flex">
+        {/* Left Rail (300px) */}
+        {activeModule === 'GIS' ? (
+          <LeftRail
+            alerts={alertsList}
+            onFlyToAlert={handleFlyToAlert}
+            onGoToShortcut={handleGoToShortcut}
           />
+        ) : (
+          <IoTLeftRail
+            stations={iotStore.stations}
+            divisions={iotStore.divisions}
+            alerts={iotStore.alerts}
+            selectedId={iotStore.selectedPump?.pump_id || iotStore.selectedDevice?.tag || iotStore.selectedDivision?.division_name || null}
+            onSelectStation={(stn) => {
+              iotStore.setSelectedStation(stn);
+              if (stn.coordinates) setFlyToTarget(stn.coordinates);
+            }}
+            onSelectPump={handleSelectIoTPump}
+            onSelectDevice={handleSelectIoTDevice}
+            onSelectDivision={handleSelectIoTDivision}
+            onSelectAlert={handleSelectIoTAlert}
+          />
+        )}
+
+        {/* Center Main Stage */}
+        <main className="flex-1 h-full relative overflow-hidden bg-slate-950 flex flex-col">
+          {/* Subheader when in IoT mode */}
+          {activeModule === 'IOT' && (
+            <div className="h-10 px-4 border-b border-slate-800 bg-slate-900/90 flex items-center justify-between z-20 shrink-0">
+              <div className="flex items-center gap-1.5 rounded-lg border border-slate-800 p-0.5 bg-slate-950 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setIotCentreView('map')}
+                  className={`px-3 py-1 rounded-md font-medium transition-all flex items-center gap-1.5 ${
+                    iotCentreView === 'map'
+                      ? 'bg-sky-600 text-white shadow-sm font-semibold'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <Map className="w-3.5 h-3.5" />
+                  <span>Map</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIotCentreView('schematic')}
+                  className={`px-3 py-1 rounded-md font-medium transition-all flex items-center gap-1.5 ${
+                    iotCentreView === 'schematic'
+                      ? 'bg-sky-600 text-white shadow-sm font-semibold'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <GitCommit className="w-3.5 h-3.5" />
+                  <span>Station schematic</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIotCentreView('sankey')}
+                  className={`px-3 py-1 rounded-md font-medium transition-all flex items-center gap-1.5 ${
+                    iotCentreView === 'sankey'
+                      ? 'bg-sky-600 text-white shadow-sm font-semibold'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <Waves className="w-3.5 h-3.5" />
+                  <span>Water flow (MLD)</span>
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {iotCentreView === 'schematic' && iotStore.stations.length > 0 && (
+                  <select
+                    value={iotStore.selectedStation?.id || ''}
+                    onChange={(e) => {
+                      const found = iotStore.stations.find((s) => s.id === e.target.value);
+                      if (found) iotStore.setSelectedStation(found);
+                    }}
+                    className="h-7 px-2.5 rounded bg-slate-800 border border-slate-700 text-xs font-mono text-slate-200"
+                  >
+                    {iotStore.stations.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => iotStore.setIsSimulateOpen(true)}
+                  className="h-7 px-3 rounded text-xs font-semibold flex items-center gap-1.5 bg-purple-600 hover:bg-purple-500 text-white transition-colors shadow-sm"
+                >
+                  <Play className="w-3 h-3 fill-current" />
+                  <span>Simulate IoT</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Central Stage Display: Map and Schematic/Sankey Overlays */}
+          <div className="flex-1 w-full h-full relative overflow-hidden">
+            {/* The Persistent Map: Never recreated on route switch */}
+            <div className={`w-full h-full ${activeModule === 'IOT' && iotCentreView !== 'map' ? 'invisible pointer-events-none' : 'visible'}`}>
+              <DigitalTwinMap
+                activeModule={activeModule}
+                selectedAsset={selectedAsset}
+                onSelectAsset={(asset) => {
+                  setSelectedAsset(asset);
+                }}
+                activeScenario={activeScenario}
+                currentHour={12}
+                isDarkTheme={theme === 'dark' || theme === 'satellite'}
+                activeLeakPipeId={activeLeakPipeId || undefined}
+                flyToTarget={flyToTarget}
+              />
+            </div>
+
+            {/* Schematic Overlay */}
+            {activeModule === 'IOT' && iotCentreView === 'schematic' && iotStore.selectedStation && (
+              <div className="absolute inset-0 bg-slate-950 z-10 overflow-auto">
+                <StationSchematic
+                  station={iotStore.selectedStation}
+                  onSelectElement={(type, id) => {
+                    if (type === 'pump') handleSelectIoTPump(id);
+                    else if (type === 'meter' || type === 'flow_sensor') handleSelectIoTDevice(id);
+                  }}
+                  selectedElementId={iotStore.selectedPump?.pump_id || iotStore.selectedDevice?.tag}
+                />
+              </div>
+            )}
+
+            {/* Sankey Flow Overlay */}
+            {activeModule === 'IOT' && iotCentreView === 'sankey' && (
+              <div className="absolute inset-0 bg-slate-950 z-10 overflow-auto">
+                <WaterFlowSankey
+                  corridors={iotStore.corridors}
+                  balance={iotStore.waterBalance || {
+                    total_inflow_mld: 2250.0,
+                    total_outflow_mld: 1845.0,
+                    storage_change_mld: 12.0,
+                    unaccounted_mld: 393.0,
+                    unaccounted_pct: 17.5,
+                    balanced: true,
+                    data_tier: 'SIMULATED'
+                  }}
+                />
+              </div>
+            )}
+          </div>
         </main>
 
-        {/* Right Inspector (380px, Context-Sensitive, Never Blank) */}
-        <RightInspector
-          asset={selectedAsset}
-          onClose={() => setSelectedAsset(null)}
-          onZoomTo={(coords) => setFlyToTarget(coords)}
-          allAlerts={alertsList}
-          isFeedFresh={isFeedFresh}
-          liveVoltageV={liveVoltageV}
-          liveCurrentA={liveCurrentA}
-        />
+        {/* Right Inspector (380px) */}
+        {activeModule === 'GIS' ? (
+          <RightInspector
+            asset={selectedAsset}
+            onClose={() => setSelectedAsset(null)}
+            onZoomTo={(coords) => setFlyToTarget(coords)}
+            allAlerts={alertsList}
+            isFeedFresh={isFeedFresh}
+            liveVoltageV={liveVoltageV}
+            liveCurrentA={liveCurrentA}
+          />
+        ) : (
+          <IoTRightInspector
+            selectedType={iotStore.selectedInspectorType}
+            selectedPump={iotStore.selectedPump}
+            selectedDevice={iotStore.selectedDevice}
+            selectedDivision={iotStore.selectedDivision}
+            onClose={() => iotStore.setSelectedInspectorType(null)}
+            onZoomTo={(coords) => setFlyToTarget(coords)}
+          />
+        )}
       </div>
 
-      {activeModule === 'IOT' && (
-        <div className="h-full w-full overflow-hidden relative">
-          <IoTWorkstation />
-        </div>
-      )}
-
-      {/* 3. Simulate Popover (Anchored, not a separate page, NO time slider bar) */}
+      {/* 3. Simulate Popover Modal */}
       {isSimulateOpen && (
         <SimulatePopover
           onClose={() => setIsSimulateOpen(false)}
@@ -237,7 +419,31 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* 4. Admin Drawer (Right Slide-over, 420px) */}
+      {iotStore.isSimulateOpen && (
+        <IoTSimulateModal
+          onClose={() => iotStore.setIsSimulateOpen(false)}
+          onRefresh={() => {}}
+        />
+      )}
+
+      {/* 4. IoT Alert Toasts */}
+      <IoTAlertToasts
+        alerts={iotStore.alerts}
+        onZoomTo={(coords) => {
+          setFlyToTarget(coords);
+          setIotCentreView('map');
+        }}
+        onAcknowledge={(id) => {
+          iotStore.acknowledgeAlertLocally(id);
+          iotApi.acknowledgeAlert(id).catch(console.error);
+        }}
+        onSnooze={(id) => {
+          iotStore.snoozeAlertLocally(id);
+          iotApi.snoozeAlert(id).catch(console.error);
+        }}
+      />
+
+      {/* 5. Admin Drawer */}
       <AdminDrawer
         isOpen={isAdminDrawerOpen}
         onClose={() => setIsAdminDrawerOpen(false)}

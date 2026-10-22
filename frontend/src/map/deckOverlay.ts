@@ -22,6 +22,7 @@ import { SelectedAsset } from '../types';
 import { layerRegistry } from '../features/iot/registry/layerRegistry';
 
 export interface DeckOverlayProps {
+  activeModule?: 'GIS' | 'IOT';
   theme: BasemapTheme;
   zoom: number;
   currentTime: number;
@@ -218,6 +219,7 @@ export function buildDeckLayers(props: DeckOverlayProps) {
       new PathLayer({
         id: 'pipes-casing-layer',
         data: visiblePipes,
+        opacity: props.activeModule === 'IOT' ? 0.35 : 1.0,
         getPath: (d: FlatPipeSegment) => d.path,
         getColor: (d: FlatPipeSegment) => {
           const isSelected = selectedAsset && (selectedAsset.id === d.properties?.id || selectedAsset.id === d.id);
@@ -246,6 +248,7 @@ export function buildDeckLayers(props: DeckOverlayProps) {
       new PathLayer({
         id: 'pipes-core-layer',
         data: visiblePipes,
+        opacity: props.activeModule === 'IOT' ? 0.35 : 1.0,
         getPath: (d: FlatPipeSegment) => d.path,
         getColor: (d: FlatPipeSegment) => {
           const status = (d.properties?.status || 'NORMAL') as AssetStatus;
@@ -375,7 +378,7 @@ export function buildDeckLayers(props: DeckOverlayProps) {
   // ---------------------------------------------------------------------------
   // 7. P&ID Station and Infrastructure Symbology (z >= 11)
   // ---------------------------------------------------------------------------
-  if (atlas && zoom >= lod.trunkMainsMinZoom) {
+  if (atlas && zoom >= lod.trunkMainsMinZoom && props.activeModule !== 'IOT') {
     const assetItems: any[] = [];
 
     // Pumping Stations
@@ -479,7 +482,7 @@ export function buildDeckLayers(props: DeckOverlayProps) {
   // ---------------------------------------------------------------------------
   // 8. High-Zoom SITE-PLAN View (z >= 17)
   // ---------------------------------------------------------------------------
-  if (atlas && zoom >= lod.sitePlanMinZoom) {
+  if (atlas && zoom >= lod.sitePlanMinZoom && props.activeModule !== 'IOT') {
     const siteConfig = LOD_CONFIG.sitePlans.PS_TATAGUNI_TERMINAL;
     if (siteConfig) {
       const origin = siteConfig.origin;

@@ -21,6 +21,9 @@ from typing import Dict, List, Optional, Any, Tuple
 import pandas as pd
 import logging
 
+import hashlib
+import re
+
 from ..config import (
     SIM_SEED,
     STATIONS_PATH,
@@ -30,8 +33,11 @@ from ..config import (
     ADVISORY_KB_PATH,
     BOREWELLS_PATH,
     DIVISION_ALIASES_PATH,
+    TEMPLATES_PATH,
     WARD_CONSUMPTION_CSV_PATH,
     DIVISION_BOUNDARIES_GEOJSON_PATH,
+    PUMPING_STATIONS_GEOJSON_PATH,
+    STPS_GEOJSON_PATH,
     load_yaml,
     load_json
 )
@@ -234,7 +240,261 @@ class IoTSimulationEngine:
                 "water_quality": wq_state,
             }
 
+        # 2. Auto-template all REAL pumping stations from GIS data
+        templates = load_yaml(TEMPLATES_PATH)
+        ps_tmpl = templates.get("pumping_station_template", {})
+        stp_tmpl = templates.get("stp_template", {})
+
+        if PUMPING_STATIONS_GEOJSON_PATH.exists():
+            try:
+                ps_geo = load_json(PUMPING_STATIONS_GEOJSON_PATH)
+                for feat in ps_geo.get("features", []):
+                    props = feat.get("properties", {})
+                    coords = feat.get("geometry", {}).get("coordinates", [])
+                    if not coords or len(coords) < 2:
+                        continue
+                    ps_id = str(props.get("KGISPumpStationID") or props.get("OBJECTID") or props.get("PumpStationID") or "").strip()
+                    stn_id = f"PS_GIS_{ps_id}"
+
+                    # Avoid duplicate hero station
+                    is_hero = False
+                    for existing_stn in self.stations_state.values():
+                        ecoords = existing_stn["cfg"].get("coordinates", [])
+                        if ecoords and abs(ecoords[0] - coords[0]) < 0.005 and abs(ecoords[1] - coords[1]) < 0.005:
+                            is_hero = True
+                            break
+                    if is_hero:
+                        continue
+
+                    seed = int(hashlib.md5(f"ps_{ps_id}".encode()).hexdigest(), 16) % (2**32)
+                    prng = random.Random(seed)
+
+                    # Pump count from capacity if published, else default 2
+                    cap_raw = str(props.get("Capacity", ""))
+                    pump_count = ps_tmpl.get("default_pump_count", 2)
+                    nums = re.findall(r"\d+", cap_raw)
+                    if nums:
+                        val = float(nums[0])
+                        if val > 0:
+                            pump_count = max(2, min(6, int(val / 25.0)))
+
+                    stn_name = props.get("name") or f"Pumping Station {ps_id}"
+
+                    stn_cfg = {
+                        "id": stn_id,
+                        "name": stn_name,
+                        "zone": "City",
+                        "station_class": "booster",
+                        "coordinates": [float(coords[0]), float(coords[1])],
+                        "site_rotation_deg": 0.0,
+                        "data_tier": "SIMULATED",
+                    }
+
+                    tank_cap = 15000.0 * pump_count
+                    tank_state = {
+                        "id": f"TANK_{stn_id}",
+                        "name": f"{stn_name} Reservoir",
+                        "capacity_m3": tank_cap,
+                        "height_m": 8.0,
+                        "level_pct": prng.uniform(45.0, 75.0),
+                        "level_m": 5.0,
+                        "volume_m3": tank_cap * 0.6,
+                        "inflow_lps": 120.0 * pump_count,
+                        "outflow_lps": 115.0 * pump_count,
+                        "start_level_pct": 30.0,
+                        "stop_level_pct": 85.0,
+                    }
+
+                    pumps_state = {}
+                    for p_idx in range(1, pump_count + 1):
+                        pid = f"{stn_id}_P{p_idx}"
+                        p_running = prng.choice([True, True, False])
+                        rated_kw = ps_tmpl.get("pumps", {}).get("rated_power_kw", 250.0)
+                        rated_v = ps_tmpl.get("pumps", {}).get("rated_voltage_v", 415.0)
+                        rated_i = ps_tmpl.get("pumps", {}).get("rated_fla_a", 420.0)
+                        p_cfg = {
+                            "id": pid,
+                            "tag": f"P{p_idx}",
+                            "name": f"Pump {p_idx}",
+                            "class": "booster",
+                            "rated_power_kw": rated_kw,
+                            "rated_voltage_v": rated_v,
+                            "rated_fla_a": rated_i,
+                            "inrush_factor_k": 2.5,
+                            "auto_control_mode": "Automatic",
+                            "devices": {
+                                "flow_meter": {
+                                    "tag": f"FIT_{pid}",
+                                    "type": "FIT",
+                                    "name": f"Pump {p_idx} Discharge Flow Meter",
+                                },
+                                "power_monitor": {
+                                    "tag": f"PMM_{pid}",
+                                    "type": "PMM",
+                                    "name": f"Pump {p_idx} Motor Monitor",
+                                }
+                            }
+                        }
+                        flow_val = (rated_kw * 1.5) if p_running else 0.0
+                        i_val = (rated_i * 0.85) if p_running else 0.0
+                        pumps_state[pid] = {
+                            "cfg": p_cfg,
+                            "state": "RUNNING" if p_running else "OFF",
+                            "state_timer_s": 500.0,
+                            "run_hours": round(prng.uniform(800.0, 6000.0), 1),
+                            "starts_count": prng.randint(100, 450),
+                            "start_elapsed_s": 0.0,
+                            "flow_lps": round(flow_val, 1),
+                            "head_m": 45.0 if p_running else 0.0,
+                            "current_r": round(i_val, 1),
+                            "current_y": round(i_val, 1),
+                            "current_b": round(i_val, 1),
+                            "current_avg": round(i_val, 1),
+                            "voltage_r": rated_v,
+                            "voltage_y": rated_v,
+                            "voltage_b": rated_v,
+                            "voltage_avg": rated_v,
+                            "active_power_kw": round(rated_kw * 0.82 if p_running else 0.0, 1),
+                            "power_factor": 0.87,
+                            "vibration_rms_mms": 1.5 if p_running else 0.1,
+                            "inrush_peak_a": 0.0,
+                            "energy_kwh": round(prng.uniform(20000.0, 120000.0), 1),
+                        }
+
+                    self.stations_state[stn_id] = {
+                        "cfg": stn_cfg,
+                        "tank": tank_state,
+                        "pumps": pumps_state,
+                        "water_quality": {
+                            "tag": f"AIT_{stn_id}",
+                            "turbidity_ntu": 0.9,
+                            "ph": 7.3,
+                            "residual_chlorine_mgl": 0.6,
+                            "last_seen": time.time(),
+                            "comms_state": "ONLINE"
+                        }
+                    }
+            except Exception as e:
+                logger.warning(f"Error loading GIS pumping stations: {e}")
+
+        # 3. Auto-template all REAL STPs from GIS data
+        if STPS_GEOJSON_PATH.exists():
+            try:
+                stp_geo = load_json(STPS_GEOJSON_PATH)
+                for feat in stp_geo.get("features", []):
+                    props = feat.get("properties", {})
+                    coords = feat.get("geometry", {}).get("coordinates", [])
+                    if not coords or len(coords) < 2:
+                        continue
+                    stp_id = str(props.get("STPId") or props.get("name") or "").strip()
+                    stn_id = f"STP_GIS_{stp_id}"
+
+                    seed = int(hashlib.md5(f"stp_{stp_id}".encode()).hexdigest(), 16) % (2**32)
+                    prng = random.Random(seed)
+
+                    raw_name = str(props.get("STPName") or props.get("name") or f"STP {stp_id}").strip()
+                    stn_name = re.sub(r"\s+", " ", raw_name)
+
+                    stn_cfg = {
+                        "id": stn_id,
+                        "name": stn_name,
+                        "zone": "City",
+                        "station_class": "stp",
+                        "coordinates": [float(coords[0]), float(coords[1])],
+                        "site_rotation_deg": 0.0,
+                        "data_tier": "SIMULATED",
+                    }
+
+                    tank_cap = 20000.0
+                    tank_state = {
+                        "id": f"TANK_{stn_id}",
+                        "name": f"{stn_name} Equalization Sump",
+                        "capacity_m3": tank_cap,
+                        "height_m": 6.0,
+                        "level_pct": prng.uniform(50.0, 80.0),
+                        "level_m": 4.0,
+                        "volume_m3": tank_cap * 0.65,
+                        "inflow_lps": 220.0,
+                        "outflow_lps": 215.0,
+                        "start_level_pct": 25.0,
+                        "stop_level_pct": 90.0,
+                    }
+
+                    pumps_state = {}
+                    equipment = [
+                        ("LP1", "Lift Pump 1", 90.0, 155.0),
+                        ("LP2", "Lift Pump 2", 90.0, 155.0),
+                        ("BL1", "Aeration Blower 1", 110.0, 190.0),
+                        ("BL2", "Aeration Blower 2", 110.0, 190.0),
+                    ]
+                    for eq_tag, eq_name, eq_kw, eq_fla in equipment:
+                        pid = f"{stn_id}_{eq_tag}"
+                        running = prng.choice([True, True, False])
+                        p_cfg = {
+                            "id": pid,
+                            "tag": eq_tag,
+                            "name": eq_name,
+                            "class": "stp_equipment",
+                            "rated_power_kw": eq_kw,
+                            "rated_voltage_v": 415.0,
+                            "rated_fla_a": eq_fla,
+                            "auto_control_mode": "Automatic",
+                            "devices": {
+                                "flow_meter": {
+                                    "tag": f"FIT_{pid}",
+                                    "type": "FIT",
+                                    "name": f"{eq_name} Flow",
+                                },
+                                "power_monitor": {
+                                    "tag": f"PMM_{pid}",
+                                    "type": "PMM",
+                                    "name": f"{eq_name} Monitor",
+                                }
+                            }
+                        }
+                        pumps_state[pid] = {
+                            "cfg": p_cfg,
+                            "state": "RUNNING" if running else "OFF",
+                            "state_timer_s": 400.0,
+                            "run_hours": round(prng.uniform(1500.0, 8000.0), 1),
+                            "starts_count": prng.randint(80, 300),
+                            "start_elapsed_s": 0.0,
+                            "flow_lps": round(110.0 if running else 0.0, 1),
+                            "head_m": 18.0 if running else 0.0,
+                            "current_r": round(eq_fla * 0.85 if running else 0.0, 1),
+                            "current_y": round(eq_fla * 0.85 if running else 0.0, 1),
+                            "current_b": round(eq_fla * 0.85 if running else 0.0, 1),
+                            "current_avg": round(eq_fla * 0.85 if running else 0.0, 1),
+                            "voltage_r": 415.0,
+                            "voltage_y": 415.0,
+                            "voltage_b": 415.0,
+                            "voltage_avg": 415.0,
+                            "active_power_kw": round(eq_kw * 0.8 if running else 0.0, 1),
+                            "power_factor": 0.86,
+                            "vibration_rms_mms": 1.2 if running else 0.1,
+                            "inrush_peak_a": 0.0,
+                            "energy_kwh": round(prng.uniform(35000.0, 180000.0), 1),
+                        }
+
+                    self.stations_state[stn_id] = {
+                        "cfg": stn_cfg,
+                        "tank": tank_state,
+                        "pumps": pumps_state,
+                        "water_quality": {
+                            "tag": f"AIT_{stn_id}",
+                            "turbidity_ntu": round(prng.uniform(4.0, 8.5), 1),
+                            "ph": round(prng.uniform(7.1, 7.8), 2),
+                            "dissolved_oxygen_mgl": round(prng.uniform(2.5, 4.8), 2),
+                            "residual_chlorine_mgl": 0.2,
+                            "last_seen": time.time(),
+                            "comms_state": "ONLINE"
+                        }
+                    }
+            except Exception as e:
+                logger.warning(f"Error loading GIS STPs: {e}")
+
     def _init_leak_monitors(self):
+
         # Transmission corridor between Tataguni and Mount Joy
         self.leak_monitors["CORR_TG_MJ"] = PipeSegmentLeakMonitor(
             segment_id="CORR_TG_MJ",
@@ -310,7 +570,10 @@ class IoTSimulationEngine:
         diurnal_factor = self._get_diurnal_factor(curr_hour)
 
         # 1. Update Each Pumping Station
+        is_5s_tick = (self.tick_count % 5 == 0)
         for stn_id, stn_obj in self.stations_state.items():
+            if (stn_id.startswith("PS_GIS_") or stn_id.startswith("STP_GIS_")) and not is_5s_tick:
+                continue
             tank = stn_obj["tank"]
             pumps = stn_obj["pumps"]
             total_station_flow_lps = 0.0

@@ -282,5 +282,15 @@ Alerts strictly follow the ISA-18.2 compliant lifecycle:
 
 ---
 
+## D-26 · IoT Map Layer Visibility, Dimmed Context & GIS Auto-Templating
+
+- Single Map Mount: App-level `<DigitalTwinMap activeModule={activeModule} />` preserves WebGL canvas across GIS and IoT mode switches.
+- Pipe Context Dimming: When `activeModule === 'IOT'`, GIS pipe casing and core PathLayers are dimmed to `0.35` opacity.
+- Auto-Templating GIS Assets: All 41 pumping stations and 34 STPs from GeoJSON are automatically templated using `config/iot/templates.yaml` with deterministic random seeds per asset ID.
+- Default Layer Toggles: All 13 IoT layers default to ON (`pumpingStations`, `stps`, `tanks`, `wtps`, `flowMeters`, `pressureSensors`, `levelSensors`, `qualityAnalysers`, `borewells`, `valves`, `smartMeters`, `mldCorridors`, `gisPipes`).
+- Interactive Left Rail: Added `Layers` tab with live toggle switches and symbology legend. Removed arbitrary slice limits on divisions and wards.
+
+---
+
 *Updated: 2026-10-22*
 

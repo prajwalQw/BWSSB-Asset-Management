@@ -14,6 +14,22 @@ import {
   DeviceTelemetry
 } from '../types';
 
+export interface IoTLayerToggles {
+  pumpingStations: boolean;
+  stps: boolean;
+  tanks: boolean;
+  wtps: boolean;
+  flowMeters: boolean;
+  pressureSensors: boolean;
+  levelSensors: boolean;
+  qualityAnalysers: boolean;
+  borewells: boolean;
+  valves: boolean;
+  smartMeters: boolean;
+  mldCorridors: boolean;
+  gisPipes: boolean;
+}
+
 export interface IoTStoreState {
   // Telemetry & Assets
   stations: StationOverview[];
@@ -22,6 +38,7 @@ export interface IoTStoreState {
   waterBalance: WaterBalanceSummary | null;
   alerts: IoTAlertItem[];
   activeInjections: Record<string, any>;
+  layerToggles: IoTLayerToggles;
 
   // Simulation Clock
   simClock: {
@@ -71,6 +88,9 @@ export interface IoTStoreState {
   setActiveToast: (toast: IoTStoreState['activeToast']) => void;
   setIsSimulateOpen: (open: boolean) => void;
 
+  toggleLayer: (layer: keyof IoTLayerToggles) => void;
+  setLayerVisibility: (layer: keyof IoTLayerToggles, visible: boolean) => void;
+
   acknowledgeAlertLocally: (alertId: string) => void;
   snoozeAlertLocally: (alertId: string) => void;
   clearAlertLocally: (alertId: string) => void;
@@ -90,6 +110,21 @@ state = {
   waterBalance: null,
   alerts: [],
   activeInjections: {},
+  layerToggles: {
+    pumpingStations: true,
+    stps: true,
+    tanks: true,
+    wtps: true,
+    flowMeters: true,
+    pressureSensors: true,
+    levelSensors: true,
+    qualityAnalysers: true,
+    borewells: true,
+    valves: true,
+    smartMeters: true,
+    mldCorridors: true,
+    gisPipes: true,
+  },
   simClock: {
     ts: Date.now() / 1000,
     clock_utc: new Date().toISOString()
@@ -235,6 +270,28 @@ state = {
     notify();
   },
 
+  toggleLayer: (layer) => {
+    state = {
+      ...state,
+      layerToggles: {
+        ...state.layerToggles,
+        [layer]: !state.layerToggles[layer]
+      }
+    };
+    notify();
+  },
+
+  setLayerVisibility: (layer, visible) => {
+    state = {
+      ...state,
+      layerToggles: {
+        ...state.layerToggles,
+        [layer]: visible
+      }
+    };
+    notify();
+  },
+
   clearAlertLocally: (alertId) => {
     state = {
       ...state,
@@ -246,14 +303,24 @@ state = {
   }
 };
 
-export function useIoTStore(): IoTStoreState;
-export function useIoTStore<T>(selector: (state: IoTStoreState) => T): T;
-export function useIoTStore<T>(selector?: (state: IoTStoreState) => T): T | IoTStoreState {
-  return useSyncExternalStore(
-    (onStoreChange) => {
-      listeners.add(onStoreChange);
-      return () => listeners.delete(onStoreChange);
-    },
-    () => (selector ? selector(state) : state)
-  );
+
+export interface IoTStoreHook {
+  (): IoTStoreState;
+  <T>(selector: (state: IoTStoreState) => T): T;
+  getState: () => IoTStoreState;
 }
+
+export const useIoTStore: IoTStoreHook = Object.assign(
+  function useIoTStore<T>(selector?: (state: IoTStoreState) => T): T | IoTStoreState {
+    return useSyncExternalStore(
+      (onStoreChange) => {
+        listeners.add(onStoreChange);
+        return () => listeners.delete(onStoreChange);
+      },
+      () => (selector ? selector(state) : state)
+    );
+  },
+  {
+    getState: () => state
+  }
+);

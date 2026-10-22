@@ -1,0 +1,68 @@
+# Device Set Templates for GIS Pumping Stations and STPs
+# Used by engine to auto-generate simulated device sets for all real GIS assets
+
+version: "1.0.0"
+
+pumping_station_template:
+  default_pump_count: 2
+  capacity_mld_per_pump: 25.0
+  pumps:
+    rated_power_kw: 250.0
+    rated_voltage_v: 415.0
+    rated_fla_a: 420.0
+    starter_type: "star-delta"
+    inrush_factor_k: 2.5
+    devices:
+      - type: "FIT"
+        name: "Discharge Flow Meter"
+        unit: "MLD"
+      - type: "PMM"
+        name: "Power & Motor Monitor"
+        channels: ["voltage_3p", "current_3p", "active_power_kw", "run_state"]
+  station_devices:
+    - type: "PIT"
+      name: "Discharge Pressure Transmitter"
+      unit: "bar"
+      alarm_high_bar: 6.5
+      alarm_low_bar: 2.0
+    - type: "LIT"
+      name: "Sump Level Sensor"
+      unit: "m"
+      alarm_low_pct: 20.0
+      alarm_high_pct: 90.0
+
+stp_template:
+  lift_pumps_count: 2
+  aeration_blowers_count: 2
+  equipment:
+    lift_pump:
+      rated_power_kw: 90.0
+      rated_voltage_v: 415.0
+      rated_fla_a: 155.0
+    aeration_blower:
+      rated_power_kw: 110.0
+      rated_voltage_v: 415.0
+      rated_fla_a: 190.0
+  devices:
+    - type: "FIT"
+      role: "inlet"
+      name: "Raw Sewage Inlet Flow Meter"
+      unit: "MLD"
+    - type: "FIT"
+      role: "outlet"
+      name: "Treated Effluent Outlet Flow Meter"
+      unit: "MLD"
+    - type: "LIT"
+      name: "Equalization Tank Level"
+      unit: "m"
+    - type: "AIT"
+      name: "Effluent Quality Analyser"
+      parameters:
+        ph:
+          min: 6.5
+          max: 8.5
+        dissolved_oxygen_mgl:
+          min: 2.0
+          max: 6.0
+        turbidity_ntu:
+          max: 10.0

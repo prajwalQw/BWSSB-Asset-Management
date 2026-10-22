@@ -24,6 +24,7 @@ import {
 import { useTwinStore } from '../../store/useTwinStore';
 
 interface DigitalTwinMapProps {
+  activeModule?: 'GIS' | 'IOT';
   onSelectAsset: (asset: SelectedAsset | null) => void;
   selectedAsset: SelectedAsset | null;
   activeScenario: string;
@@ -46,6 +47,7 @@ let globalNetworkDataCache: {
 } | null = null;
 
 export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
+  activeModule = 'GIS',
   onSelectAsset,
   selectedAsset,
   activeScenario,
@@ -328,6 +330,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
     const impellerFrame = Math.floor(Date.now() / 500) % 2;
 
     const layers = buildDeckLayers({
+      activeModule,
       theme: activeTheme,
       zoom: coords.zoom,
       currentTime: currentTimeRef.current,
@@ -341,6 +344,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
 
     overlayRef.current.setProps({ layers });
   }, [
+    activeModule,
     activeTheme,
     coords.zoom,
     selectedAsset,

@@ -87,6 +87,7 @@ export interface IoTAlertItem {
   severity: AlertSeverity;
   title: string;
   location: string;
+  asset_id?: string;
   coordinates?: [number, number];
   metric_observed: string;
   recommendation: string;

@@ -29,3 +29,8 @@ export const layerRegistry = {
     return extraLayers;
   }
 };
+
+import { buildIoTDeckLayers } from '../map/iotDeckLayers';
+
+// Auto-register isolated IoT layer provider
+layerRegistry.register(buildIoTDeckLayers);

@@ -12,9 +12,12 @@ import {
   Layers,
   Building,
   CheckCircle2,
-  X
+  X,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { StationOverview, IoTAlertItem, DivisionBoardSummary } from '../types';
+import { useIoTStore, IoTLayerToggles } from '../store/useIoTStore';
 
 export interface IoTLeftRailProps {
   stations: StationOverview[];
@@ -39,14 +42,14 @@ export const IoTLeftRail: React.FC<IoTLeftRailProps> = ({
   onSelectDivision,
   onSelectAlert,
 }) => {
-  const [activeTab, setActiveTab] = useState<'devices' | 'alerts'>('devices');
+  const [activeTab, setActiveTab] = useState<'devices' | 'alerts' | 'layers'>('devices');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedStations, setExpandedStations] = useState<Record<string, boolean>>({
     PS_TATAGUNI: true,
   });
-  const [expandedDivisions, setExpandedDivisions] = useState<Record<string, boolean>>({
-    'South Division': false,
-  });
+  const [expandedDivisions, setExpandedDivisions] = useState<Record<string, boolean>>({});
+
+  const { layerToggles, toggleLayer } = useIoTStore();
 
   const toggleStation = (id: string) => {
     setExpandedStations((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -65,7 +68,7 @@ export const IoTLeftRail: React.FC<IoTLeftRailProps> = ({
 
   return (
     <aside className="w-[300px] border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col h-full select-none z-20 text-xs">
-      {/* 1. Header Tabs: Devices | Alerts */}
+      {/* 1. Header Tabs: Devices | Alerts | Layers */}
       <div className="flex border-b border-slate-200 dark:border-slate-800 p-1 bg-slate-100 dark:bg-slate-950">
         <button
           type="button"
@@ -99,6 +102,19 @@ export const IoTLeftRail: React.FC<IoTLeftRailProps> = ({
               {alerts.length}
             </span>
           )}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('layers')}
+          className={`flex-1 py-1.5 rounded-md font-medium transition-all flex items-center justify-center gap-1.5 ${
+            activeTab === 'layers'
+              ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-sm font-semibold'
+              : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
+          }`}
+        >
+          <SlidersHorizontal className="w-3.5 h-3.5" />
+          <span>Layers</span>
         </button>
       </div>
 
@@ -220,7 +236,7 @@ export const IoTLeftRail: React.FC<IoTLeftRailProps> = ({
                 BWSSB Divisions & Smart Meters
               </div>
               <div className="space-y-1 mt-1">
-                {divisions.slice(0, 6).map((div) => {
+                {divisions.map((div) => {
                   const isExp = !!expandedDivisions[div.division_name];
                   return (
                     <div key={div.division_name} className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 overflow-hidden">
@@ -245,9 +261,9 @@ export const IoTLeftRail: React.FC<IoTLeftRailProps> = ({
                       </button>
 
                       {isExp && (
-                        <div className="pl-6 pr-2 pb-2 space-y-1 border-t border-slate-100 dark:border-slate-800/60 pt-1.5 text-[11px]">
-                          {div.wards.slice(0, 8).map((w) => (
-                            <div key={w.ward_no} className="flex items-center justify-between py-0.5 text-slate-600 dark:text-slate-400">
+                        <div className="pl-6 pr-2 pb-2 space-y-1 border-t border-slate-100 dark:border-slate-800/60 pt-1.5 text-[11px] max-h-60 overflow-y-auto">
+                          {div.wards.map((w) => (
+                            <div key={w.ward_no} className="flex items-center justify-between py-0.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200">
                               <span className="truncate">W-{w.ward_no} {w.ward_name}</span>
                               <span className="font-mono text-[10px] tabular-nums font-medium text-slate-700 dark:text-slate-300">
                                 {w.flow_lps.toFixed(1)} L/s
@@ -262,7 +278,7 @@ export const IoTLeftRail: React.FC<IoTLeftRailProps> = ({
               </div>
             </div>
           </>
-        ) : (
+        ) : activeTab === 'alerts' ? (
           /* Alerts Tab */
           <div className="space-y-2">
             {filteredAlerts.length === 0 ? (
@@ -294,6 +310,95 @@ export const IoTLeftRail: React.FC<IoTLeftRailProps> = ({
                 </div>
               ))
             )}
+          </div>
+        ) : (
+          /* Layers Tab with Toggles and Legend */
+          <div className="space-y-3 p-1">
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono uppercase font-bold text-slate-400 block tracking-wider">
+                Map Layer Visibility
+              </span>
+              <p className="text-[11px] text-slate-500">
+                Toggle live IoT layers and telemetry overlays on the map stage.
+              </p>
+            </div>
+
+            <div className="space-y-1.5">
+              {[
+                { key: 'pumpingStations' as keyof IoTLayerToggles, label: 'Pumping Stations', desc: 'Status rings, running pump counts, site plans' },
+                { key: 'stps' as keyof IoTLayerToggles, label: 'Sewage Treatment Plants (STP)', desc: 'Aeration blowers, lift pumps, effluent quality' },
+                { key: 'tanks' as keyof IoTLayerToggles, label: 'GLR / OHT Reservoirs', desc: 'Water levels and storage volume' },
+                { key: 'wtps' as keyof IoTLayerToggles, label: 'Water Treatment Plants (WTP)', desc: 'Clarifiers, filtration beds' },
+                { key: 'flowMeters' as keyof IoTLayerToggles, label: 'Flow Meters (FIT)', desc: 'Discharge & corridor totalisers' },
+                { key: 'pressureSensors' as keyof IoTLayerToggles, label: 'Pressure Transmitters (PIT)', desc: 'Header pressure bar / alarms' },
+                { key: 'levelSensors' as keyof IoTLayerToggles, label: 'Level Sensors (LIT)', desc: 'Sump & tank depth transmitters' },
+                { key: 'qualityAnalysers' as keyof IoTLayerToggles, label: 'Quality Analysers (AIT)', desc: 'pH, turbidity, residual chlorine' },
+                { key: 'borewells' as keyof IoTLayerToggles, label: 'Borewells', desc: 'Groundwater extraction points' },
+                { key: 'valves' as keyof IoTLayerToggles, label: 'Control Valves', desc: 'Isolation & flow control valves' },
+                { key: 'smartMeters' as keyof IoTLayerToggles, label: 'Smart Meter Boards', desc: 'Division supply centroids & NRW' },
+                { key: 'mldCorridors' as keyof IoTLayerToggles, label: 'MLD Corridors', desc: 'Animated bulk transmission flow' },
+                { key: 'gisPipes' as keyof IoTLayerToggles, label: 'GIS Pipes Context', desc: 'Dimmed background network (35% opacity)' },
+              ].map(({ key, label, desc }) => {
+                const isEnabled = layerToggles[key];
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => toggleLayer(key)}
+                    className={`w-full p-2.5 rounded-lg border text-left flex items-start justify-between gap-2 transition-all ${
+                      isEnabled
+                        ? 'border-sky-500/50 bg-sky-50/50 dark:bg-sky-950/30 text-slate-800 dark:text-slate-100'
+                        : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 text-slate-400 opacity-60'
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-xs flex items-center gap-1.5">
+                        <span>{label}</span>
+                      </div>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight block mt-0.5">
+                        {desc}
+                      </span>
+                    </div>
+                    <div className="mt-0.5">
+                      {isEnabled ? (
+                        <Eye className="w-4 h-4 text-sky-500 shrink-0" />
+                      ) : (
+                        <EyeOff className="w-4 h-4 text-slate-400 shrink-0" />
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Symbology Legend Reference */}
+            <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2">
+              <span className="text-[10px] font-mono uppercase font-bold text-slate-400 block tracking-wider">
+                Symbology Legend
+              </span>
+              <div className="space-y-1.5 text-[11px] font-mono text-slate-600 dark:text-slate-300">
+                <div className="flex items-center gap-2">
+                  <span className="w-3.5 h-3.5 rounded-full border-2 border-emerald-500 bg-emerald-500/20 inline-block" />
+                  <span>Normal Asset (Healthy / Active)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3.5 h-3.5 rounded-full border-2 border-rose-500 bg-rose-500/20 inline-block" />
+                  <span>Alarm Triggered (High / Trip / Leak)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3.5 h-3.5 rounded-full border-2 border-purple-500 bg-purple-500/20 inline-block" />
+                  <span>Smart Meter Board Centroid</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-4 h-1.5 rounded bg-sky-500 inline-block" />
+                  <span>MLD Bulk Corridor (Flow animated)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-4 h-1 rounded bg-slate-500 opacity-35 inline-block" />
+                  <span>GIS Pipes (Dimmed 35% context)</span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
