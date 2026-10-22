@@ -312,8 +312,21 @@ Alerts strictly follow the ISA-18.2 compliant lifecycle:
 - Ward Diurnal Profiles: 24-hour demand profile in the inspector is anchored to the real ward baseline (`daily_baseline_mld` from data.gov.in) with normalized diurnal curve multipliers, featuring the mandatory chip text: "Daily baseline: real (data.gov.in). Hourly readings: simulated."
 - Anomaly Detection Rules: Evaluates rules from `config/iot/smart_meter_rules.yaml` (night-flow rise leak, continuous flow runaway, high usage >3x MAD, reverse flow, enclosure tamper, comms lost, low battery <15%), displaying status chips and counting towards division alert totals.
 
+## D-29 · Simple Leak Simulation Card & Top-Centre Detection Popup
+
+- Single Card UI: Replaced multi-tab simulate dialog with a streamlined single card "Create a leak":
+  - `From` dropdown (pumps/stations/tanks) and `To` dropdown (strictly filtered to connected downstream nodes in the network graph).
+  - Leak size slider (5 to 100 L/s) with 3 presets: Small (15 L/s), Medium (45 L/s), Large (85 L/s).
+  - Pipe position slider (10% to 90%, default 50%).
+  - "Start leak" (primary) and "Stop leak" actions, plus "Running now" active leak list with quick Stop buttons.
+  - Collapsed "More tests" accordion for pump trip, sensor offline, meter offline, and compact audit log.
+- Physics & Network Detection: Mass-balance evaluation (`Q_from - Q_to - dV/dt`) immediately registers downstream flow drop, downstream pressure drop, and accelerates tank drawdown.
+- Top-Centre Leak Popup: Appears once per alert ID in the top center of the viewport with red alert icon, title "Possible leak between {From} and {To}", loss (L/s & kL/day), confidence, position range, potential impacts, advisory steps, and "Show on map" (flies to segment with uncertainty halo), "Acknowledge", and "Snooze" actions.
+- Persistence & Re-pop Prevention: Popups record shown IDs in `localStorage` (`bwssb_iot_shown_popup_alerts`) so they never re-pop upon page refresh, while remaining in the Alerts list as ACTIVE until cleared by "Stop leak".
+
 ---
 
 *Updated: 2026-10-22*
+
 
 

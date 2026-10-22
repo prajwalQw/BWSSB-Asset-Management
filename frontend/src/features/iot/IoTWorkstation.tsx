@@ -6,6 +6,7 @@ import { WaterFlowSankey } from './components/WaterFlowSankey';
 import { IoTRightInspector } from './components/IoTRightInspector';
 import { IoTSimulateModal } from './components/IoTSimulateModal';
 import { IoTAlertToasts } from './components/IoTAlertToasts';
+import { IoTLeakDetectionPopup } from './components/IoTLeakDetectionPopup';
 import { DigitalTwinMap } from '../../components/map/DigitalTwinMap';
 import { iotApi } from './services/iotApi';
 import {
@@ -246,9 +247,26 @@ export const IoTWorkstation: React.FC = () => {
         />
       )}
 
-      {/* 4. Alert Toasts */}
-      <IoTAlertToasts
+      {/* 4. Top-Centre Leak Detection Popup (P5) */}
+      <IoTLeakDetectionPopup
         alerts={alerts}
+        onShowOnMap={(coords) => {
+          setFlyToTarget(coords);
+          setCentreView('map');
+        }}
+        onAcknowledge={(id) => {
+          acknowledgeAlertLocally(id);
+          iotApi.acknowledgeAlert(id).catch(console.error);
+        }}
+        onSnooze={(id) => {
+          snoozeAlertLocally(id);
+          iotApi.snoozeAlert(id).catch(console.error);
+        }}
+      />
+
+      {/* 5. General Alert Toasts */}
+      <IoTAlertToasts
+        alerts={alerts.filter(a => a.rule_id !== 'RULE-IOT-LEAK-01')}
         onZoomTo={(coords) => {
           setFlyToTarget(coords);
           setCentreView('map');

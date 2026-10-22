@@ -148,6 +148,43 @@ export function buildIoTDeckLayers(props: any) {
         })
       );
     }
+
+    // Active Leak Uncertainty Corridor Halo (P5)
+    const activeLeakAlerts = alerts.filter(
+      (a: IoTAlertItem) => a.active && (a.rule_id === 'RULE-IOT-LEAK-01' || a.category === 'HYDRAULIC_INTEGRITY')
+    );
+    if (activeLeakAlerts.length > 0) {
+      layers.push(
+        new ScatterplotLayer({
+          id: 'iot-leak-uncertainty-halo',
+          data: activeLeakAlerts,
+          getPosition: (d: IoTAlertItem) => d.coordinates || [77.5380, 12.9050],
+          getRadius: 45 + Math.sin(currentTime * 3) * 12,
+          radiusUnits: 'pixels',
+          getFillColor: [239, 68, 68, 45],
+          getLineColor: [239, 68, 68, 220],
+          lineWidthMinPixels: 2.5,
+          stroked: true,
+        })
+      );
+
+      layers.push(
+        new TextLayer({
+          id: 'iot-leak-alert-labels',
+          data: activeLeakAlerts,
+          getPosition: (d: IoTAlertItem) => d.coordinates || [77.5380, 12.9050],
+          getText: (d: IoTAlertItem) => `⚠️ Leak Detected (${d.estimated_loss_lps ?? 45} L/s)`,
+          getSize: 12,
+          getColor: [255, 255, 255, 255],
+          backgroundColor: [225, 29, 72, 230],
+          backgroundPadding: [6, 3],
+          fontFamily: 'monospace',
+          fontWeight: 'bold',
+          getPixelOffset: [0, -32],
+          getTextAnchor: 'middle',
+        })
+      );
+    }
   }
 
   // ---------------------------------------------------------------------------
