@@ -8,12 +8,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
 
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+
 from .config import SERVER_HOST, SERVER_PORT
 from .bridge.ignoapi_bridge import bridge
 from .routers import assets, water_bodies, hydraulics, telemetry, alerts, admin, pumps
 from .iot.config import IOT_ENABLED
 from .iot.router import router as iot_router
 from .iot.sim.engine import sim_engine
+from .iot.scheduler.executor import plan_executor
+from .agents.monitor import monitoring_agent
+from .security.router import router as security_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -21,11 +29,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger("bwssb_digital_twin")
 
+limiter = Limiter(key_func=get_remote_address, default_limits=["240/minute"])
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Initializing Bengaluru Water Network Digital Twin Backend...")
     # Start background read-only IGNOAPI bridge
     await bridge.start()
+    await monitoring_agent.start()
     sim_task = None
     if IOT_ENABLED:
         import asyncio
@@ -46,6 +57,7 @@ async def lifespan(app: FastAPI):
         sim_engine.stop_loop()
         if sim_task and not sim_task.done():
             sim_task.cancel()
+    await monitoring_agent.stop()
     logger.info("Shutting down Digital Twin Backend...")
     await bridge.stop()
 
@@ -55,6 +67,22 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
+
+@app.middleware("http")
+async def security_headers_middleware(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: http: https:;"
+    )
+    return response
 
 # Exact development origins (no wildcard '*')
 DEV_CORS_ORIGINS = [
@@ -84,6 +112,7 @@ app.include_router(telemetry.router)
 app.include_router(alerts.router)
 app.include_router(admin.router)
 app.include_router(iot_router)
+app.include_router(security_router)
 
 @app.get("/api/v1/snapshot")
 @app.get("/api/v1/iot/snapshot")
@@ -131,22 +160,15 @@ async def get_consolidated_snapshot():
 
     bridge_telemetry = bridge.get_latest_telemetry()
 
-    plan_status = {
+    plan_data = plan_executor.get_or_create_plan(sim_time) if IOT_ENABLED else {
         "status": "BALANCED",
         "mode": "AUTOMATIC",
         "current_dispatch_mld": balance.total_inflow_mld if balance else 2250.0,
         "target_storage_pct": 78.5,
         "updated_at": time.time()
     }
-
-    agent_status = {
-        "status": "ACTIVE",
-        "state": "MONITORING",
-        "anomalies_detected": len(alerts_list),
-        "active_leaks_count": len(leaks),
-        "last_health_check": time.time(),
-        "integrity_score_pct": 98.4
-    }
+    water_movement = plan_executor.compute_water_movement(sim_time) if IOT_ENABLED else {}
+    agent_status = monitoring_agent.get_status()
 
     return {
         "ts": sim_time,
@@ -160,7 +182,8 @@ async def get_consolidated_snapshot():
         "water_balance": balance.model_dump() if balance else {},
         "leaks": leaks,
         "active_injections": sim_engine.active_injections if IOT_ENABLED else {},
-        "plan": plan_status,
+        "plan": plan_data,
+        "water_movement": water_movement,
         "agent": agent_status,
         "kpis": {
             "running_pumps": running_pumps,
@@ -226,7 +249,17 @@ async def multiplexed_stream(request: Request):
             stream_leaks = [leak_item] if isinstance(leak_item, dict) else (list(sim_engine.active_injections.get("leaks", {}).values()) if isinstance(sim_engine.active_injections.get("leaks"), dict) else [])
             yield f"event: leak\ndata: {json.dumps(stream_leaks)}\n\n"
 
-            # 5. Default message
+            # 5. Plan and Water Movement event
+            plan_payload = {
+                "plan": plan_executor.get_or_create_plan(sim_time) if IOT_ENABLED else {},
+                "water_movement": plan_executor.compute_water_movement(sim_time) if IOT_ENABLED else {}
+            }
+            yield f"event: plan\ndata: {json.dumps(plan_payload)}\n\n"
+
+            # 6. Monitoring Agent event
+            yield f"event: agent\ndata: {json.dumps(monitoring_agent.get_status())}\n\n"
+
+            # 7. Default message
             yield f"data: {json.dumps(telemetry_payload)}\n\n"
 
             await asyncio.sleep(1.0)
@@ -240,6 +273,14 @@ async def multiplexed_stream(request: Request):
             "X-Accel-Buffering": "no"
         }
     )
+
+@app.get("/api/v1/agent/status")
+async def get_agent_status():
+    return monitoring_agent.get_status()
+
+@app.get("/api/v1/agent/log")
+async def get_agent_log():
+    return monitoring_agent.get_log()
 
 @app.get("/healthz")
 async def health_check():

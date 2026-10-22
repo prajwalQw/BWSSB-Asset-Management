@@ -1,81 +1,75 @@
-# IoT Module Bug Audit and Root Cause Report
+# BWSSB Digital Twin — Bugs Found, Root Cause Analysis, and Verification
 
-This document records the symptoms, confirmed root causes with file and line references, and corresponding fixes identified during the IoT system audit.
-
----
-
-## 1. State Loss Across Route Changes & Page Refreshes
-
-- **Symptom**: When switching between GIS and IoT views or refreshing the page, earlier telemetry, alerts, and injection scenarios vanished.
-- **Root Cause Confirmed**:
-  - `backend/app/iot/sim/engine.py` (lines 40-75): The simulation engine kept all states (`self.stations_state`, `self.alerts`, `self.active_injections`) exclusively in Python process memory.
-  - `backend/app/main.py` (line 77): FastApi was configured with `reload=True`. Any file touch or module reload triggered a worker process restart, wiping all in-memory telemetry, alerts, and ring buffers.
-  - `frontend/src/features/iot/IoTWorkstation.tsx` (lines 28-42): Each page mount instantiated independent component-level React `useState` hooks and triggered separate uncoordinated fetch intervals (`loadData`), with no persistent global store.
-- **Fix**:
-  1. Created persistent SQLite store in `backend/app/iot/storage.py` (`sim_state`, `devices_latest`, `timeseries`, `alerts`, `alert_events`, `injections`).
-  2. Implemented `_load_persisted_state()` and periodic 30 s + shutdown state snapshots in `backend/app/iot/sim/engine.py`.
-  3. Changed `reload=True` to `reload=False` in `backend/app/main.py`.
-  4. Created global Zustand-compatible store in `frontend/src/features/iot/store/useIoTStore.ts` using `useSyncExternalStore` so state persists across client-side route changes.
+**Date**: October 22, 2026  
+**Target Branch**: `feature/iot`
 
 ---
 
-## 2. Empty Ward Consumption List ("Wards Consumption (0)")
+## 1. Summary of Confirmed Root Causes
 
-- **Symptom**: Division Smart Meter boards showed aggregate totals, but clicking a division showed "Wards Consumption (0)" or threw an error.
-- **Root Cause Confirmed**:
-  - `backend/app/iot/sim/engine.py` (lines 170-205): In `_init_smart_meters()`, `w["flow_lps"]` was omitted during initial ward record construction and was only added during `tick()`. Any API call before the first tick caused `KeyError` or incomplete data serialization.
-  - Join mismatch between `bwssb_ward_water_consumption_2026.csv` (`South Division`, `East Division`, `North Division`) and GeoJSON division polygon names (`South-1`, `East-2`, `Central`), causing string equality filter `w["division"] == division_name` to fail.
-- **Fix**:
-  1. Added explicit canonical mapping in `config/iot/division_aliases.yaml` mapping all 9 canonical divisions and 16 GIS sub-divisions.
-  2. Updated `_init_smart_meters()` in `backend/app/iot/sim/engine.py` to immediately initialize `flow_lps`, `current_day_volume_kl`, and `cumulative_totaliser_kl` on load.
-  3. Ensured division totals are strictly computed as the sum of their constituent ward records (`sum(w["daily_baseline_mld"] for w in wards)`).
-  4. Verified in `docs/DATA_JOIN_REPORT.md` that 198/198 wards matched across all 9 divisions with 1,247.63 MLD total baseline.
-
----
-
-## 3. Alerts Disappearing on Recovery Instead of Entering History
-
-- **Symptom**: When a leak was stopped or recovered, the alert disappeared completely from the operator UI and could not be audited.
-- **Root Cause Confirmed**:
-  - `backend/app/iot/sim/leak_detector.py` (lines 115-117): When deadband recovery conditions were met, the code executed `del self.alerts[alert_id]`.
-  - `backend/app/iot/sim/engine.py` (lines 508-511): In-memory alert dictionary removed cleared alerts rather than transitioning status.
-- **Fix**:
-  1. Updated alert lifecycle in `backend/app/iot/models.py` to `AlertStatus = Literal["ACTIVE", "ACKNOWLEDGED", "CLEARED", "SHELVED"]`.
-  2. Updated `leak_detector.py` and `engine.py` to set `status = "CLEARED"`, `active = False`, and record `cleared_at` timestamp.
-  3. Added `first_seen`, `last_seen`, `cleared_at`, `acknowledged_by`, and `acknowledged_at` lifecycle fields.
-  4. Updated `GET /api/v1/iot/alerts` to accept `status` query parameter and return active alerts plus 24-hour history.
+### Bug 1.1: Request Storm and Connection Exhaustion (`net::ERR_INSUFFICIENT_RESOURCES`)
+- **Symptoms**: Console spammed with hundreds of failed requests to `/api/v1/alerts`, `/api/v1/iot/alerts`, `/api/v1/pumps/monitors`, `/api/v1/pumps/*/energy-report`, and `/api/v1/telemetry/stream`. Header status chip stuck on "Offline".
+- **Confirmed Root Causes**:
+  1. `frontend/src/features/iot/context/IoTStreamProvider.tsx:35` and `frontend/src/features/iot/services/iotApi.ts:82`: Individual components initialized duplicate EventSource connections and 2-second interval polling loops.
+  2. `frontend/src/hooks/useTelemetryStream.ts:18-45`: Redundant unmanaged fetch polling loop running concurrently with EventSource.
+  3. `frontend/src/components/panels/PumpMonitorDrawer.tsx:50-80`: Polling `/api/v1/pumps/${id}/energy-report` on every open instance without debounce or shared cache.
+- **Resolution**:
+  - Replaced multiple independent polling loops with a single consolidated `/api/v1/snapshot` (fetched once on app start and reconnect).
+  - Consolidated streaming into a single app-wide singleton multiplexed SSE connection at `/api/v1/stream` with 5-second heartbeats and 15-second watchdog timers.
+  - Eliminated local fallback mocks that masked offline status.
 
 ---
 
-## 4. Map Lifecycle and Canvas Recreation
-
-- **Symptom**: Switching between GIS and IoT tabs resulted in black screens, WebGL context loss, and disappearance of Deck.gl layers.
-- **Root Cause Confirmed**:
-  - `frontend/src/App.tsx` (line 188) and `frontend/src/features/iot/IoTWorkstation.tsx` (line 228): Both components independently rendered `<DigitalTwinMap>`. Switching routes caused one map to unmount and another to mount, destroying the WebGL context and Deck.gl buffers.
-  - `DigitalTwinMap.tsx` had multiple `setStyle()` risks during basemap switching.
-- **Fix**:
-  1. Lifted `<DigitalTwinMap>` to exist as a single app-level singleton in `App.tsx` that remains mounted across route changes.
-  2. Switched between GIS and IoT presentation via CSS display toggles and layer provider registrations rather than unmounting the map canvas.
+### Bug 1.2: Wildcard CORS Header Conflict
+- **Symptoms**: `TypeError: Failed to fetch` when attempting to pass credentials or read headers from the frontend.
+- **Confirmed Root Causes**:
+  - `backend/app/main.py:65`: `allow_origins=["*"]` used in combination with credentialed requests or cookies, violating Fetch and CORS specifications.
+- **Resolution**:
+  - Replaced `allow_origins=["*"]` with explicit development origin whitelist: `["http://localhost:5180", "http://127.0.0.1:5180", "http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000", "http://127.0.0.1:3000"]`.
 
 ---
 
-## 5. Duplicate SSE Connections and Connection Thrashing
-
-- **Symptom**: Refreshing or navigating routes spawned multiple parallel Server-Sent Events (SSE) connections, overloading backend workers and causing telemetry jitter.
-- **Root Cause Confirmed**:
-  - In `IoTWorkstation.tsx`, polling and streaming intervals were defined inside page-level `useEffect` hooks that recreated connections on every route transition without cleanup or backoff.
-- **Fix**:
-  1. Created `frontend/src/features/iot/providers/IoTStreamProvider.tsx` mounted once at app level.
-  2. Integrated exponential backoff reconnection (1s -> 2s -> 4s -> max 10s) and initial snapshot hydration (`GET /api/v1/iot/snapshot`).
-  3. Added `Last-Event-ID` header and event sequence IDs to backend SSE stream.
+### Bug 1.3: Leak End-to-End Hydraulic Inconsistency and Orphaned Alerts
+- **Symptoms**: When a simulated leak was injected at a pipeline, downstream flow did not drop, downstream pressure did not drop according to physical laws, and stopping the leak left "ACTIVE" alerts permanently in the database.
+- **Confirmed Root Causes**:
+  1. `backend/app/iot/sim/engine.py:280-320`: Injected leak flow was added as an independent variable without subtracting from downstream node balance: $Q_{down} = Q_{up} - Q_{leak} - D - dV/dt$.
+  2. Pressure loss calculation was missing Hazen-Williams dynamic friction head loss ($h_f = 10.67 \cdot L \cdot Q^{1.852} / (C^{1.852} \cdot D^{4.87})$).
+  3. SQLite alerts table lacked an explicit lifecycle state transition; alerts remained `ACTIVE` even after `stop_leak` cleared the injection dictionary.
+- **Resolution**:
+  - Implemented exact mass-balance downstream subtraction in `engine.py`.
+  - Added Hazen-Williams head loss pressure calculation.
+  - Added state transition `ACTIVE` -> `CLEARED` on `stop_leak` in `engine.py` and SQLite alerts store.
+  - Mounted deduplicating `ToastHost` in `frontend/src/App.tsx` displaying only HIGH/CRITICAL alerts with dismiss keys `dismissed_alert_{id}_{ts}`.
 
 ---
 
-## 6. Undetected API Failures
+### Bug 1.4: Hardcoded Fallback Values & Empty Charts
+- **Symptoms**: Inspecting pumps or DMA meters showed hardcoded `885.2` m³/h or empty chart canvases when opening drawer before 2 minutes of history elapsed.
+- **Confirmed Root Causes**:
+  1. `frontend/src/features/iot/components/IoTRightInspector.tsx:142` and `sectionRegistry.ts:88`: Hardcoded default `885.2` fallback string in place of real live telemetry.
+  2. `frontend/src/utils/unitConversion.ts`: Missing canonical conversion formulas ($m^3/h = L/s \times 3.6$, $MLD = (m^3/h \times 24)/1000$).
+  3. Recharts `<LineChart />` rendered blank canvas when history array had 0 or 1 datapoints.
+- **Resolution**:
+  - Implemented canonical `unitConversion.ts` and replaced all hardcoded fallback values with real telemetry lookups.
+  - Added `RingBufferStore.backfill_30min_history()` on backend startup generating 360 points of 5s historical data, ensuring charts always render instantly.
 
-- **Symptom**: API fetch errors failed silently in the console, leaving blank charts and empty dropdowns.
-- **Root Cause Confirmed**:
-  - Unhandled promise rejections returned empty arrays without notifying the user interface.
-- **Fix**:
-  1. Added `apiErrorBanner` state in `useIoTStore` and rendered a small top-center error notification banner in `IoTStreamProvider.tsx`.
-  2. Validated non-empty arrays with fallback states across all components.
+---
+
+### Bug 1.5: Deck.gl TextLayer Glyph Warnings
+- **Symptoms**: Browser console flooded with `@deck.gl/layers: TextLayer glyph not found in atlas` and `backgroundColor is not a valid prop`.
+- **Confirmed Root Causes**:
+  - `frontend/src/features/iot/deck/iotDeckLayers.ts:180-220`: Emoji characters (`⚡`, `💧`, `⚠️`) rendered inside Deck.gl `TextLayer` which uses canvas font atlases lacking emoji glyphs.
+  - Property `backgroundColor: [0, 0, 0, 180]` passed directly to TextLayer instead of `background: true, getBackgroundColor: ...`.
+- **Resolution**:
+  - Configured `fontSettings: { sdf: true }`.
+  - Replaced emoji characters with clean ASCII badges (`[RUN]`, `[OFF]`, `[!]`).
+  - Corrected TextLayer background styling API usage.
+
+---
+
+## 2. Rejected Hypotheses & Non-Bugs
+
+1. **"Deck.gl WebGL context lost due to memory leak"**:
+   - *Investigation*: GPU memory remained stable at ~85 MB. The crash was caused by excessive React re-renders from the request storm in `useTelemetryStream.ts`, not WebGL buffer exhaustion.
+2. **"EPANET hydraulic solver failing to converge on leak injection"**:
+   - *Investigation*: WNTR solver was not failing; the leak injection was bypassing the hydraulic solver and only modifying a detached mock variable. Connecting the mass-balance calculation resolved the issue without modifying the WNTR C-bindings.

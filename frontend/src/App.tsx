@@ -18,8 +18,10 @@ import { StationSchematic } from './features/iot/components/StationSchematic';
 import { WaterFlowSankey } from './features/iot/components/WaterFlowSankey';
 import { IoTSimulateModal } from './features/iot/components/IoTSimulateModal';
 import { IoTAlertToasts } from './features/iot/components/IoTAlertToasts';
+import { SupplyPlanPanel } from './features/iot/components/SupplyPlanPanel';
+import { MonitorPanel } from './features/iot/components/MonitorPanel';
 import { useIoTStore } from './features/iot/store/useIoTStore';
-import { Map, GitCommit, Waves, Play } from 'lucide-react';
+import { Map, GitCommit, Waves, Play, Calendar, ShieldAlert } from 'lucide-react';
 
 export const App: React.FC = () => {
   const {
@@ -187,7 +189,7 @@ export const App: React.FC = () => {
   }, [activeModule]);
 
   // IoT Subsystem State
-  const [iotCentreView, setIotCentreView] = useState<'map' | 'schematic' | 'sankey'>('map');
+  const [iotCentreView, setIotCentreView] = useState<'map' | 'schematic' | 'sankey' | 'plan' | 'monitor'>('map');
   const iotStore = useIoTStore();
 
   const handleSelectIoTPump = (pumpId: string) => {
@@ -316,6 +318,32 @@ export const App: React.FC = () => {
                     <span>Water flow (MLD)</span>
                   </button>
                 )}
+
+                <button
+                  type="button"
+                  onClick={() => setIotCentreView('plan')}
+                  className={`px-3 py-1 rounded-md font-medium transition-all flex items-center gap-1.5 ${
+                    iotCentreView === 'plan'
+                      ? 'bg-sky-600 text-white shadow-sm font-semibold'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>Supply plan</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIotCentreView('monitor')}
+                  className={`px-3 py-1 rounded-md font-medium transition-all flex items-center gap-1.5 ${
+                    iotCentreView === 'monitor'
+                      ? 'bg-sky-600 text-white shadow-sm font-semibold'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <ShieldAlert className="w-3.5 h-3.5" />
+                  <span>Monitor</span>
+                </button>
               </div>
 
               <div className="flex items-center gap-2">
@@ -395,6 +423,20 @@ export const App: React.FC = () => {
                     data_tier: 'SIMULATED'
                   }}
                 />
+              </div>
+            )}
+
+            {/* Supply Plan Overlay */}
+            {activeModule === 'IOT' && iotCentreView === 'plan' && (
+              <div className="absolute inset-0 bg-slate-950 z-10 overflow-auto">
+                <SupplyPlanPanel />
+              </div>
+            )}
+
+            {/* Monitoring Agent Overlay */}
+            {activeModule === 'IOT' && iotCentreView === 'monitor' && (
+              <div className="absolute inset-0 bg-slate-950 z-10 overflow-auto">
+                <MonitorPanel />
               </div>
             )}
           </div>

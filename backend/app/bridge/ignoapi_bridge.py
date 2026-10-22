@@ -62,6 +62,20 @@ class IgnoApiReadOnlyBridge:
         }
         self._evaluate_all_sensor_health()
 
+    def send_command(self, action: str, *args, **kwargs):
+        """Enforces read-only allowlist for bridge operations."""
+        allowed_actions = {"read_all", "read_variable", "get_status"}
+        if action not in allowed_actions or not self.allow_writes:
+            raise PermissionError("Field control is intentionally unavailable. Passive read-only monitoring mode.")
+
+    def write_variable(self, name: str, value: Any):
+        """Strictly forbidden in passive read-only monitoring mode."""
+        raise PermissionError("Field control is intentionally unavailable. Passive read-only monitoring mode.")
+
+    def set_actuator(self, *args, **kwargs):
+        """Strictly forbidden in passive read-only monitoring mode."""
+        raise PermissionError("Field control is intentionally unavailable. Passive read-only monitoring mode.")
+
     def _load_configs(self):
         try:
             if SENSOR_MAP_PATH.exists():

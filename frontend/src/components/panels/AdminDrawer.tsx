@@ -8,11 +8,15 @@ import {
   Activity, 
   Sliders, 
   Radio, 
-  Database 
+  Database,
+  ShieldCheck,
+  Lock,
+  RefreshCw,
+  FileCheck,
+  Cpu
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { IoTAdminSections } from '../../features/iot/components/IoTAdminSections';
-import { Cpu } from 'lucide-react';
 
 export interface AdminDrawerProps {
   isOpen: boolean;
@@ -20,7 +24,7 @@ export interface AdminDrawerProps {
 }
 
 export const AdminDrawer: React.FC<AdminDrawerProps> = ({ isOpen, onClose }) => {
-  const [activeSection, setActiveSection] = useState<'assets' | 'pumps' | 'sensors' | 'thresholds' | 'iot'>('assets');
+  const [activeSection, setActiveSection] = useState<'assets' | 'pumps' | 'sensors' | 'thresholds' | 'iot' | 'security'>('assets');
   const [config, setConfig] = useState<any>({
     leak_threshold_lps: 8.5,
     min_night_flow_ratio_limit: 0.38,
@@ -32,12 +36,49 @@ export const AdminDrawer: React.FC<AdminDrawerProps> = ({ isOpen, onClose }) => 
   });
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [securityStatus, setSecurityStatus] = useState<any>(null);
+  const [isVerifyingChain, setIsVerifyingChain] = useState(false);
+  const [verificationFeedback, setVerificationFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       loadConfig();
+      loadSecurity();
     }
   }, [isOpen]);
+
+  const loadSecurity = async () => {
+    try {
+      const res = await fetch('/api/v1/security/status');
+      if (res.ok) {
+        const data = await res.json();
+        setSecurityStatus(data);
+      }
+    } catch (e) {
+      console.error('Failed to load security status', e);
+    }
+  };
+
+  const handleVerifyChain = async () => {
+    setIsVerifyingChain(true);
+    setVerificationFeedback(null);
+    try {
+      const res = await fetch('/api/v1/security/status');
+      if (res.ok) {
+        const data = await res.json();
+        setSecurityStatus(data);
+        if (data.audit_chain_valid) {
+          setVerificationFeedback(`Verified! All ${data.audit_records_count} hash-chained records cryptographically intact.`);
+        } else {
+          setVerificationFeedback('Warning: Tampering or invalid hash detected in audit log!');
+        }
+      }
+    } catch (err: any) {
+      setVerificationFeedback('Verification check error: ' + err.message);
+    } finally {
+      setIsVerifyingChain(false);
+    }
+  };
 
   const loadConfig = async () => {
     try {
@@ -102,6 +143,7 @@ export const AdminDrawer: React.FC<AdminDrawerProps> = ({ isOpen, onClose }) => 
             { id: 'sensors', label: 'Sensor Map', icon: Radio },
             { id: 'thresholds', label: 'Thresholds', icon: Sliders },
             { id: 'iot', label: 'IoT System', icon: Cpu },
+            { id: 'security', label: 'Security', icon: ShieldCheck },
           ].map(({ id, label, icon: Icon }) => (
             <button
               key={id}
@@ -262,6 +304,94 @@ export const AdminDrawer: React.FC<AdminDrawerProps> = ({ isOpen, onClose }) => 
 
           {/* SECTION 5: IOT SYSTEM (Additive) */}
           {activeSection === 'iot' && <IoTAdminSections />}
+
+          {/* SECTION 6: SECURITY & AUDIT (Priority 6) */}
+          {activeSection === 'security' && (
+            <div className="space-y-3">
+              <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                    Cybersecurity Posture
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                    IEC 62443 / NIST CSF
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-[11px] pt-1">
+                  <div className="p-2 rounded bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
+                    <div className="text-slate-500 font-medium">RBAC Roles</div>
+                    <div className="font-mono font-bold text-slate-800 dark:text-slate-100">
+                      {securityStatus?.rbac_roles?.join(', ') || 'viewer, operator, admin'}
+                    </div>
+                  </div>
+                  <div className="p-2 rounded bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
+                    <div className="text-slate-500 font-medium">Rate Limiting</div>
+                    <div className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                      Active (240/min)
+                    </div>
+                  </div>
+                  <div className="p-2 rounded bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
+                    <div className="text-slate-500 font-medium">OT Field Control Mode</div>
+                    <div className="font-mono font-bold text-amber-600 dark:text-amber-400">
+                      Passive Read-Only
+                    </div>
+                  </div>
+                  <div className="p-2 rounded bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
+                    <div className="text-slate-500 font-medium">Last Security Scan</div>
+                    <div className="font-mono font-bold text-slate-800 dark:text-slate-100">
+                      {securityStatus?.last_security_scan_date || '2026-10-22'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cryptographic Audit Ledger */}
+              <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                    <Lock className="w-3.5 h-3.5 text-sky-500" />
+                    Hash-Chained Audit Ledger
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleVerifyChain}
+                    disabled={isVerifyingChain}
+                    className="px-2 py-1 rounded bg-sky-50 dark:bg-sky-950/60 border border-sky-300 dark:border-sky-800 text-sky-700 dark:text-sky-300 text-[10px] font-semibold flex items-center gap-1 hover:bg-sky-100"
+                  >
+                    <RefreshCw className={`w-3 h-3 ${isVerifyingChain ? 'animate-spin' : ''}`} />
+                    <span>Verify Chain</span>
+                  </button>
+                </div>
+
+                <div className="text-[11px] space-y-1 font-mono">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Chain Status:</span>
+                    <span className={securityStatus?.audit_chain_valid ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'}>
+                      {securityStatus?.audit_chain_valid ? 'CRYPTOGRAPHICALLY VALID' : 'CHECK PENDING'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Total Tamper-Evident Entries:</span>
+                    <span className="text-slate-900 dark:text-slate-100 font-bold">
+                      {securityStatus?.audit_records_count ?? 0}
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-slate-500 truncate" title={securityStatus?.audit_head_hash}>
+                    Head SHA-256: {securityStatus?.audit_head_hash || 'genesis'}
+                  </div>
+                </div>
+
+                {verificationFeedback && (
+                  <div className="mt-2 p-2 rounded bg-sky-50 dark:bg-sky-950/50 border border-sky-300 dark:border-sky-800 text-sky-800 dark:text-sky-200 text-[11px] flex items-start gap-1.5">
+                    <FileCheck className="w-3.5 h-3.5 text-sky-500 shrink-0 mt-0.5" />
+                    <span>{verificationFeedback}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Footer Save Button */}
           <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end">
