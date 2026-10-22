@@ -109,7 +109,12 @@ export const IoTSimulateModal: React.FC<IoTSimulateModalProps> = ({ onClose, onR
       setStatusMsg(`Started ${leakRate} L/s leak on ${NETWORK_NODES[fromNode]?.label} → ${NETWORK_NODES[toNode]?.label}`);
       setTimeout(() => setStatusMsg(null), 3000);
       if (onRefresh) onRefresh();
-    } catch {
+    } catch (err: any) {
+      store.setActiveToast({
+        id: `err-${Date.now()}`,
+        message: `Leak injection failed: ${err?.message || 'Server error'}`,
+        type: 'error'
+      });
       setStatusMsg('Failed to inject leak');
     }
   };
@@ -125,7 +130,12 @@ export const IoTSimulateModal: React.FC<IoTSimulateModalProps> = ({ onClose, onR
       setStatusMsg('Leak stopped. Physics restoring to baseline.');
       setTimeout(() => setStatusMsg(null), 3000);
       if (onRefresh) onRefresh();
-    } catch {
+    } catch (err: any) {
+      store.setActiveToast({
+        id: `err-${Date.now()}`,
+        message: `Failed to stop leak: ${err?.message || 'Server error'}`,
+        type: 'error'
+      });
       setStatusMsg('Failed to stop leak');
     }
   };

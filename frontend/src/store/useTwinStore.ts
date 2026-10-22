@@ -235,6 +235,7 @@ export const useTwinStore: TwinStoreHook = Object.assign(
         listeners.add(onStoreChange);
         return () => listeners.delete(onStoreChange);
       },
+      () => (selector ? selector(state) : state),
       () => (selector ? selector(state) : state)
     );
   },

@@ -3,7 +3,7 @@ Main FastAPI Application Entrypoint.
 Bengaluru Water Network Digital Twin Backend.
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
@@ -29,10 +29,23 @@ async def lifespan(app: FastAPI):
     sim_task = None
     if IOT_ENABLED:
         import asyncio
-        sim_task = asyncio.create_task(sim_engine.start_loop())
+        async def supervised_sim_loop():
+            logger.info("Starting supervised IoT simulation loop with auto-restart...")
+            while True:
+                try:
+                    await sim_engine.start_loop()
+                except asyncio.CancelledError:
+                    break
+                except Exception as ex:
+                    logger.error(f"[SupervisedSimLoop] Unexpected error in simulation engine: {ex}. Auto-restarting loop in 2s...", exc_info=True)
+                    await asyncio.sleep(2.0)
+
+        sim_task = asyncio.create_task(supervised_sim_loop())
     yield
     if IOT_ENABLED:
         sim_engine.stop_loop()
+        if sim_task and not sim_task.done():
+            sim_task.cancel()
     logger.info("Shutting down Digital Twin Backend...")
     await bridge.stop()
 
@@ -107,7 +120,13 @@ async def get_consolidated_snapshot():
     energy_mwh = round(total_kwh / 1000.0, 1)
     energy_cost_lakhs = round(total_kwh * 7.5 / 100000.0, 2)
 
-    leaks = list(sim_engine.active_injections.get("leaks", {}).values()) if IOT_ENABLED else []
+    leak_entry = sim_engine.active_injections.get("leak") if IOT_ENABLED else None
+    if isinstance(leak_entry, dict):
+        leaks = [leak_entry]
+    elif isinstance(sim_engine.active_injections.get("leaks"), dict):
+        leaks = list(sim_engine.active_injections["leaks"].values())
+    else:
+        leaks = []
     water_loss_kld = round(sum(l.get("leak_rate_lps", 0.0) * 86.4 for l in leaks), 1)
 
     bridge_telemetry = bridge.get_latest_telemetry()
@@ -203,8 +222,9 @@ async def multiplexed_stream(request: Request):
             yield f"event: alert\ndata: {json.dumps([a.model_dump() for a in alerts_list])}\n\n"
 
             # 4. Leaks event
-            leaks = list(sim_engine.active_injections.get("leaks", {}).values()) if IOT_ENABLED else []
-            yield f"event: leak\ndata: {json.dumps(leaks)}\n\n"
+            leak_item = sim_engine.active_injections.get("leak") if IOT_ENABLED else None
+            stream_leaks = [leak_item] if isinstance(leak_item, dict) else (list(sim_engine.active_injections.get("leaks", {}).values()) if isinstance(sim_engine.active_injections.get("leaks"), dict) else [])
+            yield f"event: leak\ndata: {json.dumps(stream_leaks)}\n\n"
 
             # 5. Default message
             yield f"data: {json.dumps(telemetry_payload)}\n\n"

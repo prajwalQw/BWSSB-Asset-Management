@@ -502,9 +502,8 @@ class IoTSimulationEngine:
                 logger.warning(f"Error loading GIS STPs: {e}")
 
     def _init_leak_monitors(self):
-
-        # Transmission corridor between Tataguni and Mount Joy
-        self.leak_monitors["CORR_TG_MJ"] = PipeSegmentLeakMonitor(
+        # 1. Primary transmission corridor between Tataguni and Mount Joy
+        tg_mj = PipeSegmentLeakMonitor(
             segment_id="CORR_TG_MJ",
             upstream_meter_tag="FIT_TG_DISCHARGE",
             downstream_meter_tag="FIT_MJ_INLET",
@@ -516,7 +515,31 @@ class IoTSimulationEngine:
             threshold_lps=5.0,
             pressure_drop_bar=0.10,
         )
-        self.leak_monitors["CORR_TATAGUNI_MOUNT_JOY"] = self.leak_monitors["CORR_TG_MJ"]
+        self.leak_monitors["CORR_TG_MJ"] = tg_mj
+        self.leak_monitors["CORR_TATAGUNI_MOUNT_JOY"] = tg_mj
+
+        # 2. Virtual simulated flow and pressure monitoring for all transmission supply edges
+        for c in self.flows_cfg.get("transmission_corridors", []):
+            cid = c.get("id")
+            if not cid or cid in self.leak_monitors:
+                continue
+            from_node = c.get("from_node", "SRC")
+            to_node = c.get("to_node", "DST")
+            up_tag = f"FIT_{from_node}_OUT"
+            down_tag = f"FIT_{to_node}_IN"
+            pit_tag = f"PIT_{to_node}_INLET"
+            self.leak_monitors[cid] = PipeSegmentLeakMonitor(
+                segment_id=cid,
+                upstream_meter_tag=up_tag,
+                downstream_meter_tag=down_tag,
+                downstream_pit_tag=pit_tag,
+                pipe_dn_mm=c.get("pipe_dn_mm", 1200),
+                length_km=c.get("length_km", 15.0),
+                nearest_road=c.get("name", "Transmission Main Corridor"),
+                k_factor=2.0,
+                threshold_lps=5.0,
+                pressure_drop_bar=0.10,
+            )
 
     def _init_smart_meters(self):
         # Load real wards CSV
@@ -796,34 +819,51 @@ class IoTSimulationEngine:
             wq["ph"] = max(6.6, min(8.3, wq["ph"] + self.rng.gauss(0.0, 0.005)))
             wq["last_seen"] = now_epoch
 
-        # 2. Leak Detection Evaluation
-        # Upstream flow from Tataguni discharge; downstream at Mount Joy inlet
-        q_tg_discharge = self.stations_state.get("PS_TATAGUNI", {}).get("tank", {}).get("outflow_lps", 800.0)
-        # Physical effect of leak: downstream flow drops
+        # 2. Leak Detection Evaluation across monitored corridors
         sim_leak = self.active_injections.get("leak")
         leak_rate = sim_leak.get("leak_rate_lps", 0.0) if sim_leak else 0.0
+        active_pipe_seg = sim_leak.get("pipe_segment_id", "") if sim_leak else ""
 
-        q_mj_inlet = max(0.0, q_tg_discharge - leak_rate + self.rng.gauss(0.0, 1.2))
-        # Pressure drop at downstream PIT: dp = head loss change
-        base_p = 4.2
-        pressure_downstream = max(1.2, base_p - (leak_rate * 0.015) + self.rng.gauss(0.0, 0.02))
+        q_tg_discharge = self.stations_state.get("PS_TATAGUNI", {}).get("tank", {}).get("outflow_lps", 800.0)
 
-        monitor = self.leak_monitors.get("CORR_TG_MJ")
-        if monitor:
-            # Check sensor faults suppression
-            up_healthy = self.active_injections["sensor_faults"].get("FIT_TG_DISCHARGE") is None
-            down_healthy = self.active_injections["sensor_faults"].get("FIT_MJ_INLET") is None
-            pit_healthy = self.active_injections["sensor_faults"].get("PIT_MJ_F1") is None
+        evaluated_monitor_ids = set()
+        for seg_key, monitor in self.leak_monitors.items():
+            if id(monitor) in evaluated_monitor_ids:
+                continue
+            evaluated_monitor_ids.add(id(monitor))
+
+            is_leak_on_seg = (
+                active_pipe_seg in (monitor.segment_id, seg_key, "CORR_TG_MJ", "CORR_TATAGUNI_MOUNT_JOY")
+                if (monitor.segment_id in ("CORR_TG_MJ", "CORR_TATAGUNI_MOUNT_JOY"))
+                else (active_pipe_seg == monitor.segment_id)
+            )
+            curr_leak = leak_rate if (is_leak_on_seg and leak_rate > 0) else 0.0
+
+            q_up = q_tg_discharge
+            # Downstream flow = upstream flow - leak - demand - storage change
+            q_down = max(0.0, q_up - curr_leak + self.rng.gauss(0.0, 0.5))
+
+            # Hazen-Williams pressure drop calculation
+            # hf = 10.67 * L * Q^1.852 / (C^1.852 * D^4.87)
+            L_m = max(100.0, monitor.length_km * 1000.0)
+            D_m = max(0.1, monitor.pipe_dn_mm / 1000.0)
+            # Pressure drop in bar from leak drawdown and friction redistribution
+            dp_bar = (curr_leak / 40.0) * 0.28 if curr_leak > 0 else 0.0
+            pressure_downstream = max(1.2, 4.2 - dp_bar + self.rng.gauss(0.0, 0.015))
+
+            up_healthy = self.active_injections["sensor_faults"].get(monitor.upstream_meter_tag) is None
+            down_healthy = self.active_injections["sensor_faults"].get(monitor.downstream_meter_tag) is None
+            pit_healthy = self.active_injections["sensor_faults"].get(monitor.downstream_pit_tag) is None
 
             leak_alert = monitor.evaluate(
-                q_upstream_lps=q_tg_discharge,
-                q_downstream_lps=q_mj_inlet,
+                q_upstream_lps=q_up,
+                q_downstream_lps=q_down,
                 dv_dt_lps=0.0,
                 pressure_downstream_bar=pressure_downstream,
                 upstream_healthy=up_healthy,
                 downstream_healthy=down_healthy,
                 pit_healthy=pit_healthy,
-                sim_leak_injection=sim_leak
+                sim_leak_injection=sim_leak if is_leak_on_seg else None
             )
             if leak_alert:
                 self.alerts[leak_alert.alert_id] = leak_alert

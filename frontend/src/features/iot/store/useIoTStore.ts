@@ -318,6 +318,7 @@ export const useIoTStore: IoTStoreHook = Object.assign(
         listeners.add(onStoreChange);
         return () => listeners.delete(onStoreChange);
       },
+      () => (selector ? selector(state) : state),
       () => (selector ? selector(state) : state)
     );
   },
