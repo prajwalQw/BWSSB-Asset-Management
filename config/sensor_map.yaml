@@ -1,0 +1,385 @@
+# Sensor to IGNOAPI Telemetry Mapping Configuration
+# Bengaluru Water Network Digital Twin (BWSSB)
+# Adheres strictly to:
+# 1. Verified scale factors (no guessed multipliers).
+# 2. Strict read-only bridge polling.
+# 3. Dynamic feed health tagging: LIVE, STALE, OUT_OF_BOUNDS, or SIMULATED_FALLBACK.
+# 4. Clean per-sensor fallback to SIMULATED when variable is missing or unverified.
+# 5. Dedicated asset "Pump control panel (auxiliary supply)" for true 12V DC and 2A telemetry.
+# 6. Any new IGNOAPI variable added in future maps through this file only.
+
+version: "1.1.0"
+updated_at: "2026-10-21T17:58:00Z"
+
+# Bridge Polling & Connection Settings
+bridge_settings:
+  host: "127.0.0.1"
+  port: 8899
+  poll_interval_seconds: 0.5
+  staleness_threshold_seconds: 3.0
+  allow_writes: false              # IMMUTABLE: Enforces Rule 4 read-only safety
+  socket_timeout_seconds: 2.0
+  reconnect_backoff_max_seconds: 10.0
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 1. PUMP CONTROL PANEL (AUXILIARY SUPPLY) - LIVE SCADA TELEMETRY
+# ─────────────────────────────────────────────────────────────────────────────
+# Dedicated station electrical panel asset exposing true unscaled 12V DC and 2A telemetry.
+auxiliary_panels:
+  - panel_id: "PANEL_TG_AUX_01"
+    name: "Pump control panel (auxiliary supply)"
+    station_id: "PS_TATAGUNI_MAIN"
+    station_name: "Tataguni Terminal Pumping Station"
+    data_tier_default: "LIVE"
+    provenance: "LIVE"
+    coordinates: [77.5255, 12.8680]
+    channels:
+      aux_voltage:
+        channel_id: "PANEL_TG_AUX_01_VOLTAGE"
+        label: "Auxiliary Control DC Bus Voltage"
+        ignoapi_variable: "voltage_v"
+        unit: "V DC"
+        scale_factor: 1.0
+        offset: 0.0
+        valid_range: {min: 9.0, max: 15.0}
+        data_tier: "LIVE"
+        fallback_source: "SIMULATED"
+        verified: true
+        notes: "Direct 1:1 telemetry of 12 V DC auxiliary control supply / battery backup."
+
+      aux_current:
+        channel_id: "PANEL_TG_AUX_01_CURRENT"
+        label: "Auxiliary Pilot / Instrumentation Current"
+        ignoapi_variable: "motor_current_a"
+        unit: "A DC"
+        scale_factor: 1.0
+        offset: 0.0
+        valid_range: {min: 0.0, max: 20.0}
+        data_tier: "LIVE"
+        fallback_source: "SIMULATED"
+        verified: true
+        notes: "Direct 1:1 telemetry of 2 A auxiliary drive and instrument power draw."
+
+      shaft_speed:
+        channel_id: "PANEL_TG_AUX_01_SPEED"
+        label: "Pump Shaft Speed (Auxiliary Sensor)"
+        ignoapi_variable: "speed"
+        unit: "RPM"
+        scale_factor: 1.0
+        offset: 0.0
+        valid_range: {min: 0.0, max: 1800.0}
+        data_tier: "LIVE"
+        fallback_source: "SIMULATED"
+        verified: true
+        notes: "Rotational speed in RPM."
+
+      motor_temperature:
+        channel_id: "PANEL_TG_AUX_01_TEMP"
+        label: "Motor Casing Thermocouple"
+        ignoapi_variable: "motor_temp_c"
+        unit: "deg C"
+        scale_factor: 1.0
+        offset: 0.0
+        valid_range: {min: 15.0, max: 120.0}
+        data_tier: "LIVE"
+        fallback_source: "SIMULATED"
+        verified: true
+        notes: "Motor stator thermocouple in deg C."
+
+      drive_alarm_register:
+        channel_id: "PANEL_TG_AUX_01_ALARM"
+        label: "Drive Fault Alarm Register"
+        ignoapi_variable: "alarmLM"
+        unit: "code"
+        scale_factor: 1.0
+        offset: 0.0
+        valid_range: {min: 0, max: 65535}
+        data_tier: "LIVE"
+        fallback_source: "SIMULATED"
+        verified: true
+        notes: "Drive fault code register."
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 2. PUMP MAIN MOTORS (6.6 kV Medium-Voltage Transmission Pumps)
+# ─────────────────────────────────────────────────────────────────────────────
+# Main 6.6 kV pump motor electrical channels remain strictly in SIMULATED tier.
+pumps:
+  - pump_id: "PUMP_TG_01"
+    name: "Tataguni Stage Pump Unit 01 (Duty)"
+    station_id: "PS_TATAGUNI_MAIN"
+    rated_voltage_v: 6600
+    rated_current_a: 124.5
+    rated_power_kw: 1200.0
+    channels:
+      main_bus_voltage_kv:
+        label: "Main 3-Phase Bus Voltage"
+        ignoapi_variable: null
+        unit: "kV AC"
+        scale_factor: 1.0
+        valid_range: {min: 5.5, max: 7.2}
+        fallback_source: "SIMULATED"
+        data_tier: "SIMULATED"
+        notes: "6.6 kV medium-voltage bus is not present in IGNOAPI. Operating in SIMULATED tier."
+
+      main_motor_current_a:
+        label: "Main Motor Phase Current"
+        ignoapi_variable: null
+        unit: "A AC"
+        scale_factor: 1.0
+        valid_range: {min: 0.0, max: 200.0}
+        fallback_source: "SIMULATED"
+        data_tier: "SIMULATED"
+        notes: "124.5 A medium-voltage motor draw is not present in IGNOAPI. Operating in SIMULATED tier."
+
+      active_power_kw:
+        label: "Active Power Draw"
+        ignoapi_variable: null
+        unit: "kW"
+        scale_factor: 1.0
+        valid_range: {min: 0.0, max: 1500.0}
+        fallback_source: "SIMULATED"
+        data_tier: "SIMULATED"
+        notes: "1200 kW hydraulic load power computed by simulation engine."
+
+  - pump_id: "PUMP_TG_02"
+    name: "Tataguni Stage Pump Unit 02 (Duty)"
+    station_id: "PS_TATAGUNI_MAIN"
+    rated_voltage_v: 6600
+    rated_current_a: 124.5
+    rated_power_kw: 1200.0
+    channels:
+      main_bus_voltage_kv:
+        ignoapi_variable: null
+        unit: "kV AC"
+        fallback_source: "SIMULATED"
+        data_tier: "SIMULATED"
+      main_motor_current_a:
+        ignoapi_variable: null
+        unit: "A AC"
+        fallback_source: "SIMULATED"
+        data_tier: "SIMULATED"
+      active_power_kw:
+        ignoapi_variable: null
+        unit: "kW"
+        fallback_source: "SIMULATED"
+        data_tier: "SIMULATED"
+
+  - pump_id: "PUMP_TG_03_STANDBY"
+    name: "Tataguni Stage Pump Unit 03 (Standby)"
+    station_id: "PS_TATAGUNI_MAIN"
+    rated_voltage_v: 6600
+    rated_current_a: 124.5
+    rated_power_kw: 1200.0
+    channels:
+      main_bus_voltage_kv:
+        ignoapi_variable: null
+        unit: "kV AC"
+        fallback_source: "SIMULATED"
+        data_tier: "SIMULATED"
+      main_motor_current_a:
+        ignoapi_variable: null
+        unit: "A AC"
+        fallback_source: "SIMULATED"
+        data_tier: "SIMULATED"
+      active_power_kw:
+        ignoapi_variable: null
+        unit: "kW"
+        fallback_source: "SIMULATED"
+        data_tier: "SIMULATED"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 3. BULK FLOW METERS (LPS)
+# ─────────────────────────────────────────────────────────────────────────────
+# All 9 bulk flow meters remain strictly in SIMULATED tier.
+flow_meters:
+  - sensor_id: "FM_TG_OUTLET"
+    name: "Tataguni Transmission Discharge Meter"
+    pipe_id: "PIPE_CORRIDOR_01"
+    unit: "LPS"
+    ignoapi_variable: null
+    scale_factor: 1.0
+    valid_range: {min: 0.0, max: 1800.0}
+    fallback_source: "SIMULATED"
+    data_tier: "SIMULATED"
+    notes: "No native flow variable in IGNOAPI. Operating in SIMULATED tier."
+
+  - sensor_id: "FM_KANAKAPURA"
+    name: "Kanakapura Road Feeder Meter"
+    pipe_id: "PIPE_CORRIDOR_04"
+    unit: "LPS"
+    ignoapi_variable: null
+    scale_factor: 1.0
+    valid_range: {min: 0.0, max: 1200.0}
+    fallback_source: "SIMULATED"
+    data_tier: "SIMULATED"
+    notes: "Operating in SIMULATED tier."
+
+  - sensor_id: "FM_BANASHANKARI"
+    name: "Banashankari DMA Bulk Inflow Meter"
+    pipe_id: "PIPE_CORRIDOR_06"
+    unit: "LPS"
+    ignoapi_variable: null
+    scale_factor: 1.0
+    valid_range: {min: 0.0, max: 800.0}
+    fallback_source: "SIMULATED"
+    data_tier: "SIMULATED"
+    notes: "Operating in SIMULATED tier."
+
+  - sensor_id: "FM_RV_ROAD"
+    name: "RV Road Main Transmission Feeder Meter"
+    pipe_id: "PIPE_CORRIDOR_08"
+    unit: "LPS"
+    ignoapi_variable: null
+    scale_factor: 1.0
+    valid_range: {min: 0.0, max: 950.0}
+    fallback_source: "SIMULATED"
+    data_tier: "SIMULATED"
+    notes: "Operating in SIMULATED tier."
+
+  - sensor_id: "FM_JAYANAGAR"
+    name: "Jayanagar West Bulk Flow Meter"
+    pipe_id: "PIPE_TO_JAYANAGAR_OHT"
+    unit: "LPS"
+    ignoapi_variable: null
+    scale_factor: 1.0
+    valid_range: {min: 0.0, max: 300.0}
+    fallback_source: "SIMULATED"
+    data_tier: "SIMULATED"
+    notes: "Operating in SIMULATED tier."
+
+  - sensor_id: "FM_MOUNT_JOY_INLET"
+    name: "Mount Joy Reservoir Inflow Meter"
+    pipe_id: "PIPE_TO_MOUNT_JOY"
+    unit: "LPS"
+    ignoapi_variable: null
+    scale_factor: 1.0
+    valid_range: {min: 0.0, max: 850.0}
+    fallback_source: "SIMULATED"
+    data_tier: "SIMULATED"
+    notes: "Operating in SIMULATED tier."
+
+  - sensor_id: "FM_BASAVANAGUDI"
+    name: "Basavanagudi Commercial DMA Meter"
+    pipe_id: "PIPE_CORRIDOR_10"
+    unit: "LPS"
+    ignoapi_variable: null
+    scale_factor: 1.0
+    valid_range: {min: 0.0, max: 600.0}
+    fallback_source: "SIMULATED"
+    data_tier: "SIMULATED"
+    notes: "Operating in SIMULATED tier."
+
+  - sensor_id: "FM_KR_MARKET"
+    name: "City Market Commercial Hub Meter"
+    pipe_id: "PIPE_CORRIDOR_15"
+    unit: "LPS"
+    ignoapi_variable: null
+    scale_factor: 1.0
+    valid_range: {min: 0.0, max: 750.0}
+    fallback_source: "SIMULATED"
+    data_tier: "SIMULATED"
+    notes: "Operating in SIMULATED tier."
+
+  - sensor_id: "FM_HIGH_GROUNDS_INLET"
+    name: "High Grounds Master Inflow Meter"
+    pipe_id: "PIPE_TO_HIGH_GROUNDS"
+    unit: "LPS"
+    ignoapi_variable: null
+    scale_factor: 1.0
+    valid_range: {min: 0.0, max: 1100.0}
+    fallback_source: "SIMULATED"
+    data_tier: "SIMULATED"
+    notes: "Operating in SIMULATED tier."
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 4. PRESSURE TRANSMITTERS (bar)
+# ─────────────────────────────────────────────────────────────────────────────
+# All 8 pressure transmitters remain strictly in SIMULATED tier.
+pressure_sensors:
+  - sensor_id: "PT_TG_MANIFOLD"
+    name: "Tataguni Pumping Discharge Pressure"
+    node_id: "JUNC_TG_MANIFOLD"
+    unit: "bar"
+    ignoapi_variable: null
+    scale_factor: 1.0
+    valid_range: {min: 0.0, max: 16.0}
+    fallback_source: "SIMULATED"
+    data_tier: "SIMULATED"
+    notes: "Operating in SIMULATED tier."
+
+  - sensor_id: "PT_TALAGHATTAPURA"
+    name: "Talaghattapura Pipeline Pressure"
+    node_id: "N_TALAGHATTAPURA"
+    unit: "bar"
+    ignoapi_variable: null
+    scale_factor: 1.0
+    valid_range: {min: 0.0, max: 12.0}
+    fallback_source: "SIMULATED"
+    data_tier: "SIMULATED"
+    notes: "Operating in SIMULATED tier."
+
+  - sensor_id: "PT_KONANAKUNTE"
+    name: "Konanakunte Cross Feeder Pressure"
+    node_id: "N_KONANAKUNTE_CROSS"
+    unit: "bar"
+    ignoapi_variable: null
+    scale_factor: 1.0
+    valid_range: {min: 0.0, max: 10.0}
+    fallback_source: "SIMULATED"
+    data_tier: "SIMULATED"
+    notes: "Operating in SIMULATED tier."
+
+  - sensor_id: "PT_BANASHANKARI"
+    name: "Banashankari PRV Terminal Pressure"
+    node_id: "N_BANASHANKARI_TTMC"
+    unit: "bar"
+    ignoapi_variable: null
+    scale_factor: 1.0
+    valid_range: {min: 0.0, max: 8.0}
+    fallback_source: "SIMULATED"
+    data_tier: "SIMULATED"
+    notes: "Operating in SIMULATED tier."
+
+  - sensor_id: "PT_BASAVANAGUDI"
+    name: "Basavanagudi DVK Junction Pressure"
+    node_id: "N_BASAVANAGUDI_DVK"
+    unit: "bar"
+    ignoapi_variable: null
+    scale_factor: 1.0
+    valid_range: {min: 0.0, max: 8.0}
+    fallback_source: "SIMULATED"
+    data_tier: "SIMULATED"
+    notes: "Operating in SIMULATED tier."
+
+  - sensor_id: "PT_CHAMARAJPET"
+    name: "Chamarajpet Reticulation Pressure"
+    node_id: "N_CHAMARAJPET_5TH_MAIN"
+    unit: "bar"
+    ignoapi_variable: null
+    scale_factor: 1.0
+    valid_range: {min: 0.0, max: 6.0}
+    fallback_source: "SIMULATED"
+    data_tier: "SIMULATED"
+    notes: "Operating in SIMULATED tier."
+
+  - sensor_id: "PT_KR_MARKET"
+    name: "City Market Distribution Pressure"
+    node_id: "N_KR_MARKET_JUNCTION"
+    unit: "bar"
+    ignoapi_variable: null
+    scale_factor: 1.0
+    valid_range: {min: 0.0, max: 6.0}
+    fallback_source: "SIMULATED"
+    data_tier: "SIMULATED"
+    notes: "Operating in SIMULATED tier."
+
+  - sensor_id: "PT_SHESHADRIPURAM"
+    name: "Sheshadripuram Elevated Node Pressure"
+    node_id: "N_SHESHADRIPURAM"
+    unit: "bar"
+    ignoapi_variable: null
+    scale_factor: 1.0
+    valid_range: {min: 0.0, max: 6.0}
+    fallback_source: "SIMULATED"
+    data_tier: "SIMULATED"
+    notes: "Operating in SIMULATED tier."

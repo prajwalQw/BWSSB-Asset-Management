@@ -1,0 +1,256 @@
+{
+  "kb_version": "1.0.0",
+  "last_updated": "2026-10-21T15:15:00Z",
+  "disclaimer": "ADVISORY ONLY: All diagnostic causes, forward impacts, and suggested remedial actions are advisory decision support recommendations. Final operational and isolation decisions must be taken by qualified BWSSB mechanical and electrical engineers.",
+  "advisory_rules": {
+    "CURRENT_OUTSIDE_BAND": {
+      "rule_id": "KB-ELEC-01",
+      "name": "Phase Current Divergence from Learned Steady-State Band",
+      "severity": "WARNING",
+      "category": "ELECTRICAL_LOAD",
+      "likely_causes": [
+        "Hydraulic load shift due to pipe throttling or branch valve closure",
+        "Winding degradation or stator insulation resistance breakdown",
+        "Mechanical binding or bearing clearance wear in pump drive end",
+        "Fluctuation in fluid specific gravity or sediment ingestion from reservoir floor"
+      ],
+      "forward_consequences": [
+        "Elevated I2R stator winding resistive heating exceeding thermal class F limits",
+        "Accelerated motor insulation breakdown leading to inter-turn short circuit",
+        "Premature tripping of thermal overload relay (TOR) causing sudden supply interruption",
+        "Higher specific energy consumption and financial surcharge from power utility (BESCOM)"
+      ],
+      "suggested_actions": [
+        "Verify motor surface temperature using calibrated infrared thermography gun",
+        "Inspect discharge pressure and confirm delivery valve position matches SCADA setpoint",
+        "Conduct Megger insulation resistance test (> 100 Megaohms @ 2.5 kV DC)",
+        "If current exceeds +15% for > 15 minutes, prepare load shift to Standby Pump Unit 03"
+      ]
+    },
+    "POWER_OUTSIDE_BAND": {
+      "rule_id": "KB-ELEC-02",
+      "name": "Active Power Draw Divergence from Learned Steady-State Band",
+      "severity": "WARNING",
+      "category": "POWER_CONSUMPTION",
+      "likely_causes": [
+        "Unscheduled pump speed variation or VFD frequency fluctuation",
+        "Impeller shroud fouling or accumulation of fibrous debris",
+        "Operating point drift along system head curve away from Best Efficiency Point (BEP)",
+        "Supply voltage depression requiring higher current draw for constant shaft torque"
+      ],
+      "forward_consequences": [
+        "Higher daily energy expenditure for pumping transmission corridor",
+        "Increased thermal dissipation within pump station motor control center (MCC)",
+        "Potential contract maximum demand (MD) penalty from electrical utility",
+        "Premature mechanical seal degradation due to shaft deflection"
+      ],
+      "suggested_actions": [
+        "Cross-check active power against suction head and discharge pressure transmitters",
+        "Verify power factor correction capacitor bank is online and functional",
+        "Inspect shaft vibration levels across drive-end and non-drive-end bearing housings",
+        "Audit SCADA flow meter readings to recompute instantaneous hydraulic efficiency"
+      ]
+    },
+    "RISING_TREND_DRIFT": {
+      "rule_id": "KB-MECH-01",
+      "name": "Steady-State Drift / Progressive Power Degradation",
+      "severity": "WARNING",
+      "category": "PREDICTIVE_MAINTENANCE",
+      "likely_causes": [
+        "Progressive bearing wear and lubrication grease breakdown",
+        "Internal wear ring clearance expansion causing internal recirculation leakage",
+        "Silt/grit abrasion on bronze impeller vanes eroding hydraulic profile",
+        "Motor coupling misalignment developing mechanical reaction forces"
+      ],
+      "forward_consequences": [
+        "Progressive loss of volumetric discharge efficiency over weeks",
+        "Unplanned catastrophic bearing seizure causing emergency pump trip",
+        "Depletion of terminal service reservoir (High Grounds / Mount Joy) storage",
+        "Compounded lifetime energy waste exceeding replacement wear ring costs"
+      ],
+      "suggested_actions": [
+        "Schedule non-destructive vibration spectrum analysis (FFT) on pump and motor bearings",
+        "Grease bearing housings with manufacturer-approved high-temperature lithium complex grease",
+        "Inspect alignment using dual laser alignment tool during scheduled maintenance window",
+        "Review forecast 'Time to Alarm Limit' to schedule planned overhaul before critical threshold"
+      ]
+    },
+    "VOLTAGE_IMBALANCE": {
+      "rule_id": "KB-GRID-01",
+      "name": "Three-Phase Supply Voltage Imbalance (> 2.0%)",
+      "severity": "CRITICAL",
+      "category": "GRID_SUPPLY",
+      "likely_causes": [
+        "BESCOM 66kV/11kV substation single-phase feeder load asymmetry",
+        "High-resistance contact or pitting on Medium Voltage circuit breaker contacts",
+        "Blown transformer primary fuse or unbalanced tap-changer setting",
+        "Loose terminal termination in Motor Control Center (MCC) incoming cubicle"
+      ],
+      "forward_consequences": [
+        "Severe negative-sequence current injection producing counter-rotating magnetic flux",
+        "Rotor bar heating rising by 2x the square of voltage imbalance percentage (NEMA MG-1)",
+        "Thermal tripping of motor winding RTDs despite moderate active power",
+        "Severe motor life reduction: 3.5% imbalance halves motor winding lifespan"
+      ],
+      "suggested_actions": [
+        "Check incoming line-to-line voltages (V_RY, V_YB, V_BR) at station main incomer",
+        "Notify BESCOM load dispatch center regarding supply phase asymmetry on Tataguni 66kV bay",
+        "Perform thermal imaging of breaker busbar terminals and disconnect switches",
+        "Derate pump continuous load or de-energize if voltage imbalance exceeds 3.0%"
+      ]
+    },
+    "UNDERVOLTAGE": {
+      "rule_id": "KB-GRID-02",
+      "name": "Supply Undervoltage (< 90% of Rated Voltage)",
+      "severity": "CRITICAL",
+      "category": "GRID_SUPPLY",
+      "likely_causes": [
+        "Grid peak load depression on transmission substation",
+        "On-load tap changer (OLTC) stuck at low tap step",
+        "Excessive voltage drop across long incoming underground 11kV cables"
+      ],
+      "forward_consequences": [
+        "Motor pulls proportional higher current to deliver rated shaft torque ($I \\propto 1/V$)",
+        "Rapid winding temperature rise triggering stator thermal protection",
+        "Reduced breakdown stall torque increasing vulnerability to transient grid dips"
+      ],
+      "suggested_actions": [
+        "Verify OLTC automated regulation at station 66/6.6kV power transformer",
+        "If undervoltage persists below 88%, sequentially trip non-critical booster pumps",
+        "Coordinate with Karnataka Power Transmission Corporation Limited (KPTCL) dispatch"
+      ]
+    },
+    "OVERVOLTAGE": {
+      "rule_id": "KB-GRID-03",
+      "name": "Supply Overvoltage (> 110% of Rated Voltage)",
+      "severity": "WARNING",
+      "category": "GRID_SUPPLY",
+      "likely_causes": [
+        "Ferranti effect during light night-time grid loading (01:00 - 04:00 AM)",
+        "Improper fixed capacitor bank overcompensation without reactive power control"
+      ],
+      "forward_consequences": [
+        "Magnetic core saturation in motor stator laminations",
+        "Excessive magnetizing current and increased core eddy-current iron losses",
+        "High voltage stress on motor insulation and VFD DC-bus filter capacitors"
+      ],
+      "suggested_actions": [
+        "Disengage automatic capacitor banks step-by-step during nocturnal light-load period",
+        "Verify transformer secondary tap position",
+        "Monitor motor core temperature via embedded resistance temperature detectors (RTDs)"
+      ]
+    },
+    "LOW_POWER_FACTOR": {
+      "rule_id": "KB-ELEC-03",
+      "name": "Low Operating Power Factor (< 0.82)",
+      "severity": "ADVISORY",
+      "category": "ELECTRICAL_EFFICIENCY",
+      "likely_causes": [
+        "Pump operating severely under-loaded (throttled discharge or low system head)",
+        "Degraded or disconnected Automatic Power Factor Correction (APFC) capacitor bank",
+        "Oversized motor installed for current operational duty point"
+      ],
+      "forward_consequences": [
+        "Substantial reactive power (kVAR) consumption from grid",
+        "Direct monetary penalty billed on monthly BESCOM commercial electricity tariff",
+        "Increased apparent kVA loading on substation power transformer"
+      ],
+      "suggested_actions": [
+        "Inspect APFC capacitor panel for blown fuse links or defective vacuum contactors",
+        "Verify current transformers (CT) feedback signal to reactive power controller",
+        "Evaluate pump throttling; open bypass or adjust VFD speed to restore optimal loading"
+      ]
+    },
+    "FREQUENT_STARTS": {
+      "rule_id": "KB-OPER-01",
+      "name": "Excessive Start-Stop Cycling (> 3 Starts/Hour)",
+      "severity": "CRITICAL",
+      "category": "OPERATIONAL_DISCIPLINE",
+      "likely_causes": [
+        "Hunting between level sensor cut-in and cut-out thresholds in service reservoir",
+        "Pressure switch chattering due to lack of surge anticipation valve or hydraulic shock",
+        "Erroneous SCADA auto-restart loop triggered on transient sensor glitches"
+      ],
+      "forward_consequences": [
+        "Severe cumulative thermal stress from repeated inrush current (6x rated)",
+        "Rotor bar fatigue and brazing joint fracture from electromagnetic start forces",
+        "Premature failure of Medium Voltage vacuum circuit breaker closing mechanisms"
+      ],
+      "suggested_actions": [
+        "Enforce minimum run-time (15 minutes) and anti-recycle lock-out timer (20 minutes)",
+        "Widen deadband between reservoir start and stop setpoints in SCADA",
+        "Inspect air vessel cushioning and non-return valve slam prevention damping"
+      ]
+    },
+    "RUNNING_DRY": {
+      "rule_id": "KB-HYDR-01",
+      "name": "Pump Running Dry / Suction Starvation (Low Current with Zero/Low Flow)",
+      "severity": "CRITICAL",
+      "category": "HYDRAULIC_PROTECTION",
+      "likely_causes": [
+        "Clearwater reservoir level dropped below suction sump bellmouth intake",
+        "Air entrapment or vortex formation at pump suction manifold",
+        "Suction isolation butterfly valve closed or stuck shut",
+        "Severe suction strainer blockage with leaves, plastic, or debris"
+      ],
+      "forward_consequences": [
+        "Complete loss of water lubrication for internal cutless rubber / bronze sleeve bearings",
+        "Catastrophic overheating of mechanical seal faces within 60 to 90 seconds",
+        "Impeller seizure against stationary casing wear rings leading to locked rotor trip",
+        "Zero delivery to transmission main causing immediate pressure collapse downstream"
+      ],
+      "suggested_actions": [
+        "IMMEDIATE ACTION: Manually initiate controlled pump trip to prevent mechanical destruction",
+        "Verify suction sump water level and low-level safety interlock float switch",
+        "Inspect suction strainer basket differential pressure",
+        "Prime pump casing and vent air from casing high-point bleed valves before restart"
+      ]
+    },
+    "BLOCKAGE_OR_FRICTION": {
+      "rule_id": "KB-HYDR-02",
+      "name": "Discharge Blockage or High Mechanical Friction (High Current with Low Flow)",
+      "severity": "CRITICAL",
+      "category": "HYDRAULIC_PROTECTION",
+      "likely_causes": [
+        "Discharge non-return valve (NRV) or motorised butterfly valve stuck partially closed",
+        "Foreign object / timber / debris lodged between impeller shroud and casing volute",
+        "Foreign material packing in stuffing box gland seal or bearing mechanical binding",
+        "Air pocket accumulation causing hydraulic vapor lock downstream"
+      ],
+      "forward_consequences": [
+        "Pump operating at shut-off head churn; all shaft energy converts to fluid heat",
+        "Water inside casing rapidly reaches boiling temperature, causing cavitation and steam lock",
+        "Excessive radial hydraulic thrust causing severe shaft deflection and fatigue fracture",
+        "Motor thermal overload trip within 3 to 8 minutes"
+      ],
+      "suggested_actions": [
+        "Inspect motorized delivery valve actuator and limit switch feedback",
+        "Examine non-return valve counterweight lever to confirm flap has opened fully",
+        "Measure pump casing temperature; if hot to touch, stop pump immediately and allow cooling",
+        "Conduct manual bar-over of pump shaft with power locked out to detect mechanical tight spots"
+      ]
+    },
+    "EFFICIENCY_DROP": {
+      "rule_id": "KB-PERF-01",
+      "name": "Hydraulic Efficiency Degradation (Rising kWh per m³)",
+      "severity": "WARNING",
+      "category": "LIFECYCLE_EFFICIENCY",
+      "likely_causes": [
+        "Gradual wear of impeller vanes and enlargement of casing ring running clearances",
+        "Roughness buildup and tuberculation inside pump volute casting",
+        "Mismatch between current pipeline system curve and pump impeller design trimming"
+      ],
+      "forward_consequences": [
+        "Higher electrical energy consumed per million litres delivered (kWh/ML)",
+        "Daily operational energy cost penalty compounding to lakhs of rupees annually",
+        "Increased carbon footprint for BWSSB bulk water transmission system"
+      ],
+      "suggested_actions": [
+        "Perform thermodynamic or calibrated wire-to-water efficiency test",
+        "Compare head-flow performance against OEM factory pump test curve",
+        "Plan pump refurbishment: replace wear rings, apply ceramic epoxy anti-friction coating",
+        "Evaluate variable frequency drive (VFD) retrofit if system operating head varies widely"
+      ]
+    }
+  }
+}

@@ -1,0 +1,135 @@
+# IGNOAPI Variable Configuration for BWSSB Asset Intelligence Platform
+# Cleaned: Unused robotic/AGV variables removed from app config.
+# Retained: Only active variables relevant to Pumping Station & Electrical Telemetry.
+# All operations are strictly READ-ONLY.
+
+ignoapi_server:
+  host: "127.0.0.1"
+  port: 8899
+  poll_interval_seconds: 0.5   # 2 Hz
+  connect_timeout_seconds: 2.0
+  recv_timeout_seconds: 3.0
+  stale_threshold_seconds: 3.0
+  allow_writes: false          # Rule 4: IMMUTABLE read-only constraint
+
+# Retained active variables
+variables:
+  speed:
+    canonical_name: "pump_shaft_speed"
+    plain_label: "Pump Shaft Rotational Speed"
+    unit: "RPM"
+    scale_factor: 1.0
+    expected_type: "float"
+    valid_range:
+      min: 0.0
+      max: 1800.0
+    expected_frequency_hz: 2.0
+    stale_threshold_seconds: 3.0
+    group: "motor"
+    ui_mapping: "shaft_speed_rpm"
+    notes: "Direct 1:1 speed reading from IGNOAPI"
+
+  motor_temp_c:
+    canonical_name: "pump_motor_temperature"
+    plain_label: "Pump Motor Casing Temperature"
+    unit: "deg_C"
+    scale_factor: 1.0
+    expected_type: "float"
+    valid_range:
+      min: 15.0
+      max: 120.0
+    expected_frequency_hz: 2.0
+    stale_threshold_seconds: 3.0
+    group: "thermal"
+    ui_mapping: "motor_temp_c"
+    notes: "Direct thermocouple reading from motor casing"
+
+  voltage_v:
+    canonical_name: "aux_control_bus_voltage"
+    plain_label: "Auxiliary Control DC Bus Voltage"
+    unit: "V_DC"
+    scale_factor: 1.0
+    expected_type: "float"
+    valid_range:
+      min: 9.0
+      max: 15.0
+    expected_frequency_hz: 2.0
+    stale_threshold_seconds: 3.0
+    group: "electrical"
+    ui_mapping: "aux_voltage_v"
+    notes: "12V DC auxiliary control supply"
+
+  motor_current_a:
+    canonical_name: "aux_motor_current"
+    plain_label: "Auxiliary Drive Current"
+    unit: "A_DC"
+    scale_factor: 1.0
+    expected_type: "float"
+    valid_range:
+      min: 0.0
+      max: 20.0
+    expected_frequency_hz: 2.0
+    stale_threshold_seconds: 3.0
+    group: "electrical"
+    ui_mapping: "aux_current_a"
+    notes: "Low-voltage auxiliary motor draw"
+
+  alarmLM:
+    canonical_name: "pump_drive_alarm_code"
+    plain_label: "Motor Drive Fault Register"
+    unit: "code"
+    scale_factor: 1.0
+    expected_type: "integer"
+    valid_range:
+      min: 0
+      max: 65535
+    expected_frequency_hz: 2.0
+    stale_threshold_seconds: 3.0
+    group: "alarms"
+    ui_mapping: "alarm_code"
+    notes: "Trip alarm register code from drive controller"
+
+  switch_status:
+    canonical_name: "emergency_stop_trip"
+    plain_label: "Station Emergency Stop Status"
+    unit: "binary"
+    scale_factor: 1.0
+    expected_type: "integer"
+    valid_range:
+      min: 0
+      max: 1
+    expected_frequency_hz: 2.0
+    stale_threshold_seconds: 3.0
+    group: "safety"
+    ui_mapping: "estop_active"
+    notes: "Emergency trip push-button contact (0 = Healthy, 1 = Tripped)"
+
+alarm_code_table:
+  0:
+    meaning: "Normal Operation"
+    label: "Normal (No Fault)"
+    severity: "NORMAL"
+  192:  # 0x0C0
+    meaning: "DC bus overvoltage"
+    label: "Control Bus Voltage High"
+    severity: "CRITICAL"
+  208:  # 0x0D0
+    meaning: "DC bus undervoltage"
+    label: "Control Bus Voltage Low"
+    severity: "CRITICAL"
+  224:  # 0x0E0
+    meaning: "Overcurrent"
+    label: "Motor Phase Overcurrent"
+    severity: "CRITICAL"
+  240:  # 0x0F0
+    meaning: "Driver overheated"
+    label: "Motor Drive Inverter Overheated"
+    severity: "WARNING"
+  256:  # 0x100
+    meaning: "Motor overloaded"
+    label: "Pump Mechanical Overload"
+    severity: "WARNING"
+  258:  # 0x102
+    meaning: "Motor rotor blocked"
+    label: "Pump Impeller Jammed / Rotor Locked"
+    severity: "CRITICAL"

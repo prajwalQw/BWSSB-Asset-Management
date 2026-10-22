@@ -1,0 +1,807 @@
+zone_metadata:
+  zone_id: "DMA_ZONE_SOUTH_CENTRAL_01"
+  name: "South-Central Transmission & Distribution Corridor (Tataguni - Mount Joy - High Grounds)"
+  provenance: "SIMULATED"
+  simulated: true
+  disclaimer: "Simulated hydraulic digital twin network synthesized from real BWSSB transmission alignments and anchored to verified pumping and reservoir locations. Not official BWSSB GIS geometry."
+  hydraulic_timestep_seconds: 3600
+  total_duration_hours: 24
+
+anchors:
+  source_reservoir:
+    id: "RES_TATAGUNI_CLEARWATER"
+    name: "Tataguni Clear Water Sump (Stage IV/V)"
+    node_type: "RESERVOIR"
+    provenance: "SIMULATED"
+    simulated: true
+    coordinates: [77.5140, 12.8685]
+    elevation_m: 820.0
+    head_m: 825.0
+  
+  pumping_station:
+    id: "PS_TATAGUNI_TERMINAL"
+    name: "Tataguni Terminal Pumping Station"
+    node_type: "PUMPING_STATION"
+    provenance: "SIMULATED"
+    simulated: true
+    coordinates: [77.5148, 12.8690]
+    elevation_m: 821.5
+    installed_pumps_count: 3
+    suction_manifold: "RES_TATAGUNI_CLEARWATER"
+    discharge_manifold: "JUNC_TG_MANIFOLD"
+
+  service_tanks:
+    - id: "TANK_MOUNT_JOY_GLR"
+      name: "Mount Joy Balancing Reservoir (GLR)"
+      node_type: "TANK"
+      tank_type: "GROUND_LEVEL_RESERVOIR"
+      provenance: "SIMULATED"
+      simulated: true
+      coordinates: [77.5621, 12.9372]
+      elevation_m: 915.0
+      initial_level_m: 4.1
+      min_level_m: 1.0
+      max_level_m: 5.5
+      diameter_m: 45.0
+      capacity_mld: 35.0
+    - id: "TANK_HIGH_GROUNDS_GLR"
+      name: "High Grounds Master Balancing Reservoir (GLR)"
+      node_type: "TANK"
+      tank_type: "GROUND_LEVEL_RESERVOIR"
+      provenance: "SIMULATED"
+      simulated: true
+      coordinates: [77.5843, 12.9912]
+      elevation_m: 928.0
+      initial_level_m: 4.85
+      min_level_m: 1.5
+      max_level_m: 6.0
+      diameter_m: 55.0
+      capacity_mld: 45.0
+    - id: "TANK_JAYANAGAR_OHT"
+      name: "Jayanagar 4th Block Overhead Tank (OHT)"
+      node_type: "TANK"
+      tank_type: "OVERHEAD_TANK"
+      provenance: "SIMULATED"
+      simulated: true
+      coordinates: [77.5800, 12.9280]
+      elevation_m: 912.0
+      initial_level_m: 3.2
+      min_level_m: 0.8
+      max_level_m: 4.5
+      diameter_m: 18.0
+      capacity_mld: 5.0
+
+pumps:
+  - id: "PUMP_TG_01"
+    name: "Tataguni Stage Pump Unit 01 (Duty)"
+    provenance: "SIMULATED"
+    simulated: true
+    station_id: "PS_TATAGUNI_MAIN"
+    station_name: "Tataguni Terminal Pumping Station"
+    zone: "DMA_ZONE_SOUTH_CENTRAL_01"
+    coordinates: [77.5255, 12.8680]
+    from_node: "RES_TATAGUNI_CLEARWATER"
+    to_node: "JUNC_TG_MANIFOLD"
+    status: "RUNNING"
+    speed_ratio: 1.0
+    power_kw: 1200.0
+    rated_voltage_v: 6600
+    rated_current_a: 124.5
+    number_of_phases: 3
+    power_factor_rated: 0.88
+    startup_window_seconds: 30
+    max_starts_per_hour: 3
+    rated_speed_rpm: 1450.0
+    head_curve: [[0.0, 75.0], [500.0, 70.0], [1000.0, 60.0], [1500.0, 45.0]]
+  - id: "PUMP_TG_02"
+    name: "Tataguni Stage Pump Unit 02 (Duty)"
+    provenance: "SIMULATED"
+    simulated: true
+    station_id: "PS_TATAGUNI_MAIN"
+    station_name: "Tataguni Terminal Pumping Station"
+    zone: "DMA_ZONE_SOUTH_CENTRAL_01"
+    coordinates: [77.5255, 12.8680]
+    from_node: "RES_TATAGUNI_CLEARWATER"
+    to_node: "JUNC_TG_MANIFOLD"
+    status: "RUNNING"
+    speed_ratio: 1.0
+    power_kw: 1200.0
+    rated_voltage_v: 6600
+    rated_current_a: 124.5
+    number_of_phases: 3
+    power_factor_rated: 0.88
+    startup_window_seconds: 30
+    max_starts_per_hour: 3
+    rated_speed_rpm: 1450.0
+    head_curve: [[0.0, 75.0], [500.0, 70.0], [1000.0, 60.0], [1500.0, 45.0]]
+  - id: "PUMP_TG_03_STANDBY"
+    name: "Tataguni Stage Pump Unit 03 (Standby)"
+    provenance: "SIMULATED"
+    simulated: true
+    station_id: "PS_TATAGUNI_MAIN"
+    station_name: "Tataguni Terminal Pumping Station"
+    zone: "DMA_ZONE_SOUTH_CENTRAL_01"
+    coordinates: [77.5255, 12.8680]
+    from_node: "RES_TATAGUNI_CLEARWATER"
+    to_node: "JUNC_TG_MANIFOLD"
+    status: "STANDBY"
+    speed_ratio: 0.0
+    power_kw: 1200.0
+    rated_voltage_v: 6600
+    rated_current_a: 124.5
+    number_of_phases: 3
+    power_factor_rated: 0.88
+    startup_window_seconds: 30
+    max_starts_per_hour: 3
+    rated_speed_rpm: 1450.0
+    head_curve: [[0.0, 75.0], [500.0, 70.0], [1000.0, 60.0], [1500.0, 45.0]]
+
+valves:
+  - id: "VALVE_BSK_PRV"
+    name: "Banashankari Pressure Reducing Valve"
+    node_type: "VALVE"
+    valve_type: "PRV"
+    from_node: "N_SARAKKI_SIGNAL"
+    to_node: "N_BANASHANKARI_TTMC"
+    coordinates: [77.5580, 12.9145]
+    diameter_mm: 500
+    pressure_setting_bar: 2.8
+    status: "ACTIVE"
+    simulated: true
+  - id: "VALVE_BVG_ISO"
+    name: "Basavanagudi Feeder Isolation Valve (V-104)"
+    node_type: "VALVE"
+    valve_type: "TCV"
+    from_node: "N_SOUTH_END_CIRCLE"
+    to_node: "N_BASAVANAGUDI_DVK"
+    coordinates: [77.5725, 12.9360]
+    diameter_mm: 450
+    status: "ACTIVE"
+    simulated: true
+  - id: "VALVE_HG_TCV"
+    name: "High Grounds Reservoir Inlet Throttle Valve"
+    node_type: "VALVE"
+    valve_type: "TCV"
+    from_node: "N_SHESHADRIPURAM"
+    to_node: "N_HIGH_GROUNDS_INLET"
+    coordinates: [77.5815, 12.9895]
+    diameter_mm: 600
+    status: "ACTIVE"
+    simulated: true
+
+flow_meters:
+  - id: "FM_TG_OUTLET"
+    name: "Tataguni Transmission Discharge Meter"
+    pipe_id: "PIPE_CORRIDOR_01"
+    coordinates: [77.5180, 12.8750]
+    value_source: "SIMULATED"
+    ignoapi_variable: "speed"
+    measurement_noise_std_lps: 0.8
+    simulated: true
+  - id: "FM_KANAKAPURA"
+    name: "Kanakapura Road Feeder Meter"
+    pipe_id: "PIPE_CORRIDOR_04"
+    coordinates: [77.5320, 12.8980]
+    value_source: "SIMULATED"
+    ignoapi_variable: null
+    measurement_noise_std_lps: 0.6
+    simulated: true
+  - id: "FM_BANASHANKARI"
+    name: "Banashankari DMA Bulk Inflow Meter"
+    pipe_id: "PIPE_CORRIDOR_06"
+    coordinates: [77.5500, 12.9180]
+    value_source: "SIMULATED"
+    ignoapi_variable: null
+    measurement_noise_std_lps: 0.5
+    simulated: true
+  - id: "FM_RV_ROAD"
+    name: "RV Road Main Transmission Feeder Meter"
+    pipe_id: "PIPE_CORRIDOR_08"
+    coordinates: [77.5680, 12.9240]
+    value_source: "SIMULATED"
+    ignoapi_variable: null
+    measurement_noise_std_lps: 0.6
+    simulated: true
+  - id: "FM_JAYANAGAR"
+    name: "Jayanagar West Bulk Flow Meter"
+    pipe_id: "PIPE_TO_JAYANAGAR_OHT"
+    coordinates: [77.5680, 12.9250]
+    value_source: "SIMULATED"
+    ignoapi_variable: null
+    measurement_noise_std_lps: 0.4
+    simulated: true
+  - id: "FM_MOUNT_JOY_INLET"
+    name: "Mount Joy Reservoir Inflow Meter"
+    pipe_id: "PIPE_TO_MOUNT_JOY"
+    coordinates: [77.5615, 12.9360]
+    value_source: "SIMULATED"
+    ignoapi_variable: null
+    measurement_noise_std_lps: 0.7
+    simulated: true
+  - id: "FM_BASAVANAGUDI"
+    name: "Basavanagudi Commercial DMA Meter"
+    pipe_id: "PIPE_CORRIDOR_10"
+    coordinates: [77.5720, 12.9420]
+    value_source: "SIMULATED"
+    ignoapi_variable: null
+    measurement_noise_std_lps: 0.5
+    simulated: true
+  - id: "FM_KR_MARKET"
+    name: "City Market Commercial Hub Meter"
+    pipe_id: "PIPE_CORRIDOR_15"
+    coordinates: [77.5760, 12.9640]
+    value_source: "SIMULATED"
+    ignoapi_variable: null
+    measurement_noise_std_lps: 0.9
+    simulated: true
+  - id: "FM_HIGH_GROUNDS_INLET"
+    name: "High Grounds Master Inflow Meter"
+    pipe_id: "PIPE_TO_HIGH_GROUNDS"
+    coordinates: [77.5835, 12.9900]
+    value_source: "SIMULATED"
+    ignoapi_variable: null
+    measurement_noise_std_lps: 0.8
+    simulated: true
+
+pressure_sensors:
+  - id: "PT_TG_MANIFOLD"
+    name: "Tataguni Pumping Discharge Pressure"
+    node_id: "JUNC_TG_MANIFOLD"
+    coordinates: [77.5150, 12.8695]
+    value_source: "SIMULATED"
+    ignoapi_variable: "voltage_v"
+    measurement_noise_std_bar: 0.04
+    simulated: true
+  - id: "PT_TALAGHATTAPURA"
+    name: "Talaghattapura Pipeline Pressure"
+    node_id: "N_TALAGHATTAPURA"
+    coordinates: [77.5250, 12.8830]
+    value_source: "SIMULATED"
+    ignoapi_variable: null
+    measurement_noise_std_bar: 0.03
+    simulated: true
+  - id: "PT_KONANAKUNTE"
+    name: "Konanakunte Cross Feeder Pressure"
+    node_id: "N_KONANAKUNTE_CROSS"
+    coordinates: [77.5450, 12.9060]
+    value_source: "SIMULATED"
+    ignoapi_variable: null
+    measurement_noise_std_bar: 0.03
+    simulated: true
+  - id: "PT_BANASHANKARI"
+    name: "Banashankari PRV Terminal Pressure"
+    node_id: "N_BANASHANKARI_TTMC"
+    coordinates: [77.5620, 12.9170]
+    value_source: "SIMULATED"
+    ignoapi_variable: null
+    measurement_noise_std_bar: 0.02
+    simulated: true
+  - id: "PT_BASAVANAGUDI"
+    name: "Basavanagudi DVK Junction Pressure"
+    node_id: "N_BASAVANAGUDI_DVK"
+    coordinates: [77.5700, 12.9400]
+    value_source: "SIMULATED"
+    ignoapi_variable: null
+    measurement_noise_std_bar: 0.03
+    simulated: true
+  - id: "PT_CHAMARAJPET"
+    name: "Chamarajpet Reticulation Pressure"
+    node_id: "N_CHAMARAJPET_5TH_MAIN"
+    coordinates: [77.5630, 12.9550]
+    value_source: "SIMULATED"
+    ignoapi_variable: null
+    measurement_noise_std_bar: 0.03
+    simulated: true
+  - id: "PT_KR_MARKET"
+    name: "City Market Distribution Pressure"
+    node_id: "N_KR_MARKET_JUNCTION"
+    coordinates: [77.5760, 12.9640]
+    value_source: "SIMULATED"
+    ignoapi_variable: null
+    measurement_noise_std_bar: 0.04
+    simulated: true
+  - id: "PT_SHESHADRIPURAM"
+    name: "Sheshadripuram Elevated Node Pressure"
+    node_id: "N_SHESHADRIPURAM"
+    coordinates: [77.5790, 12.9890]
+    value_source: "SIMULATED"
+    ignoapi_variable: null
+    measurement_noise_std_bar: 0.03
+    simulated: true
+
+consumer_clusters:
+  - id: "N_TALAGHATTAPURA"
+    name: "Talaghattapura Residential Cluster"
+    node_type: "CONSUMER_CLUSTER"
+    category: "DOMESTIC"
+    connection_count: 1450
+    coordinates: [77.5250, 12.8830]
+    elevation_m: 835.0
+    base_demand_lps: 18.5
+    simulated: true
+  - id: "N_VAJARAHALLI"
+    name: "Vajarahalli Metro Cluster"
+    node_type: "CONSUMER_CLUSTER"
+    category: "DOMESTIC"
+    connection_count: 1820
+    coordinates: [77.5340, 12.8950]
+    elevation_m: 848.0
+    base_demand_lps: 22.0
+    simulated: true
+  - id: "N_KONANAKUNTE_CROSS"
+    name: "Konanakunte Mixed Commercial & Domestic"
+    node_type: "CONSUMER_CLUSTER"
+    category: "MIXED"
+    connection_count: 2740
+    coordinates: [77.5450, 12.9060]
+    elevation_m: 865.0
+    base_demand_lps: 34.0
+    simulated: true
+  - id: "N_SARAKKI_SIGNAL"
+    name: "Sarakki Junction Consumer Cluster"
+    node_type: "CONSUMER_CLUSTER"
+    category: "DOMESTIC"
+    connection_count: 2310
+    coordinates: [77.5550, 12.9120]
+    elevation_m: 880.0
+    base_demand_lps: 28.5
+    simulated: true
+  - id: "N_BANASHANKARI_TTMC"
+    name: "Banashankari Bus Terminal & Ward 164"
+    node_type: "CONSUMER_CLUSTER"
+    category: "COMMERCIAL"
+    connection_count: 3620
+    coordinates: [77.5620, 12.9170]
+    elevation_m: 890.0
+    base_demand_lps: 45.0
+    simulated: true
+  - id: "N_KADIRENAHALLI_CROSS"
+    name: "Kadirenahalli Urban Settlement"
+    node_type: "CONSUMER_CLUSTER"
+    category: "DOMESTIC"
+    connection_count: 2480
+    coordinates: [77.5500, 12.9230]
+    elevation_m: 895.0
+    base_demand_lps: 31.0
+    simulated: true
+  - id: "N_PADMANABHANAGAR"
+    name: "Padmanabhanagar Residential Sector"
+    node_type: "CONSUMER_CLUSTER"
+    category: "DOMESTIC"
+    connection_count: 2150
+    coordinates: [77.5420, 12.9290]
+    elevation_m: 902.0
+    base_demand_lps: 26.5
+    simulated: true
+  - id: "N_SOUTH_END_CIRCLE"
+    name: "South End Circle Hub"
+    node_type: "CONSUMER_CLUSTER"
+    category: "MIXED"
+    connection_count: 3100
+    coordinates: [77.5750, 12.9320]
+    elevation_m: 908.0
+    base_demand_lps: 38.0
+    simulated: true
+  - id: "N_BASAVANAGUDI_DVK"
+    name: "Basavanagudi Heritage & Commercial DMA"
+    node_type: "CONSUMER_CLUSTER"
+    category: "COMMERCIAL"
+    connection_count: 3450
+    coordinates: [77.5700, 12.9400]
+    elevation_m: 912.0
+    base_demand_lps: 42.0
+    simulated: true
+  - id: "N_BULL_TEMPLE"
+    name: "Bull Temple Road Consumer Cluster"
+    node_type: "CONSUMER_CLUSTER"
+    category: "DOMESTIC"
+    connection_count: 2400
+    coordinates: [77.5670, 12.9450]
+    elevation_m: 915.0
+    base_demand_lps: 30.0
+    simulated: true
+  - id: "N_CHAMARAJPET_5TH_MAIN"
+    name: "Chamarajpet 5th Main Dense Settlement"
+    node_type: "CONSUMER_CLUSTER"
+    category: "DOMESTIC"
+    connection_count: 2950
+    coordinates: [77.5630, 12.9550]
+    elevation_m: 910.0
+    base_demand_lps: 36.0
+    simulated: true
+  - id: "N_LALBAGH_WEST_GATE"
+    name: "Lalbagh West Gate Institutional Node"
+    node_type: "CONSUMER_CLUSTER"
+    category: "BULK"
+    connection_count: 850
+    coordinates: [77.5800, 12.9490]
+    elevation_m: 912.0
+    base_demand_lps: 25.0
+    simulated: true
+  - id: "N_MINERVA_CIRCLE"
+    name: "Minerva Circle Commercial Zone"
+    node_type: "CONSUMER_CLUSTER"
+    category: "COMMERCIAL"
+    connection_count: 2600
+    coordinates: [77.5820, 12.9580]
+    elevation_m: 914.0
+    base_demand_lps: 32.0
+    simulated: true
+  - id: "N_KR_MARKET_JUNCTION"
+    name: "City Market Major Commercial Center"
+    node_type: "CONSUMER_CLUSTER"
+    category: "COMMERCIAL"
+    connection_count: 4800
+    coordinates: [77.5760, 12.9640]
+    elevation_m: 918.0
+    base_demand_lps: 55.0
+    simulated: true
+  - id: "N_MYSORE_BANK_CIRCLE"
+    name: "Mysore Bank Avenue Financial District"
+    node_type: "CONSUMER_CLUSTER"
+    category: "COMMERCIAL"
+    connection_count: 3200
+    coordinates: [77.5790, 12.9740]
+    elevation_m: 924.0
+    base_demand_lps: 40.0
+    simulated: true
+  - id: "N_MAHARANI_COLLEGE"
+    name: "Maharani College Campus Node"
+    node_type: "CONSUMER_CLUSTER"
+    category: "INSTITUTIONAL"
+    connection_count: 1200
+    coordinates: [77.5830, 12.9780]
+    elevation_m: 925.0
+    base_demand_lps: 28.0
+    simulated: true
+  - id: "N_ANAND_RAO_CIRCLE"
+    name: "Anand Rao Circle Feeder"
+    node_type: "CONSUMER_CLUSTER"
+    category: "MIXED"
+    connection_count: 2800
+    coordinates: [77.5780, 12.9830]
+    elevation_m: 927.0
+    base_demand_lps: 34.0
+    simulated: true
+  - id: "N_SHESHADRIPURAM"
+    name: "Sheshadripuram Elevated Residential Area"
+    node_type: "CONSUMER_CLUSTER"
+    category: "DOMESTIC"
+    connection_count: 3100
+    coordinates: [77.5790, 12.9890]
+    elevation_m: 930.0
+    base_demand_lps: 38.0
+    simulated: true
+
+pipes:
+  - id: "PIPE_CORRIDOR_01"
+    from_node: "JUNC_TG_MANIFOLD"
+    to_node: "N_TALAGHATTAPURA"
+    diameter_mm: 900
+    material: "MS"
+    roughness: 130.0
+    length_m: 1850.0
+    installed_year: 2008
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5150, 12.8695], [77.5200, 12.8760], [77.5250, 12.8830]]
+  - id: "PIPE_CORRIDOR_02"
+    from_node: "N_TALAGHATTAPURA"
+    to_node: "N_VAJARAHALLI"
+    diameter_mm: 900
+    material: "MS"
+    roughness: 130.0
+    length_m: 1620.0
+    installed_year: 2008
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5250, 12.8830], [77.5300, 12.8890], [77.5340, 12.8950]]
+  - id: "PIPE_CORRIDOR_03"
+    from_node: "N_VAJARAHALLI"
+    to_node: "N_KONANAKUNTE_CROSS"
+    diameter_mm: 900
+    material: "MS"
+    roughness: 125.0
+    length_m: 1710.0
+    installed_year: 2002
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5340, 12.8950], [77.5400, 12.9000], [77.5450, 12.9060]]
+  - id: "PIPE_CORRIDOR_04"
+    from_node: "N_KONANAKUNTE_CROSS"
+    to_node: "N_SARAKKI_SIGNAL"
+    diameter_mm: 750
+    material: "DI"
+    roughness: 125.0
+    length_m: 1350.0
+    installed_year: 2002
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5450, 12.9060], [77.5500, 12.9090], [77.5550, 12.9120]]
+  - id: "PIPE_CORRIDOR_05"
+    from_node: "N_SARAKKI_SIGNAL"
+    to_node: "N_BANASHANKARI_TTMC"
+    diameter_mm: 750
+    material: "DI"
+    roughness: 120.0
+    length_m: 980.0
+    installed_year: 1998
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5550, 12.9120], [77.5580, 12.9145], [77.5620, 12.9170]]
+  - id: "PIPE_CORRIDOR_06"
+    from_node: "N_BANASHANKARI_TTMC"
+    to_node: "N_KADIRENAHALLI_CROSS"
+    diameter_mm: 600
+    material: "DI"
+    roughness: 120.0
+    length_m: 1420.0
+    installed_year: 1998
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5620, 12.9170], [77.5560, 12.9200], [77.5500, 12.9230]]
+  - id: "PIPE_CORRIDOR_07"
+    from_node: "N_KADIRENAHALLI_CROSS"
+    to_node: "N_PADMANABHANAGAR"
+    diameter_mm: 450
+    material: "HDPE"
+    roughness: 140.0
+    length_m: 1100.0
+    installed_year: 2016
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5500, 12.9230], [77.5460, 12.9260], [77.5420, 12.9290]]
+  - id: "PIPE_CORRIDOR_08"
+    from_node: "N_BANASHANKARI_TTMC"
+    to_node: "N_SOUTH_END_CIRCLE"
+    diameter_mm: 750
+    material: "DI"
+    roughness: 120.0
+    length_m: 2100.0
+    installed_year: 1995
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5620, 12.9170], [77.5680, 12.9240], [77.5750, 12.9320]]
+  - id: "PIPE_TO_JAYANAGAR_OHT"
+    from_node: "N_SOUTH_END_CIRCLE"
+    to_node: "TANK_JAYANAGAR_OHT"
+    diameter_mm: 400
+    material: "DI"
+    roughness: 130.0
+    length_m: 650.0
+    installed_year: 2012
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5750, 12.9320], [77.5780, 12.9300], [77.5800, 12.9280]]
+  - id: "PIPE_CORRIDOR_09"
+    from_node: "N_SOUTH_END_CIRCLE"
+    to_node: "N_BASAVANAGUDI_DVK"
+    diameter_mm: 600
+    material: "CI"
+    roughness: 100.0
+    length_m: 1050.0
+    installed_year: 1988
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5750, 12.9320], [77.5725, 12.9360], [77.5700, 12.9400]]
+  - id: "PIPE_TO_MOUNT_JOY"
+    from_node: "N_BASAVANAGUDI_DVK"
+    to_node: "TANK_MOUNT_JOY_GLR"
+    diameter_mm: 600
+    material: "DI"
+    roughness: 125.0
+    length_m: 950.0
+    installed_year: 2005
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5700, 12.9400], [77.5660, 12.9385], [77.5621, 12.9372]]
+  - id: "PIPE_CORRIDOR_10"
+    from_node: "N_BASAVANAGUDI_DVK"
+    to_node: "N_BULL_TEMPLE"
+    diameter_mm: 600
+    material: "CI"
+    roughness: 95.0
+    length_m: 680.0
+    installed_year: 1985
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5700, 12.9400], [77.5685, 12.9425], [77.5670, 12.9450]]
+  - id: "PIPE_CORRIDOR_11"
+    from_node: "N_BULL_TEMPLE"
+    to_node: "N_CHAMARAJPET_5TH_MAIN"
+    diameter_mm: 500
+    material: "CI"
+    roughness: 95.0
+    length_m: 1200.0
+    installed_year: 1985
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5670, 12.9450], [77.5650, 12.9500], [77.5630, 12.9550]]
+  - id: "PIPE_CORRIDOR_12"
+    from_node: "N_SOUTH_END_CIRCLE"
+    to_node: "N_LALBAGH_WEST_GATE"
+    diameter_mm: 600
+    material: "DI"
+    roughness: 120.0
+    length_m: 1950.0
+    installed_year: 2004
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5750, 12.9320], [77.5780, 12.9400], [77.5800, 12.9490]]
+  - id: "PIPE_CORRIDOR_13"
+    from_node: "N_LALBAGH_WEST_GATE"
+    to_node: "N_MINERVA_CIRCLE"
+    diameter_mm: 600
+    material: "DI"
+    roughness: 115.0
+    length_m: 1050.0
+    installed_year: 1999
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5800, 12.9490], [77.5810, 12.9535], [77.5820, 12.9580]]
+  - id: "PIPE_CORRIDOR_14"
+    from_node: "N_MINERVA_CIRCLE"
+    to_node: "N_KR_MARKET_JUNCTION"
+    diameter_mm: 600
+    material: "DI"
+    roughness: 115.0
+    length_m: 920.0
+    installed_year: 1999
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5820, 12.9580], [77.5790, 12.9610], [77.5760, 12.9640]]
+  - id: "PIPE_CORRIDOR_15"
+    from_node: "N_KR_MARKET_JUNCTION"
+    to_node: "N_MYSORE_BANK_CIRCLE"
+    diameter_mm: 750
+    material: "MS"
+    roughness: 125.0
+    length_m: 1250.0
+    installed_year: 2010
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5760, 12.9640], [77.5775, 12.9690], [77.5790, 12.9740]]
+  - id: "PIPE_CORRIDOR_16"
+    from_node: "N_MYSORE_BANK_CIRCLE"
+    to_node: "N_MAHARANI_COLLEGE"
+    diameter_mm: 750
+    material: "MS"
+    roughness: 125.0
+    length_m: 620.0
+    installed_year: 2010
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5790, 12.9740], [77.5810, 12.9760], [77.5830, 12.9780]]
+  - id: "PIPE_CORRIDOR_17"
+    from_node: "N_MAHARANI_COLLEGE"
+    to_node: "N_ANAND_RAO_CIRCLE"
+    diameter_mm: 750
+    material: "DI"
+    roughness: 120.0
+    length_m: 850.0
+    installed_year: 2006
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5830, 12.9780], [77.5805, 12.9805], [77.5780, 12.9830]]
+  - id: "PIPE_CORRIDOR_18"
+    from_node: "N_ANAND_RAO_CIRCLE"
+    to_node: "N_SHESHADRIPURAM"
+    diameter_mm: 600
+    material: "DI"
+    roughness: 120.0
+    length_m: 780.0
+    installed_year: 2006
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5780, 12.9830], [77.5785, 12.9860], [77.5790, 12.9890]]
+  - id: "PIPE_TO_HIGH_GROUNDS"
+    from_node: "N_SHESHADRIPURAM"
+    to_node: "TANK_HIGH_GROUNDS_GLR"
+    diameter_mm: 750
+    material: "MS"
+    roughness: 130.0
+    length_m: 680.0
+    installed_year: 2011
+    status: "ACTIVE"
+    simulated: true
+    coordinates_path: [[77.5790, 12.9890], [77.5815, 12.9900], [77.5843, 12.9912]]
+
+diurnal_pattern_multipliers:
+  - 0.55  # 00:00 - Night low
+  - 0.48  # 01:00
+  - 0.42  # 02:00 - Minimum Night Flow (MNF)
+  - 0.40  # 03:00 - Minimum Night Flow (MNF)
+  - 0.50  # 04:00
+  - 0.85  # 05:00 - Morning rise
+  - 1.45  # 06:00 - Morning peak
+  - 1.70  # 07:00 - Morning peak
+  - 1.65  # 08:00
+  - 1.35  # 09:00
+  - 1.15  # 10:00
+  - 1.05  # 11:00
+  - 0.95  # 12:00
+  - 0.90  # 13:00
+  - 0.88  # 14:00
+  - 0.92  # 15:00
+  - 1.05  # 16:00
+  - 1.25  # 17:00
+  - 1.50  # 18:00 - Evening peak
+  - 1.55  # 19:00 - Evening peak
+  - 1.30  # 20:00
+  - 1.10  # 21:00
+  - 0.85  # 22:00
+  - 0.65  # 23:00
+
+dma_segments:
+  - id: "SEG_01_TATAGUNI_TRANSMISSION"
+    name: "Tataguni Transmission Corridor (Stage IV)"
+    inflow_meters: ["FM_TG_OUTLET"]
+    outflow_meters: ["FM_KANAKAPURA"]
+    pipes: ["PIPE_CORRIDOR_01", "PIPE_CORRIDOR_02", "PIPE_CORRIDOR_03"]
+    consumer_clusters: ["N_TALAGHATTAPURA", "N_VAJARAHALLI", "N_KONANAKUNTE_CROSS"]
+    storage_tanks: []
+    boundary_pressure_sensors: ["PT_TG_MANIFOLD", "PT_TALAGHATTAPURA"]
+    nearest_landmark: "Kanakapura Road (NH-948) near Art of Living & Talaghattapura"
+    total_connections: 6010
+    simulated: true
+
+  - id: "SEG_02_KANAKAPURA_CORRIDOR"
+    name: "Kanakapura Road DMA Sector (Konanakunte to Banashankari)"
+    inflow_meters: ["FM_KANAKAPURA"]
+    outflow_meters: ["FM_BANASHANKARI", "FM_RV_ROAD"]
+    pipes: ["PIPE_CORRIDOR_04", "PIPE_CORRIDOR_05"]
+    consumer_clusters: ["N_SARAKKI_SIGNAL", "N_BANASHANKARI_TTMC"]
+    storage_tanks: []
+    boundary_pressure_sensors: ["PT_KONANAKUNTE", "PT_BANASHANKARI"]
+    nearest_landmark: "Kanakapura Road Metro Corridor near Sarakki Signal & Banashankari Metro"
+    total_connections: 5200
+    simulated: true
+
+  - id: "SEG_03_PADMANABHANAGAR"
+    name: "Padmanabhanagar & Kadirenahalli Feeder Sector"
+    inflow_meters: ["FM_BANASHANKARI"]
+    outflow_meters: []
+    pipes: ["PIPE_CORRIDOR_06", "PIPE_CORRIDOR_07"]
+    consumer_clusters: ["N_KADIRENAHALLI_CROSS", "N_PADMANABHANAGAR"]
+    storage_tanks: []
+    boundary_pressure_sensors: ["PT_BANASHANKARI"]
+    nearest_landmark: "Outer Ring Road near Kadirenahalli Cross & Padmanabhanagar"
+    total_connections: 4620
+    simulated: true
+
+  - id: "SEG_04_BASAVANAGUDI_CORRIDOR"
+    name: "Basavanagudi Historic Corridor & Mount Joy Feeder"
+    inflow_meters: ["FM_BASAVANAGUDI"]
+    outflow_meters: []
+    pipes: ["PIPE_CORRIDOR_10", "PIPE_CORRIDOR_11"]
+    consumer_clusters: ["N_BULL_TEMPLE", "N_CHAMARAJPET_5TH_MAIN"]
+    storage_tanks: []
+    boundary_pressure_sensors: ["PT_BASAVANAGUDI", "PT_CHAMARAJPET"]
+    nearest_landmark: "Bull Temple Road near DVK Circle & BMS College of Engineering"
+    total_connections: 6200
+    simulated: true
+
+  - id: "SEG_05_CENTRAL_COMMERCIAL"
+    name: "City Market & Avenue Road Commercial DMA"
+    inflow_meters: ["FM_KR_MARKET"]
+    outflow_meters: []
+    pipes: ["PIPE_CORRIDOR_12", "PIPE_CORRIDOR_13", "PIPE_CORRIDOR_14", "PIPE_CORRIDOR_15"]
+    consumer_clusters: ["N_LALBAGH_WEST_GATE", "N_MINERVA_CIRCLE", "N_KR_MARKET_JUNCTION", "N_MYSORE_BANK_CIRCLE"]
+    storage_tanks: []
+    boundary_pressure_sensors: ["PT_KR_MARKET"]
+    nearest_landmark: "KR Market Commercial Hub & Mysore Bank Avenue"
+    total_connections: 13800
+    simulated: true
+
+  - id: "SEG_06_NORTHERN_HIGH_GROUNDS"
+    name: "Sheshadripuram & High Grounds Master Sector"
+    inflow_meters: []
+    outflow_meters: ["FM_HIGH_GROUNDS_INLET"]
+    pipes: ["PIPE_CORRIDOR_16", "PIPE_CORRIDOR_17", "PIPE_CORRIDOR_18", "PIPE_TO_HIGH_GROUNDS"]
+    consumer_clusters: ["N_MAHARANI_COLLEGE", "N_ANAND_RAO_CIRCLE", "N_SHESHADRIPURAM"]
+    storage_tanks: ["TANK_HIGH_GROUNDS_GLR"]
+    boundary_pressure_sensors: ["PT_SHESHADRIPURAM"]
+    nearest_landmark: "Seshadri Road, Anand Rao Circle & High Grounds Master GLR"
+    total_connections: 7100
+    simulated: true
+

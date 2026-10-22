@@ -1,0 +1,54 @@
+{
+  "config_version": "section5-prototype-1.0",
+  "configuration_status": "PROTOTYPE_CONFIGURATION_NOT_VALIDATED",
+  "risk_model": {
+    "enabled": true,
+    "model_type": "transparent_weighted_heuristic",
+    "model_name": "operational_risk_prototype",
+    "required_factors": ["condition", "criticality", "consequence"],
+    "factors": {
+      "condition": {"weight": 0.35, "source": "Section 4 assessed condition state"},
+      "anomaly": {"weight": 0.15, "source": "Section 4 detector output where detector coverage exists"},
+      "criticality": {"weight": 0.25, "source": "operator configuration; no default classification"},
+      "consequence": {"weight": 0.25, "source": "operator configuration; no default classification"}
+    },
+    "factor_scores": {
+      "condition": {"HEALTHY": 0.0, "WATCH": 0.33, "DEGRADED": 0.67, "CRITICAL": 1.0},
+      "criticality": {"LOW": 0.0, "MEDIUM": 0.33, "HIGH": 0.67, "CRITICAL": 1.0},
+      "consequence": {"LOW": 0.0, "MEDIUM": 0.33, "HIGH": 0.67, "CRITICAL": 1.0}
+    },
+    "risk_levels": [
+      {"name": "LOW", "minimum": 0, "maximum_exclusive": 25},
+      {"name": "MEDIUM", "minimum": 25, "maximum_exclusive": 50},
+      {"name": "HIGH", "minimum": 50, "maximum_exclusive": 75},
+      {"name": "CRITICAL", "minimum": 75, "maximum_exclusive": 101}
+    ]
+  },
+  "criticality": {
+    "enabled": true,
+    "classification_source": "PROTOTYPE_CONFIGURATION",
+    "default": null,
+    "overrides": {}
+  },
+  "consequence": {
+    "default": null,
+    "overrides": {}
+  },
+  "priority": {
+    "minimum_confidence_for_action": 0.5,
+    "risk_to_priority": {"CRITICAL": "P0", "HIGH": "P1", "MEDIUM": "P2", "LOW": "P3"},
+    "unknown_priority": "UNRANKED",
+    "low_confidence_priority": "PENDING_REVIEW"
+  },
+  "maintenance": {
+    "enabled": true,
+    "risk_actions": {
+      "LOW": {"action": "MONITOR", "urgency": "ROUTINE_MONITORING"},
+      "MEDIUM": {"action": "INSPECT", "urgency": "PLANNED_INSPECTION"},
+      "HIGH": {"action": "URGENT_INSPECTION", "urgency": "URGENT_INSPECTION"},
+      "CRITICAL": {"action": "IMMEDIATE_ATTENTION", "urgency": "CRITICAL_INTERVENTION"}
+    },
+    "unknown_action": "DATA_REVIEW"
+  },
+  "prediction": {"enabled": false}
+}

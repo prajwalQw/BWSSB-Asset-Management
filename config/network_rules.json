@@ -1,0 +1,288 @@
+{
+  "config_version": "1.0.0",
+  "last_updated": "2026-10-21T13:30:00Z",
+  "system_title": "Bengaluru Water Supply Digital Twin Rule & Threshold Register",
+  "human_governance_policy": {
+    "no_automatic_control": true,
+    "require_human_decision": true,
+    "role_authorized": ["CHIEF_ENGINEER", "EXECUTIVE_ENGINEER", "SUPERVISORY_OPERATOR"]
+  },
+  "pump_ratings": {
+    "TK_HALLI_PUMP_STAGE_IV": {
+      "nominal_flow_mld": 100.0,
+      "rated_power_kw": 2500,
+      "rated_voltage_v": 6600,
+      "rated_current_a": 259.0,
+      "number_of_phases": 3,
+      "power_factor_rated": 0.89,
+      "startup_window_seconds": 45,
+      "max_starts_per_hour": 2,
+      "inrush_ratio": 5.8,
+      "rated_speed_rpm": 980,
+      "rated_head_m": 120.0,
+      "rated_efficiency_pct": 82.5,
+      "allowable_head_tolerance_pct": 10.0,
+      "allowable_power_tolerance_pct": 12.0
+    },
+    "HAROHALLI_BOOSTER_PUMP_1": {
+      "nominal_flow_mld": 85.0,
+      "rated_power_kw": 1800,
+      "rated_voltage_v": 6600,
+      "rated_current_a": 186.8,
+      "number_of_phases": 3,
+      "power_factor_rated": 0.88,
+      "startup_window_seconds": 35,
+      "max_starts_per_hour": 2,
+      "inrush_ratio": 5.9,
+      "rated_speed_rpm": 980,
+      "rated_head_m": 85.0,
+      "rated_efficiency_pct": 81.0,
+      "allowable_head_tolerance_pct": 10.0,
+      "allowable_power_tolerance_pct": 12.0
+    },
+    "TATAGUNI_STAGE_PUMP_01": {
+      "nominal_flow_mld": 60.0,
+      "rated_power_kw": 1200,
+      "rated_voltage_v": 6600,
+      "rated_current_a": 124.5,
+      "number_of_phases": 3,
+      "power_factor_rated": 0.88,
+      "startup_window_seconds": 30,
+      "max_starts_per_hour": 3,
+      "inrush_ratio": 6.0,
+      "rated_speed_rpm": 1450,
+      "rated_head_m": 65.0,
+      "rated_efficiency_pct": 80.0,
+      "allowable_head_tolerance_pct": 8.0,
+      "allowable_power_tolerance_pct": 10.0
+    },
+    "TATAGUNI_STAGE_PUMP_02": {
+      "nominal_flow_mld": 60.0,
+      "rated_power_kw": 1200,
+      "rated_voltage_v": 6600,
+      "rated_current_a": 124.5,
+      "number_of_phases": 3,
+      "power_factor_rated": 0.88,
+      "startup_window_seconds": 30,
+      "max_starts_per_hour": 3,
+      "inrush_ratio": 6.0,
+      "rated_speed_rpm": 1450,
+      "rated_head_m": 65.0,
+      "rated_efficiency_pct": 80.0,
+      "allowable_head_tolerance_pct": 8.0,
+      "allowable_power_tolerance_pct": 10.0
+    },
+    "TATAGUNI_STAGE_PUMP_03_STANDBY": {
+      "nominal_flow_mld": 60.0,
+      "rated_power_kw": 1200,
+      "rated_voltage_v": 6600,
+      "rated_current_a": 124.5,
+      "number_of_phases": 3,
+      "power_factor_rated": 0.88,
+      "startup_window_seconds": 30,
+      "max_starts_per_hour": 3,
+      "inrush_ratio": 6.0,
+      "rated_speed_rpm": 1450,
+      "rated_head_m": 65.0,
+      "rated_efficiency_pct": 80.0,
+      "allowable_head_tolerance_pct": 8.0,
+      "allowable_power_tolerance_pct": 10.0
+    },
+    "PUMP_TG_01": {
+      "nominal_flow_mld": 60.0,
+      "rated_power_kw": 1200,
+      "rated_voltage_v": 6600,
+      "rated_current_a": 124.5,
+      "number_of_phases": 3,
+      "power_factor_rated": 0.88,
+      "startup_window_seconds": 30,
+      "max_starts_per_hour": 3,
+      "inrush_ratio": 6.0,
+      "rated_speed_rpm": 1450,
+      "rated_head_m": 65.0,
+      "rated_efficiency_pct": 80.0,
+      "allowable_head_tolerance_pct": 8.0,
+      "allowable_power_tolerance_pct": 10.0
+    },
+    "PUMP_TG_02": {
+      "nominal_flow_mld": 60.0,
+      "rated_power_kw": 1200,
+      "rated_voltage_v": 6600,
+      "rated_current_a": 124.5,
+      "number_of_phases": 3,
+      "power_factor_rated": 0.88,
+      "startup_window_seconds": 30,
+      "max_starts_per_hour": 3,
+      "inrush_ratio": 6.0,
+      "rated_speed_rpm": 1450,
+      "rated_head_m": 65.0,
+      "rated_efficiency_pct": 80.0,
+      "allowable_head_tolerance_pct": 8.0,
+      "allowable_power_tolerance_pct": 10.0
+    },
+    "PUMP_TG_03_STANDBY": {
+      "nominal_flow_mld": 60.0,
+      "rated_power_kw": 1200,
+      "rated_voltage_v": 6600,
+      "rated_current_a": 124.5,
+      "number_of_phases": 3,
+      "power_factor_rated": 0.88,
+      "startup_window_seconds": 30,
+      "max_starts_per_hour": 3,
+      "inrush_ratio": 6.0,
+      "rated_speed_rpm": 1450,
+      "rated_head_m": 65.0,
+      "rated_efficiency_pct": 80.0,
+      "allowable_head_tolerance_pct": 8.0,
+      "allowable_power_tolerance_pct": 10.0
+    }
+  },
+  "operational_thresholds": {
+    "pressure_bar": {
+      "min_allowable": 1.5,
+      "max_allowable": 6.0,
+      "critical_low": 1.0,
+      "critical_high": 7.5
+    },
+    "pipe_velocity_mps": {
+      "min_recommended": 0.3,
+      "max_recommended": 2.2,
+      "critical_high": 3.0
+    },
+    "tank_levels_m": {
+      "MOUNT_JOY_GLR": {
+        "min_safe_level": 1.2,
+        "normal_operating_level": 4.1,
+        "max_capacity_level": 5.5,
+        "capacity_mld": 35.0
+      },
+      "HIGH_GROUNDS_GLR": {
+        "min_safe_level": 1.5,
+        "normal_operating_level": 4.85,
+        "max_capacity_level": 6.0,
+        "capacity_mld": 45.0
+      }
+    },
+    "dma_leak_tolerances": {
+      "minimum_night_flow_ratio_threshold": 0.38,
+      "nrw_loss_warning_pct": 30.0,
+      "nrw_loss_critical_pct": 42.0
+    },
+    "leak_detection_tolerances": {
+      "persistence_n": 3,
+      "persistence_m": 4,
+      "sensor_noise_sigma_multiplier": 2.5,
+      "min_flow_imbalance_threshold_lps": 8.0,
+      "mnf_window_hours": [2, 3, 4],
+      "mnf_rise_threshold_ratio": 0.25,
+      "stuck_sensor_variance_threshold": 0.001,
+      "out_of_range_flow_min_lps": 0.0,
+      "out_of_range_flow_max_lps": 2000.0,
+      "out_of_range_pressure_min_bar": 0.1,
+      "out_of_range_pressure_max_bar": 12.0,
+      "localisation_uncertainty_std_m": 50.0,
+      "min_uncertainty_radius_m": 35.0
+    },
+    "tariffs_and_energy": {
+      "water_tariff_inr_per_kl": 48.0,
+      "commercial_water_tariff_inr_per_kl": 62.0,
+      "pump_energy_cost_inr_per_kwh": 7.50,
+      "average_pumping_kwh_per_kl": 0.65
+    },
+    "pump_power_monitor_thresholds": {
+      "steady_state_band_mad_multiplier": 2.5,
+      "voltage_imbalance_max_pct": 2.0,
+      "voltage_undervoltage_pct": 90.0,
+      "voltage_overvoltage_pct": 110.0,
+      "power_factor_min": 0.82,
+      "max_starts_per_hour": 3,
+      "dry_run_current_ratio": 0.65,
+      "dry_run_flow_ratio": 0.20,
+      "blockage_current_ratio": 1.15,
+      "blockage_flow_ratio": 0.50,
+      "efficiency_drop_threshold_pct": 20.0,
+      "drift_forecast_horizon_hours": 72,
+      "confidence_level_pct": 95.0
+    }
+  },
+  "sensor_variable_mappings": {
+    "speed": {
+      "mapped_asset_id": "TATAGUNI_STAGE_PUMP_01",
+      "metric": "pump_speed_rpm",
+      "data_tier": "LIVE",
+      "unit": "RPM",
+      "expected_baseline": 1450.0,
+      "tolerance_pct": 5.0
+    },
+    "LEFT_MOTOR_ENCODER_VAL": {
+      "mapped_asset_id": "TATAGUNI_STAGE_PUMP_01",
+      "metric": "drive_shaft_encoder_left",
+      "data_tier": "LIVE",
+      "unit": "counts",
+      "expected_baseline": 125400,
+      "tolerance_pct": 2.0
+    },
+    "RIGHT_MOTOR_ENCODER_VAL": {
+      "mapped_asset_id": "TATAGUNI_STAGE_PUMP_02",
+      "metric": "drive_shaft_encoder_right",
+      "data_tier": "LIVE",
+      "unit": "counts",
+      "expected_baseline": 125380,
+      "tolerance_pct": 2.0
+    },
+    "motor_temp_c": {
+      "mapped_asset_id": "TATAGUNI_STAGE_PUMP_01",
+      "metric": "stator_winding_temperature",
+      "data_tier": "LIVE",
+      "unit": "°C",
+      "max_safe_limit": 75.0,
+      "critical_limit": 85.0
+    },
+    "motor_current_a": {
+      "mapped_asset_id": "TATAGUNI_STAGE_PUMP_01",
+      "metric": "operating_phase_current",
+      "data_tier": "LIVE",
+      "unit": "Amperes",
+      "max_safe_limit": 120.0,
+      "critical_limit": 140.0
+    }
+  },
+  "alert_rules": [
+    {
+      "rule_id": "RULE-LEAK-01",
+      "name": "DMA Minimum Night Flow Burst Anomaly",
+      "category": "LEAK_DETECTION",
+      "severity": "CRITICAL",
+      "trigger_condition": "night_flow_observed > 1.35 * baseline_night_flow AND node_pressure_drop > 0.8",
+      "recommendation_text": "Possible distribution main fracture. Dispatch acoustic leakage team to DMA Sector 4 (Basavanagudi corridor). Check isolation valve V-104.",
+      "requires_human_approval": true
+    },
+    {
+      "rule_id": "RULE-PUMP-PWR-01",
+      "name": "Excess Pump Power Draw / Low Hydraulic Efficiency",
+      "category": "PUMP_POWER",
+      "severity": "HIGH",
+      "trigger_condition": "active_power_kw > 1.15 * rated_power_kw AND discharge_flow < 0.90 * nominal_flow",
+      "recommendation_text": "Pump power consumption exceeds rating curve by >15%. High risk of cavitation or impeller fouling at Tataguni Pump 1. Recommend shifting load to Standby Pump 3.",
+      "requires_human_approval": true
+    },
+    {
+      "rule_id": "RULE-PRESS-LOW-01",
+      "name": "Low Consumer Pressure Deficit",
+      "category": "PRESSURE_ANOMALY",
+      "severity": "WARNING",
+      "trigger_condition": "junction_pressure < 1.2 bar for > 15 consecutive minutes",
+      "recommendation_text": "Consumer terminal pressure inadequate at high elevation nodes in High Grounds feeder. Recommend modulating PRV-03 or stepping up outlet booster.",
+      "requires_human_approval": true
+    },
+    {
+      "rule_id": "RULE-TANK-DRAIN-01",
+      "name": "Balancing Reservoir Depletion Warning",
+      "category": "STORAGE_LEVEL",
+      "severity": "CRITICAL",
+      "trigger_condition": "tank_level < 1.5m AND outflow > 1.2 * inflow",
+      "recommendation_text": "Mount Joy GLR storage dropping towards critical reserve (35% remaining). Recommend requesting increased bulk allocation from Tataguni Pumping Head.",
+      "requires_human_approval": true
+    }
+  ]
+}
