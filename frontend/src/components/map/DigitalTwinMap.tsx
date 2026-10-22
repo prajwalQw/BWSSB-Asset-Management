@@ -33,6 +33,18 @@ interface DigitalTwinMapProps {
   flyToTarget?: [number, number] | null;
 }
 
+// Module-level network dataset cache to prevent re-fetching and flashing across tab switches
+let globalNetworkDataCache: {
+  mainsLines: any[];
+  simZonePipes: any[];
+  simZoneNodes: any[];
+  pumpingStations: any[];
+  stps: any[];
+  borewells: any[];
+  divisionBoundaries: any[];
+  waterBodies: any[];
+} | null = null;
+
 export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
   onSelectAsset,
   selectedAsset,
@@ -54,7 +66,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
   const [basemapError, setBasemapError] = useState<string | null>(null);
   const [coords, setCoords] = useState({ lon: 77.5946, lat: 12.9716, zoom: 11.2 });
 
-  // Network dataset cache for Deck.gl
+  // Network dataset cache for Deck.gl (instantly populated if already cached)
   const [networkData, setNetworkData] = useState<{
     mainsLines: any[];
     simZonePipes: any[];
@@ -64,7 +76,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
     borewells: any[];
     divisionBoundaries: any[];
     waterBodies: any[];
-  }>({
+  }>(() => globalNetworkDataCache || {
     mainsLines: [],
     simZonePipes: [],
     simZoneNodes: [],
@@ -85,14 +97,17 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
     }
   }, [storeTheme, mapReady]);
 
-  // Resilient dataset loader: attempts live API first, falls back to bundled static GeoJSON
+  // Resilient dataset loader: attempts live API first with 2.5s timeout, falls back to bundled static GeoJSON
   useEffect(() => {
     let isCancelled = false;
     let retryTimer: ReturnType<typeof setTimeout> | null = null;
 
     const fetchResource = async (apiUrl: string, fallbackUrl?: string) => {
       try {
-        const r = await fetch(apiUrl);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2500);
+        const r = await fetch(apiUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
         if (r.ok) {
           const data = await r.json();
           if (data && Array.isArray(data.features) && data.features.length > 0) {
@@ -100,7 +115,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
           }
         }
       } catch {
-        // proceed to fallback
+        // proceed immediately to fallback if API is unreachable, offline, or times out
       }
       if (fallbackUrl) {
         try {
@@ -153,7 +168,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
         const divisionBoundaries = divRes.features || [];
         const waterBodies = lakesRes.features || [];
 
-        setNetworkData({
+        const loaded = {
           mainsLines,
           simZonePipes,
           simZoneNodes,
@@ -162,7 +177,10 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
           borewells: [],
           divisionBoundaries,
           waterBodies,
-        });
+        };
+
+        globalNetworkDataCache = loaded;
+        setNetworkData(loaded);
 
         // If all assets came back empty because backend is still booting, retry in 3s
         if (pumpingStations.length === 0 && mainsLines.length === 0 && attempt < 4) {
@@ -175,6 +193,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
       }
     };
 
+    // If cache already has network data, no need to show empty map while revalidating
     loadDatasets();
 
     return () => {
@@ -420,7 +439,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
       {/* Floating P&ID Symbology Legend Modal / Overlay */}
       {isLegendOpen && (
         <div className="absolute bottom-10 left-4 z-20 max-w-sm">
-          <MapLegend theme={activeTheme} />
+          <MapLegend theme={activeTheme} onClose={() => setIsLegendOpen(false)} />
         </div>
       )}
 

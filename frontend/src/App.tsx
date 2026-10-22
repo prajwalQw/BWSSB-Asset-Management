@@ -157,6 +157,16 @@ export const App: React.FC = () => {
     setFlyToTarget(center);
   };
 
+  // Trigger map canvas resize whenever GIS module is brought to front
+  useEffect(() => {
+    if (activeModule === 'GIS') {
+      const timer = setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [activeModule]);
+
   return (
     <div className="h-screen w-screen overflow-hidden grid grid-rows-[56px_1fr] bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased">
       {/* 1. Top Bar 56px */}
@@ -174,40 +184,43 @@ export const App: React.FC = () => {
       />
 
       {/* 2. Main Workstation Area: GIS Workstation or IoT Workstation */}
-      {activeModule === 'IOT' ? (
-        <IoTWorkstation />
-      ) : (
-        <div className="flex h-full w-full overflow-hidden relative">
-          {/* Left Rail (300px, Collapsible) */}
-          <LeftRail
-            alerts={alertsList}
-            onFlyToAlert={handleFlyToAlert}
-            onGoToShortcut={handleGoToShortcut}
-          />
+      {/* Retain GIS map mounted in DOM so WebGL context, camera, and loaded network datasets are preserved */}
+      <div className={`h-full w-full overflow-hidden relative ${activeModule === 'GIS' ? 'flex' : 'hidden'}`}>
+        {/* Left Rail (300px, Collapsible) */}
+        <LeftRail
+          alerts={alertsList}
+          onFlyToAlert={handleFlyToAlert}
+          onGoToShortcut={handleGoToShortcut}
+        />
 
-          {/* Center Map Stage (Full Height) */}
-          <main className="flex-1 h-full relative overflow-hidden bg-slate-950">
-            <DigitalTwinMap
-              selectedAsset={selectedAsset}
-              onSelectAsset={setSelectedAsset}
-              activeScenario={activeScenario}
-              currentHour={12}
-              isDarkTheme={theme === 'dark' || theme === 'satellite'}
-              activeLeakPipeId={activeLeakPipeId || undefined}
-              flyToTarget={flyToTarget}
-            />
-          </main>
-
-          {/* Right Inspector (380px, Context-Sensitive, Never Blank) */}
-          <RightInspector
-            asset={selectedAsset}
-            onClose={() => setSelectedAsset(null)}
-            onZoomTo={(coords) => setFlyToTarget(coords)}
-            allAlerts={alertsList}
-            isFeedFresh={isFeedFresh}
-            liveVoltageV={liveVoltageV}
-            liveCurrentA={liveCurrentA}
+        {/* Center Map Stage (Full Height) */}
+        <main className="flex-1 h-full relative overflow-hidden bg-slate-950">
+          <DigitalTwinMap
+            selectedAsset={selectedAsset}
+            onSelectAsset={setSelectedAsset}
+            activeScenario={activeScenario}
+            currentHour={12}
+            isDarkTheme={theme === 'dark' || theme === 'satellite'}
+            activeLeakPipeId={activeLeakPipeId || undefined}
+            flyToTarget={flyToTarget}
           />
+        </main>
+
+        {/* Right Inspector (380px, Context-Sensitive, Never Blank) */}
+        <RightInspector
+          asset={selectedAsset}
+          onClose={() => setSelectedAsset(null)}
+          onZoomTo={(coords) => setFlyToTarget(coords)}
+          allAlerts={alertsList}
+          isFeedFresh={isFeedFresh}
+          liveVoltageV={liveVoltageV}
+          liveCurrentA={liveCurrentA}
+        />
+      </div>
+
+      {activeModule === 'IOT' && (
+        <div className="h-full w-full overflow-hidden relative">
+          <IoTWorkstation />
         </div>
       )}
 

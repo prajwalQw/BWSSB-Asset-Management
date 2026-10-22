@@ -13,7 +13,10 @@ import {
   TimeseriesResponse
 } from '../types';
 
-const API_BASE = '/api/v1/iot';
+const API_BASE =
+  typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://127.0.0.1:8000/api/v1/iot'
+    : '/api/v1/iot';
 
 export const iotApi = {
   async getStations(): Promise<StationOverview[]> {
@@ -77,7 +80,10 @@ export const iotApi = {
 
   async getAlerts(): Promise<IoTAlertItem[]> {
     try {
-      const res = await fetch(`${API_BASE}/alerts`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+      const res = await fetch(`${API_BASE}/alerts`, { signal: controller.signal });
+      clearTimeout(timeoutId);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch {

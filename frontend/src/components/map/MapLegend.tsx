@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Layers, Droplet, Activity, Gauge, Zap } from 'lucide-react';
-import { BasemapTheme, MAP_THEMES } from '../../map/theme';
+import { ChevronDown, ChevronUp, Layers, X } from 'lucide-react';
+import { BasemapTheme } from '../../map/theme';
 
 interface MapLegendProps {
   theme: BasemapTheme;
+  onClose?: () => void;
 }
 
-export const MapLegend: React.FC<MapLegendProps> = ({ theme }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const currentTheme = MAP_THEMES[theme];
+export const MapLegend: React.FC<MapLegendProps> = ({ theme, onClose }) => {
+  const [isOpen, setIsOpen] = useState(true);
 
   return (
-    <div className="absolute bottom-8 left-4 z-20 font-sans text-xs select-none">
+    <div className="font-sans text-xs select-none">
       <div
         className={`rounded-2xl border shadow-2xl backdrop-blur-md transition-all overflow-hidden ${
           theme === 'light'
@@ -20,27 +20,40 @@ export const MapLegend: React.FC<MapLegendProps> = ({ theme }) => {
         }`}
       >
         {/* Collapsible Header */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className={`w-full px-3.5 py-2.5 flex items-center justify-between gap-3 text-left font-mono font-semibold transition-colors ${
-            theme === 'light' ? 'hover:bg-slate-100' : 'hover:bg-slate-800/80'
-          }`}
-          title="Toggle Symbology & Engineering Legend"
-        >
-          <div className="flex items-center gap-2">
-            <Layers className="w-4 h-4 text-cyan-400" />
-            <span className="text-[11px] tracking-tight uppercase">Network Legend</span>
-          </div>
-          {isOpen ? (
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-          ) : (
-            <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+        <div className={`flex items-center justify-between border-b ${theme === 'light' ? 'border-slate-100' : 'border-slate-800'}`}>
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className={`flex-1 px-3.5 py-2.5 flex items-center justify-between gap-3 text-left font-mono font-semibold transition-colors ${
+              theme === 'light' ? 'hover:bg-slate-100' : 'hover:bg-slate-800/80'
+            }`}
+            title="Toggle Symbology & Engineering Legend"
+          >
+            <div className="flex items-center gap-2">
+              <Layers className="w-4 h-4 text-cyan-400" />
+              <span className="text-[11px] tracking-tight uppercase">Network Legend</span>
+            </div>
+            {isOpen ? (
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            ) : (
+              <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+            )}
+          </button>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className={`p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ${
+                theme === 'light' ? 'hover:bg-slate-100' : 'hover:bg-slate-800/80'
+              }`}
+              title="Close Legend"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
           )}
-        </button>
+        </div>
 
         {/* Legend Content */}
         {isOpen && (
-          <div className="p-3.5 pt-1 space-y-3.5 max-h-[380px] w-64 overflow-y-auto text-[11px]">
+          <div className="p-3.5 pt-2 space-y-3.5 max-h-[380px] w-64 overflow-y-auto text-[11px]">
             {/* 1. Pipe Diameters */}
             <div className="space-y-1.5">
               <span className="font-mono text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
