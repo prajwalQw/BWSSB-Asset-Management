@@ -200,7 +200,9 @@ function getFallbackStations(): StationOverview[] {
       pumps: [
         {
           pump_id: 'PUMP_TG_H1',
-          tag: 'H1',
+          tag: 'TG-HLP-01',
+          display_name: 'High-Lift Pump 1',
+          role: 'High-Lift Pump',
           station_id: 'PS_TATAGUNI',
           run_state: 'RUNNING',
           auto_control_mode: 'Automatic',
@@ -226,7 +228,9 @@ function getFallbackStations(): StationOverview[] {
         },
         {
           pump_id: 'PUMP_TG_H2',
-          tag: 'H2',
+          tag: 'TG-HLP-02',
+          display_name: 'High-Lift Pump 2',
+          role: 'High-Lift Pump',
           station_id: 'PS_TATAGUNI',
           run_state: 'RUNNING',
           auto_control_mode: 'Automatic',
@@ -252,7 +256,9 @@ function getFallbackStations(): StationOverview[] {
         },
         {
           pump_id: 'PUMP_TG_H3',
-          tag: 'H3',
+          tag: 'TG-HLP-03',
+          display_name: 'High-Lift Pump 3',
+          role: 'High-Lift Pump',
           station_id: 'PS_TATAGUNI',
           run_state: 'OFF',
           auto_control_mode: 'Automatic',
@@ -281,7 +287,7 @@ function getFallbackStations(): StationOverview[] {
         {
           tag: 'FIT_TG_H1',
           type_code: 'FIT',
-          name: 'H1 Electromagnetic Bulk Flow Meter',
+          name: 'Discharge Flow Meter',
           asset_link: 'PUMP_TG_H1',
           location: { station_id: 'PS_TATAGUNI', offset_m: [2.0, -8.0] },
           active: true,
@@ -294,7 +300,7 @@ function getFallbackStations(): StationOverview[] {
         {
           tag: 'PIT_TG_H1',
           type_code: 'PIT',
-          name: 'H1 Discharge Pressure Transmitter',
+          name: 'Discharge Pressure',
           asset_link: 'PUMP_TG_H1',
           location: { station_id: 'PS_TATAGUNI', offset_m: [8.0, -8.0] },
           active: true,

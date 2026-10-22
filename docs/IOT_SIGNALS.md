@@ -7,27 +7,27 @@ All telemetry signals adhere to **ISA-5.1** identification letters and **OPC UA 
 ### Electromagnetic Bulk Flow Meters (`FIT`)
 | Tag | Asset Association | Signal Name | Engineering Unit | Valid Range | Resolution | Accuracy | Source Citation |
 |---|---|---|---|---|---|---|---|
-| `FIT_TG_H1` | Tataguni Pump H1 | `flow_lps` | L/s | 0.0 – 1200.0 | 0.1 | ±0.5% | Cauvery Stage IV SCADA Specs |
-| `FIT_TG_H1` | Tataguni Pump H1 | `forward_totaliser_kl` | kL | 0.0 – 99999999.0 | 0.1 | ±0.5% | Meter Register Standard |
-| `FIT_TG_H2` | Tataguni Pump H2 | `flow_lps` | L/s | 0.0 – 1200.0 | 0.1 | ±0.5% | Cauvery Stage IV SCADA Specs |
-| `FIT_TG_H3` | Tataguni Pump H3 | `flow_lps` | L/s | 0.0 – 1200.0 | 0.1 | ±0.5% | Cauvery Stage IV SCADA Specs |
+| `FIT_TG_H1` | Tataguni High-Lift Pump 1 (TG-HLP-01) | `flow_lps` | L/s | 0.0 – 1200.0 | 0.1 | ±0.5% | Cauvery Stage IV SCADA Specs |
+| `FIT_TG_H1` | Tataguni High-Lift Pump 1 (TG-HLP-01) | `forward_totaliser_kl` | kL | 0.0 – 99999999.0 | 0.1 | ±0.5% | Meter Register Standard |
+| `FIT_TG_H2` | Tataguni High-Lift Pump 2 (TG-HLP-02) | `flow_lps` | L/s | 0.0 – 1200.0 | 0.1 | ±0.5% | Cauvery Stage IV SCADA Specs |
+| `FIT_TG_H3` | Tataguni High-Lift Pump 3 (TG-HLP-03) | `flow_lps` | L/s | 0.0 – 1200.0 | 0.1 | ±0.5% | Cauvery Stage IV SCADA Specs |
 | `FIT_TG_DISCHARGE` | Tataguni Common Header | `flow_lps` | L/s | 0.0 – 3500.0 | 0.5 | ±0.5% | BWSSB Transmission Main Spec |
-| `FIT_MJ_F1` | Mount Joy Pump F1 | `flow_lps` | L/s | 0.0 – 600.0 | 0.1 | ±0.5% | GLR Booster SCADA Spec |
-| `FIT_MJ_F2` | Mount Joy Pump F2 | `flow_lps` | L/s | 0.0 – 600.0 | 0.1 | ±0.5% | GLR Booster SCADA Spec |
+| `FIT_MJ_F1` | Mount Joy Booster Pump 1 (MJ-BST-01) | `flow_lps` | L/s | 0.0 – 600.0 | 0.1 | ±0.5% | GLR Booster SCADA Spec |
+| `FIT_MJ_F2` | Mount Joy Booster Pump 2 (MJ-BST-02) | `flow_lps` | L/s | 0.0 – 600.0 | 0.1 | ±0.5% | GLR Booster SCADA Spec |
 | `FIT_MJ_INLET` | Mount Joy GLR Inlet | `flow_lps` | L/s | 0.0 – 1500.0 | 0.1 | ±0.5% | Yokogawa 2015 Case Study |
-| `FIT_HG_F1` | High Grounds Pump F1 | `flow_lps` | L/s | 0.0 – 750.0 | 0.1 | ±0.5% | GLR Booster SCADA Spec |
-| `FIT_HG_F2` | High Grounds Pump F2 | `flow_lps` | L/s | 0.0 – 750.0 | 0.1 | ±0.5% | GLR Booster SCADA Spec |
+| `FIT_HG_F1` | High Grounds Booster Pump 1 (HG-BST-01) | `flow_lps` | L/s | 0.0 – 750.0 | 0.1 | ±0.5% | GLR Booster SCADA Spec |
+| `FIT_HG_F2` | High Grounds Booster Pump 2 (HG-BST-02) | `flow_lps` | L/s | 0.0 – 750.0 | 0.1 | ±0.5% | GLR Booster SCADA Spec |
 
 ### Pressure Transmitters (`PIT`)
 | Tag | Asset Association | Signal Name | Engineering Unit | Valid Range | Low Alarm | High Alarm | Accuracy |
 |---|---|---|---|---|---|---|---|
-| `PIT_TG_H1` | Tataguni Pump H1 Discharge | `pressure_bar` | bar | 0.0 – 25.0 | 2.0 bar | 16.0 bar | ±0.25% |
-| `PIT_TG_H2` | Tataguni Pump H2 Discharge | `pressure_bar` | bar | 0.0 – 25.0 | 2.0 bar | 16.0 bar | ±0.25% |
-| `PIT_TG_H3` | Tataguni Pump H3 Discharge | `pressure_bar` | bar | 0.0 – 25.0 | 2.0 bar | 16.0 bar | ±0.25% |
-| `PIT_MJ_F1` | Mount Joy Pump F1 Discharge | `pressure_bar` | bar | 0.0 – 16.0 | 1.5 bar | 8.0 bar | ±0.25% |
-| `PIT_MJ_F2` | Mount Joy Pump F2 Discharge | `pressure_bar` | bar | 0.0 – 16.0 | 1.5 bar | 8.0 bar | ±0.25% |
-| `PIT_HG_F1` | High Grounds F1 Discharge | `pressure_bar` | bar | 0.0 – 16.0 | 1.5 bar | 9.0 bar | ±0.25% |
-| `PIT_HG_F2` | High Grounds F2 Discharge | `pressure_bar` | bar | 0.0 – 16.0 | 1.5 bar | 9.0 bar | ±0.25% |
+| `PIT_TG_H1` | Tataguni High-Lift Pump 1 Discharge | `pressure_bar` | bar | 0.0 – 25.0 | 2.0 bar | 16.0 bar | ±0.25% |
+| `PIT_TG_H2` | Tataguni High-Lift Pump 2 Discharge | `pressure_bar` | bar | 0.0 – 25.0 | 2.0 bar | 16.0 bar | ±0.25% |
+| `PIT_TG_H3` | Tataguni High-Lift Pump 3 Discharge | `pressure_bar` | bar | 0.0 – 25.0 | 2.0 bar | 16.0 bar | ±0.25% |
+| `PIT_MJ_F1` | Mount Joy Booster Pump 1 Discharge | `pressure_bar` | bar | 0.0 – 16.0 | 1.5 bar | 8.0 bar | ±0.25% |
+| `PIT_MJ_F2` | Mount Joy Booster Pump 2 Discharge | `pressure_bar` | bar | 0.0 – 16.0 | 1.5 bar | 8.0 bar | ±0.25% |
+| `PIT_HG_F1` | High Grounds Booster Pump 1 Discharge | `pressure_bar` | bar | 0.0 – 16.0 | 1.5 bar | 9.0 bar | ±0.25% |
+| `PIT_HG_F2` | High Grounds Booster Pump 2 Discharge | `pressure_bar` | bar | 0.0 – 16.0 | 1.5 bar | 9.0 bar | ±0.25% |
 
 ### Level Transmitters (`LIT`)
 | Tag | Tank / Reservoir | Signal Name | Engineering Unit | Valid Range | Low Alarm | High Alarm |

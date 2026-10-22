@@ -277,30 +277,34 @@ export const App: React.FC = () => {
                   <Map className="w-3.5 h-3.5" />
                   <span>Map</span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setIotCentreView('schematic')}
-                  className={`px-3 py-1 rounded-md font-medium transition-all flex items-center gap-1.5 ${
-                    iotCentreView === 'schematic'
-                      ? 'bg-sky-600 text-white shadow-sm font-semibold'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <GitCommit className="w-3.5 h-3.5" />
-                  <span>Station schematic</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIotCentreView('sankey')}
-                  className={`px-3 py-1 rounded-md font-medium transition-all flex items-center gap-1.5 ${
-                    iotCentreView === 'sankey'
-                      ? 'bg-sky-600 text-white shadow-sm font-semibold'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <Waves className="w-3.5 h-3.5" />
-                  <span>Water flow (MLD)</span>
-                </button>
+                {iotStore.stations.length > 0 && iotStore.stations.some((s) => s.pumps && s.pumps.length > 0) && (
+                  <button
+                    type="button"
+                    onClick={() => setIotCentreView('schematic')}
+                    className={`px-3 py-1 rounded-md font-medium transition-all flex items-center gap-1.5 ${
+                      iotCentreView === 'schematic'
+                        ? 'bg-sky-600 text-white shadow-sm font-semibold'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    <GitCommit className="w-3.5 h-3.5" />
+                    <span>Station schematic</span>
+                  </button>
+                )}
+                {iotStore.corridors.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setIotCentreView('sankey')}
+                    className={`px-3 py-1 rounded-md font-medium transition-all flex items-center gap-1.5 ${
+                      iotCentreView === 'sankey'
+                        ? 'bg-sky-600 text-white shadow-sm font-semibold'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    <Waves className="w-3.5 h-3.5" />
+                    <span>Water flow (MLD)</span>
+                  </button>
+                )}
               </div>
 
               <div className="flex items-center gap-2">

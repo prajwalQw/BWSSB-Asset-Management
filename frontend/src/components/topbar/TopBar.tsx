@@ -202,19 +202,21 @@ export const TopBar: React.FC<TopBarProps> = ({
           <span>{isFeedFresh ? 'Live' : 'Offline'}</span>
         </div>
 
-        {/* "Simulate" Button (triggers Popover) */}
-        <button
-          type="button"
-          onClick={() => setIsSimulateOpen(!isSimulateOpen)}
-          className={`h-8 px-3 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm ${
-            isSimulateOpen
-              ? 'bg-purple-600 text-white'
-              : 'bg-purple-50 dark:bg-purple-950/40 border border-purple-300 dark:border-purple-800 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50'
-          }`}
-        >
-          <Play className="w-3 h-3 fill-current" />
-          <span>Simulate</span>
-        </button>
+        {/* "Simulate" Button (triggers Popover in GIS mode) */}
+        {activeModule === 'GIS' && (
+          <button
+            type="button"
+            onClick={() => setIsSimulateOpen(!isSimulateOpen)}
+            className={`h-8 px-3 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm ${
+              isSimulateOpen
+                ? 'bg-purple-600 text-white'
+                : 'bg-purple-50 dark:bg-purple-950/40 border border-purple-300 dark:border-purple-800 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50'
+            }`}
+          >
+            <Play className="w-3 h-3 fill-current" />
+            <span>Simulate</span>
+          </button>
+        )}
 
         {/* Admin Gear Button (triggers slide-over drawer) */}
         <button

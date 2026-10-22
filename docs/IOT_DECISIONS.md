@@ -323,6 +323,16 @@ Alerts strictly follow the ISA-18.2 compliant lifecycle:
 - Physics & Network Detection: Mass-balance evaluation (`Q_from - Q_to - dV/dt`) immediately registers downstream flow drop, downstream pressure drop, and accelerates tank drawdown.
 - Top-Centre Leak Popup: Appears once per alert ID in the top center of the viewport with red alert icon, title "Possible leak between {From} and {To}", loss (L/s & kL/day), confidence, position range, potential impacts, advisory steps, and "Show on map" (flies to segment with uncertainty halo), "Acknowledge", and "Snooze" actions.
 - Persistence & Re-pop Prevention: Popups record shown IDs in `localStorage` (`bwssb_iot_shown_popup_alerts`) so they never re-pop upon page refresh, while remaining in the Alerts list as ACTIVE until cleared by "Stop leak".
+---
+
+## D-30 · Standardized Naming, Display Names & UI Cleanup
+
+- Cryptic Tag Elimination: Replaced all legacy tags (H1/H2/H3/F1/F2) across config, UI, models, and documentation with standard ISA tags (`TG-HLP-01`, `TG-HLP-02`, `TG-HLP-03`, `MJ-BST-01`, `MJ-BST-02`, `HG-BST-01`, `HG-BST-02`).
+- Standardized Display Names & Roles: All pumps carry standardized `display_name` ("High-Lift Pump 1/2/3", "Booster Pump 1/2", "Lift Pump 1/2", "Aeration Blower 1/2") and `role`. Sensor display names are normalized to "Discharge Flow Meter", "Discharge Pressure", "Tank Level", "Water Quality Analyser".
+- Admin Display Name Editor: Added interactive display name management in `IoTAdminSections.tsx` enabling operators to edit human-readable names with raw tags displayed as secondary metadata.
+- Clean UI & Sentence-Case: Converted all uppercase headers and labels to sentence-case; eliminated monospace fonts except for tags and tabular numerals; standardized 15px base typography; removed glow effects and softened borders.
+- Single Simulate Button: Suppressed the GIS simulate button in `TopBar.tsx` when `activeModule === 'IOT'`, guaranteeing exactly one "Simulate IoT" button on the IoT workspace.
+- View Tab Fallback: Protected the floating central navigation by only showing "Station schematic" and "Water flow (MLD)" tabs when station and corridor datasets are populated.
 
 ---
 

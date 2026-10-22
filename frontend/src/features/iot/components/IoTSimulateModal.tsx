@@ -398,9 +398,9 @@ export const IoTSimulateModal: React.FC<IoTSimulateModalProps> = ({ onClose, onR
                       onChange={(e) => setSelectedPump(e.target.value)}
                       className="w-full p-1.5 rounded border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-[11px]"
                     >
-                      <option value="PUMP_TG_H1">Tataguni Pump TG-H1</option>
-                      <option value="PUMP_TG_H2">Tataguni Pump TG-H2</option>
-                      <option value="PUMP_TG_H3">Tataguni Pump TG-H3</option>
+                      <option value="PUMP_TG_H1">High-Lift Pump 1 (TG-HLP-01)</option>
+                      <option value="PUMP_TG_H2">High-Lift Pump 2 (TG-HLP-02)</option>
+                      <option value="PUMP_TG_H3">High-Lift Pump 3 (TG-HLP-03)</option>
                     </select>
                   </div>
                   <button
@@ -421,9 +421,9 @@ export const IoTSimulateModal: React.FC<IoTSimulateModalProps> = ({ onClose, onR
                       onChange={(e) => setSelectedSensor(e.target.value)}
                       className="w-full p-1.5 rounded border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-[11px]"
                     >
-                      <option value="FIT_TG_DISCHARGE">FIT_TG_DISCHARGE (Flow Transmitter)</option>
-                      <option value="PIT_MJ_F1">PIT_MJ_F1 (Pressure Transmitter)</option>
-                      <option value="AIT_PS_TATAGUNI">AIT_PS_TATAGUNI (Quality Analyser)</option>
+                      <option value="FIT_TG_DISCHARGE">Tataguni Discharge Flow Meter</option>
+                      <option value="PIT_MJ_F1">Mount Joy Booster Pump 1 Discharge Pressure</option>
+                      <option value="AIT_PS_TATAGUNI">Tataguni Water Quality Analyser</option>
                     </select>
                   </div>
                   <button

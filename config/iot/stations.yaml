@@ -23,8 +23,10 @@ stations:
       offset_m: [45.0, 15.0]
     pumps:
       - id: "PUMP_TG_H1"
-        tag: "H1"
-        name: "High-Lift Pump Set 1 (H1)"
+        tag: "TG-HLP-01"
+        display_name: "High-Lift Pump 1"
+        role: "High-Lift Pump"
+        name: "High-Lift Pump 1"
         class: "high-lift"
         rated_power_kw: 1200.0
         rated_voltage_v: 6600.0
@@ -52,32 +54,34 @@ stations:
           flow_sensor:
             tag: "FIT_TG_H1_SEN"
             type: "FIT"
-            name: "H1 Discharge Sensor Element"
+            name: "Discharge Sensor Element"
             offset_m: [-6.0, -8.0]
             accuracy_pct: 0.5
           flow_meter:
             tag: "FIT_TG_H1"
             type: "FIT"
-            name: "H1 Electromagnetic Bulk Flow Meter"
+            name: "Discharge Flow Meter"
             offset_m: [2.0, -8.0]
             pipe_dn_mm: 800
             accuracy_pct: 0.5
           pressure_transmitter:
             tag: "PIT_TG_H1"
             type: "PIT"
-            name: "H1 Discharge Pressure Transmitter"
+            name: "Discharge Pressure"
             offset_m: [8.0, -8.0]
             accuracy_pct: 0.25
           iot_board:
             tag: "IOT_TG_H1"
             type: "PMM"
-            name: "H1 IoT Motor & Power Intelligence Board"
+            name: "Power & Motor Intelligence Board"
             offset_m: [-15.0, -8.0]
             channels: ["voltage_3p", "current_3p", "vibration", "run_state"]
 
       - id: "PUMP_TG_H2"
-        tag: "H2"
-        name: "High-Lift Pump Set 2 (H2)"
+        tag: "TG-HLP-02"
+        display_name: "High-Lift Pump 2"
+        role: "High-Lift Pump"
+        name: "High-Lift Pump 2"
         class: "high-lift"
         rated_power_kw: 1200.0
         rated_voltage_v: 6600.0
@@ -105,32 +109,34 @@ stations:
           flow_sensor:
             tag: "FIT_TG_H2_SEN"
             type: "FIT"
-            name: "H2 Discharge Sensor Element"
+            name: "Discharge Sensor Element"
             offset_m: [-6.0, 0.0]
             accuracy_pct: 0.5
           flow_meter:
             tag: "FIT_TG_H2"
             type: "FIT"
-            name: "H2 Electromagnetic Bulk Flow Meter"
+            name: "Discharge Flow Meter"
             offset_m: [2.0, 0.0]
             pipe_dn_mm: 800
             accuracy_pct: 0.5
           pressure_transmitter:
             tag: "PIT_TG_H2"
             type: "PIT"
-            name: "H2 Discharge Pressure Transmitter"
+            name: "Discharge Pressure"
             offset_m: [8.0, 0.0]
             accuracy_pct: 0.25
           iot_board:
             tag: "IOT_TG_H2"
             type: "PMM"
-            name: "H2 IoT Motor & Power Intelligence Board"
+            name: "Power & Motor Intelligence Board"
             offset_m: [-15.0, 0.0]
             channels: ["voltage_3p", "current_3p", "vibration", "run_state"]
 
       - id: "PUMP_TG_H3"
-        tag: "H3"
-        name: "High-Lift Pump Set 3 (H3)"
+        tag: "TG-HLP-03"
+        display_name: "High-Lift Pump 3"
+        role: "High-Lift Pump"
+        name: "High-Lift Pump 3"
         class: "high-lift"
         rated_power_kw: 1200.0
         rated_voltage_v: 6600.0
@@ -158,26 +164,26 @@ stations:
           flow_sensor:
             tag: "FIT_TG_H3_SEN"
             type: "FIT"
-            name: "H3 Discharge Sensor Element"
+            name: "Discharge Sensor Element"
             offset_m: [-6.0, 8.0]
             accuracy_pct: 0.5
           flow_meter:
             tag: "FIT_TG_H3"
             type: "FIT"
-            name: "H3 Electromagnetic Bulk Flow Meter"
+            name: "Discharge Flow Meter"
             offset_m: [2.0, 8.0]
             pipe_dn_mm: 800
             accuracy_pct: 0.5
           pressure_transmitter:
             tag: "PIT_TG_H3"
             type: "PIT"
-            name: "H3 Discharge Pressure Transmitter"
+            name: "Discharge Pressure"
             offset_m: [8.0, 8.0]
             accuracy_pct: 0.25
           iot_board:
             tag: "IOT_TG_H3"
             type: "PMM"
-            name: "H3 IoT Motor & Power Intelligence Board"
+            name: "Power & Motor Intelligence Board"
             offset_m: [-15.0, 8.0]
             channels: ["voltage_3p", "current_3p", "vibration", "run_state"]
 
@@ -214,8 +220,10 @@ stations:
       offset_m: [35.0, 10.0]
     pumps:
       - id: "PUMP_MJ_F1"
-        tag: "F1"
-        name: "Booster Pump Set 1 (F1)"
+        tag: "MJ-BST-01"
+        display_name: "Booster Pump 1"
+        role: "Booster Pump"
+        name: "Booster Pump 1"
         class: "booster"
         rated_power_kw: 350.0
         rated_voltage_v: 415.0
@@ -243,32 +251,34 @@ stations:
           flow_sensor:
             tag: "FIT_MJ_F1_SEN"
             type: "FIT"
-            name: "F1 Discharge Sensor Element"
+            name: "Discharge Sensor Element"
             offset_m: [-4.0, -5.0]
             accuracy_pct: 0.5
           flow_meter:
             tag: "FIT_MJ_F1"
             type: "FIT"
-            name: "F1 Electromagnetic Bulk Flow Meter"
+            name: "Discharge Flow Meter"
             offset_m: [2.0, -5.0]
             pipe_dn_mm: 500
             accuracy_pct: 0.5
           pressure_transmitter:
             tag: "PIT_MJ_F1"
             type: "PIT"
-            name: "F1 Discharge Pressure Transmitter"
+            name: "Discharge Pressure"
             offset_m: [6.0, -5.0]
             accuracy_pct: 0.25
           iot_board:
             tag: "IOT_MJ_F1"
             type: "PMM"
-            name: "F1 IoT Motor Monitoring Board"
+            name: "Power & Motor Intelligence Board"
             offset_m: [-14.0, -5.0]
             channels: ["voltage_3p", "current_3p", "vibration", "run_state"]
 
       - id: "PUMP_MJ_F2"
-        tag: "F2"
-        name: "Booster Pump Set 2 (F2)"
+        tag: "MJ-BST-02"
+        display_name: "Booster Pump 2"
+        role: "Booster Pump"
+        name: "Booster Pump 2"
         class: "booster"
         rated_power_kw: 350.0
         rated_voltage_v: 415.0
@@ -296,26 +306,26 @@ stations:
           flow_sensor:
             tag: "FIT_MJ_F2_SEN"
             type: "FIT"
-            name: "F2 Discharge Sensor Element"
+            name: "Discharge Sensor Element"
             offset_m: [-4.0, 5.0]
             accuracy_pct: 0.5
           flow_meter:
             tag: "FIT_MJ_F2"
             type: "FIT"
-            name: "F2 Electromagnetic Bulk Flow Meter"
+            name: "Discharge Flow Meter"
             offset_m: [2.0, 5.0]
             pipe_dn_mm: 500
             accuracy_pct: 0.5
           pressure_transmitter:
             tag: "PIT_MJ_F2"
             type: "PIT"
-            name: "F2 Discharge Pressure Transmitter"
+            name: "Discharge Pressure"
             offset_m: [6.0, 5.0]
             accuracy_pct: 0.25
           iot_board:
             tag: "IOT_MJ_F2"
             type: "PMM"
-            name: "F2 IoT Motor Monitoring Board"
+            name: "Power & Motor Intelligence Board"
             offset_m: [-14.0, 5.0]
             channels: ["voltage_3p", "current_3p", "vibration", "run_state"]
 
@@ -352,8 +362,10 @@ stations:
       offset_m: [40.0, 12.0]
     pumps:
       - id: "PUMP_HG_F1"
-        tag: "F1"
-        name: "Booster Pump Set 1 (F1)"
+        tag: "HG-BST-01"
+        display_name: "Booster Pump 1"
+        role: "Booster Pump"
+        name: "Booster Pump 1"
         class: "booster"
         rated_power_kw: 450.0
         rated_voltage_v: 415.0
@@ -381,32 +393,34 @@ stations:
           flow_sensor:
             tag: "FIT_HG_F1_SEN"
             type: "FIT"
-            name: "F1 Discharge Sensor Element"
+            name: "Discharge Sensor Element"
             offset_m: [-4.0, -5.0]
             accuracy_pct: 0.5
           flow_meter:
             tag: "FIT_HG_F1"
             type: "FIT"
-            name: "F1 Electromagnetic Bulk Flow Meter"
+            name: "Discharge Flow Meter"
             offset_m: [2.0, -5.0]
             pipe_dn_mm: 600
             accuracy_pct: 0.5
           pressure_transmitter:
             tag: "PIT_HG_F1"
             type: "PIT"
-            name: "F1 Discharge Pressure Transmitter"
+            name: "Discharge Pressure"
             offset_m: [6.0, -5.0]
             accuracy_pct: 0.25
           iot_board:
             tag: "IOT_HG_F1"
             type: "PMM"
-            name: "F1 IoT Motor Monitoring Board"
+            name: "Power & Motor Intelligence Board"
             offset_m: [-14.0, -5.0]
             channels: ["voltage_3p", "current_3p", "vibration", "run_state"]
 
       - id: "PUMP_HG_F2"
-        tag: "F2"
-        name: "Booster Pump Set 2 (F2)"
+        tag: "HG-BST-02"
+        display_name: "Booster Pump 2"
+        role: "Booster Pump"
+        name: "Booster Pump 2"
         class: "booster"
         rated_power_kw: 450.0
         rated_voltage_v: 415.0
@@ -434,26 +448,26 @@ stations:
           flow_sensor:
             tag: "FIT_HG_F2_SEN"
             type: "FIT"
-            name: "F2 Discharge Sensor Element"
+            name: "Discharge Sensor Element"
             offset_m: [-4.0, 5.0]
             accuracy_pct: 0.5
           flow_meter:
             tag: "FIT_HG_F2"
             type: "FIT"
-            name: "F2 Electromagnetic Bulk Flow Meter"
+            name: "Discharge Flow Meter"
             offset_m: [2.0, 5.0]
             pipe_dn_mm: 600
             accuracy_pct: 0.5
           pressure_transmitter:
             tag: "PIT_HG_F2"
             type: "PIT"
-            name: "F2 Discharge Pressure Transmitter"
+            name: "Discharge Pressure"
             offset_m: [6.0, 5.0]
             accuracy_pct: 0.25
           iot_board:
             tag: "IOT_HG_F2"
             type: "PMM"
-            name: "F2 IoT Motor Monitoring Board"
+            name: "Power & Motor Intelligence Board"
             offset_m: [-14.0, 5.0]
             channels: ["voltage_3p", "current_3p", "vibration", "run_state"]
 

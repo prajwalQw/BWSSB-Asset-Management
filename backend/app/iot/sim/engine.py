@@ -313,10 +313,13 @@ class IoTSimulationEngine:
                         rated_kw = ps_tmpl.get("pumps", {}).get("rated_power_kw", 250.0)
                         rated_v = ps_tmpl.get("pumps", {}).get("rated_voltage_v", 415.0)
                         rated_i = ps_tmpl.get("pumps", {}).get("rated_fla_a", 420.0)
+                        stn_code = re.sub(r"[^A-Z0-9]", "", stn_name.upper())[:6] or "STN"
                         p_cfg = {
                             "id": pid,
-                            "tag": f"P{p_idx}",
-                            "name": f"Pump {p_idx}",
+                            "tag": f"{stn_code}-BST-0{p_idx}",
+                            "display_name": f"Booster Pump {p_idx}",
+                            "role": "Booster Pump",
+                            "name": f"Booster Pump {p_idx}",
                             "class": "booster",
                             "rated_power_kw": rated_kw,
                             "rated_voltage_v": rated_v,
@@ -327,12 +330,12 @@ class IoTSimulationEngine:
                                 "flow_meter": {
                                     "tag": f"FIT_{pid}",
                                     "type": "FIT",
-                                    "name": f"Pump {p_idx} Discharge Flow Meter",
+                                    "name": "Discharge Flow Meter",
                                 },
                                 "power_monitor": {
                                     "tag": f"PMM_{pid}",
                                     "type": "PMM",
-                                    "name": f"Pump {p_idx} Motor Monitor",
+                                    "name": "Power & Motor Monitor",
                                 }
                             }
                         }
@@ -431,9 +434,13 @@ class IoTSimulationEngine:
                     for eq_tag, eq_name, eq_kw, eq_fla in equipment:
                         pid = f"{stn_id}_{eq_tag}"
                         running = prng.choice([True, True, False])
+                        stn_code = re.sub(r"[^A-Z0-9]", "", stn_name.upper())[:6] or "STP"
+                        role_name = "Lift Pump" if "Lift" in eq_name else "Aeration Blower"
                         p_cfg = {
                             "id": pid,
-                            "tag": eq_tag,
+                            "tag": f"{stn_code}-{eq_tag}",
+                            "display_name": eq_name,
+                            "role": role_name,
                             "name": eq_name,
                             "class": "stp_equipment",
                             "rated_power_kw": eq_kw,
@@ -444,12 +451,12 @@ class IoTSimulationEngine:
                                 "flow_meter": {
                                     "tag": f"FIT_{pid}",
                                     "type": "FIT",
-                                    "name": f"{eq_name} Flow",
+                                    "name": "Discharge Flow Meter",
                                 },
                                 "power_monitor": {
                                     "tag": f"PMM_{pid}",
                                     "type": "PMM",
-                                    "name": f"{eq_name} Monitor",
+                                    "name": "Power & Motor Monitor",
                                 }
                             }
                         }
@@ -1071,6 +1078,8 @@ class IoTSimulationEngine:
                 p_state = PumpTelemetryState(
                     pump_id=pid,
                     tag=pcfg.get("tag", pid),
+                    display_name=pcfg.get("display_name", pcfg.get("name", pid)),
+                    role=pcfg.get("role", pcfg.get("class", "Pump")),
                     station_id=stn_id,
                     run_state=p["state"],
                     auto_control_mode=pcfg.get("auto_control_mode", "Automatic"),

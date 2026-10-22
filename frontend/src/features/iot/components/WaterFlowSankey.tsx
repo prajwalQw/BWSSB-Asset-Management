@@ -71,25 +71,25 @@ export const WaterFlowSankey: React.FC<WaterFlowSankeyProps> = ({ corridors, bal
         </div>
 
         {/* Water Balance Summary Box */}
-        <div className="p-2.5 rounded-xl border border-slate-800 bg-slate-900/80 flex items-center gap-4 text-xs font-mono">
+        <div className="p-2.5 rounded-xl border border-slate-800 bg-slate-900/80 flex items-center gap-4 text-xs">
           <div>
-            <span className="text-slate-500 block text-[10px] uppercase">Inflow</span>
-            <span className="font-bold text-sky-400 tabular-nums">{balance.total_inflow_mld.toFixed(1)} MLD</span>
+            <span className="text-slate-500 block text-[11px]">Inflow</span>
+            <span className="font-bold text-sky-400 font-mono tabular-nums">{balance.total_inflow_mld.toFixed(1)} MLD</span>
           </div>
           <div className="text-slate-600">-</div>
           <div>
-            <span className="text-slate-500 block text-[10px] uppercase">Outflow</span>
-            <span className="font-bold text-emerald-400 tabular-nums">{balance.total_outflow_mld.toFixed(1)} MLD</span>
+            <span className="text-slate-500 block text-[11px]">Outflow</span>
+            <span className="font-bold text-emerald-400 font-mono tabular-nums">{balance.total_outflow_mld.toFixed(1)} MLD</span>
           </div>
           <div className="text-slate-600">-</div>
           <div>
-            <span className="text-slate-500 block text-[10px] uppercase">Δ Storage</span>
-            <span className="font-bold text-slate-300 tabular-nums">{balance.storage_change_mld.toFixed(1)} MLD</span>
+            <span className="text-slate-500 block text-[11px]">Δ Storage</span>
+            <span className="font-bold text-slate-300 font-mono tabular-nums">{balance.storage_change_mld.toFixed(1)} MLD</span>
           </div>
           <div className="text-slate-600">=</div>
           <div className="pl-2 border-l border-slate-800">
-            <span className="text-slate-500 block text-[10px] uppercase">Unaccounted (NRW)</span>
-            <span className="font-bold text-amber-400 tabular-nums">
+            <span className="text-slate-500 block text-[11px]">Unaccounted (NRW)</span>
+            <span className="font-bold text-amber-400 font-mono tabular-nums">
               {balance.unaccounted_mld.toFixed(1)} MLD ({balance.unaccounted_pct.toFixed(1)}%)
             </span>
           </div>
@@ -103,7 +103,7 @@ export const WaterFlowSankey: React.FC<WaterFlowSankeyProps> = ({ corridors, bal
           return (
             <div key={stageIdx} className="flex flex-col gap-3">
               <div className="text-center pb-2 border-b border-slate-800/80">
-                <span className="text-[11px] font-mono text-slate-400 uppercase font-bold tracking-wider">
+                <span className="text-xs text-slate-400 font-semibold">
                   {title}
                 </span>
               </div>

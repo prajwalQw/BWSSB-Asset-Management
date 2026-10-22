@@ -170,25 +170,25 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
         {/* Status Chips */}
         <div className="grid grid-cols-2 gap-2">
           <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-            <span className="text-[10px] text-slate-500 block uppercase font-mono">Pump Run Status</span>
+            <span className="text-xs text-slate-500 block">Pump run status</span>
             <div className="flex items-center gap-1.5 mt-1">
               <span
                 className={`w-2 h-2 rounded-full ${
                   isRunning ? 'bg-emerald-500' : 'bg-slate-400'
                 }`}
               />
-              <span className="font-bold text-slate-800 dark:text-slate-200 font-mono">
+              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">
                 {selectedPump.run_state}
               </span>
-              <span className="text-[10px] text-slate-500">
+              <span className="text-[11px] text-slate-500">
                 ({isRunning ? 'Active' : 'Not active'})
               </span>
             </div>
           </div>
 
           <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-            <span className="text-[10px] text-slate-500 block uppercase font-mono">Hydraulic Output</span>
-            <div className="font-mono text-slate-800 dark:text-slate-200 font-bold mt-1 tabular-nums">
+            <span className="text-xs text-slate-500 block">Hydraulic output</span>
+            <div className="text-slate-800 dark:text-slate-200 font-semibold text-xs mt-1 tabular-nums">
               {selectedPump.flow_lps.toFixed(1)} L/s ({dischargePressureBar} bar)
             </div>
           </div>
@@ -354,26 +354,26 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
         {/* Summary Row */}
         <div className="grid grid-cols-2 gap-2">
           <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-            <span className="text-[10px] text-slate-500 block uppercase font-mono">Pumps Running</span>
-            <div className="font-mono text-base font-bold text-emerald-500 mt-0.5 tabular-nums">
+            <span className="text-xs text-slate-500 block">Pumps running</span>
+            <div className="text-base font-bold text-emerald-500 mt-0.5 tabular-nums">
               {runningPumps} <span className="text-xs text-slate-400 font-normal">of {totalPumps}</span>
             </div>
           </div>
           <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-            <span className="text-[10px] text-slate-500 block uppercase font-mono">Discharge Flow</span>
-            <div className="font-mono text-base font-bold text-sky-500 mt-0.5 tabular-nums">
+            <span className="text-xs text-slate-500 block">Discharge flow</span>
+            <div className="text-base font-bold text-sky-500 mt-0.5 tabular-nums">
               {dischargeFlowMld.toFixed(1)} <span className="text-xs text-slate-400 font-normal">MLD</span>
             </div>
           </div>
           <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-            <span className="text-[10px] text-slate-500 block uppercase font-mono">Total Power</span>
-            <div className="font-mono text-base font-bold text-amber-500 mt-0.5 tabular-nums">
+            <span className="text-xs text-slate-500 block">Total power</span>
+            <div className="text-base font-bold text-amber-500 mt-0.5 tabular-nums">
               {totalPowerKw.toFixed(1)} <span className="text-xs text-slate-400 font-normal">kW</span>
             </div>
           </div>
           <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-            <span className="text-[10px] text-slate-500 block uppercase font-mono">Tank Level</span>
-            <div className="font-mono text-base font-bold text-slate-700 dark:text-slate-200 mt-0.5 tabular-nums">
+            <span className="text-xs text-slate-500 block">Tank level</span>
+            <div className="text-base font-bold text-slate-700 dark:text-slate-200 mt-0.5 tabular-nums">
               {selectedStation.tank ? `${selectedStation.tank.level_pct.toFixed(1)}%` : 'Not published'}
             </div>
           </div>
@@ -513,14 +513,14 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
         {/* Summary Row */}
         <div className="grid grid-cols-2 gap-2">
           <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-            <span className="text-[10px] text-slate-500 block uppercase font-mono">Inlet / Outlet Flow</span>
-            <div className="font-mono text-sm font-bold text-sky-500 mt-0.5 tabular-nums">
+            <span className="text-xs text-slate-500 block">Inlet and outlet flow</span>
+            <div className="text-sm font-bold text-sky-500 mt-0.5 tabular-nums">
               {inletMld.toFixed(1)} / {outletMld.toFixed(1)} MLD
             </div>
           </div>
           <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-            <span className="text-[10px] text-slate-500 block uppercase font-mono">Treatment Efficiency</span>
-            <div className="font-mono text-sm font-bold text-emerald-500 mt-0.5 tabular-nums">
+            <span className="text-xs text-slate-500 block">Treatment efficiency</span>
+            <div className="text-sm font-bold text-emerald-500 mt-0.5 tabular-nums">
               {treatedPct}% Treated
             </div>
           </div>
@@ -650,20 +650,20 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
         {/* Status Chips: Sensor active / Comms online / Quality */}
         <div className="grid grid-cols-2 gap-2">
           <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-            <span className="text-[10px] text-slate-500 block uppercase font-mono">Sensor State</span>
+            <span className="text-xs text-slate-500 block">Sensor state</span>
             <div className="flex items-center gap-1.5 mt-1">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span className="font-bold text-slate-800 dark:text-slate-200 font-mono">
-                Sensor Active
+              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">
+                Sensor active
               </span>
             </div>
           </div>
 
           <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-            <span className="text-[10px] text-slate-500 block uppercase font-mono">Comms Channel</span>
+            <span className="text-xs text-slate-500 block">Comms channel</span>
             <div className="flex items-center gap-1.5 mt-1">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span className="font-bold text-slate-800 dark:text-slate-200 font-mono">
+              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">
                 {dev.comms_state || 'ONLINE'} (Good)
               </span>
             </div>
@@ -709,8 +709,8 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
 
         {isPressure && (
           <div className="p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 space-y-2">
-            <span className="text-slate-500 block uppercase text-[10px] font-mono">
-              Line Pressure
+            <span className="text-slate-500 block text-xs">
+              Line pressure
             </span>
             <div className="font-mono text-3xl font-bold text-sky-500 tabular-nums">
               {(dev.latest_values?.value || 3.8).toFixed(1)}{' '}
@@ -731,8 +731,8 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
 
         {isLevel && (
           <div className="p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 space-y-2">
-            <span className="text-slate-500 block uppercase text-[10px] font-mono">
-              Reservoir / Sump Water Level
+            <span className="text-slate-500 block text-xs">
+              Reservoir and sump water level
             </span>
             <div className="font-mono text-3xl font-bold text-sky-500 tabular-nums">
               {(dev.latest_values?.value || 78.5).toFixed(1)}{' '}
@@ -771,8 +771,8 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
 
         {isValve && (
           <div className="p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 space-y-2">
-            <span className="text-slate-500 block uppercase text-[10px] font-mono">
-              Control Valve Position
+            <span className="text-slate-500 block text-xs">
+              Control valve position
             </span>
             <div className="font-mono text-2xl font-bold text-emerald-500">
               OPEN (100% Open)
@@ -785,8 +785,8 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
 
         {isBorewell && (
           <div className="p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 space-y-2">
-            <span className="text-slate-500 block uppercase text-[10px] font-mono">
-              Borewell Extraction Package
+            <span className="text-slate-500 block text-xs">
+              Borewell extraction package
             </span>
             <div className="space-y-1.5 font-mono text-[11px]">
               <div className="flex justify-between">
@@ -894,8 +894,8 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
           {/* Diagnostics: Comms, Battery, Signal */}
           <div className="grid grid-cols-3 gap-2">
             <div className="p-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-              <span className="text-[10px] text-slate-500 block uppercase font-mono">Comms</span>
-              <div className="font-mono text-xs font-bold mt-0.5 flex items-center gap-1">
+              <span className="text-[11px] text-slate-500 block">Comms</span>
+              <div className="text-xs font-bold mt-0.5 flex items-center gap-1">
                 <span className={`w-2 h-2 rounded-full ${selectedWard.status === 'ONLINE' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                 <span className={selectedWard.status === 'ONLINE' ? 'text-emerald-500' : 'text-rose-500'}>
                   {selectedWard.status}
@@ -904,15 +904,15 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
             </div>
 
             <div className="p-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-              <span className="text-[10px] text-slate-500 block uppercase font-mono">Battery</span>
-              <div className={`font-mono text-xs font-bold mt-0.5 ${selectedWard.battery_pct < 15.0 ? 'text-amber-500 font-bold' : 'text-slate-200'}`}>
+              <span className="text-[11px] text-slate-500 block">Battery</span>
+              <div className={`text-xs font-bold mt-0.5 ${selectedWard.battery_pct < 15.0 ? 'text-amber-500 font-bold' : 'text-slate-200'}`}>
                 {selectedWard.battery_pct.toFixed(1)}%
               </div>
             </div>
 
             <div className="p-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-              <span className="text-[10px] text-slate-500 block uppercase font-mono">Signal</span>
-              <div className="font-mono text-xs font-bold text-slate-200 mt-0.5">
+              <span className="text-[11px] text-slate-500 block">Signal</span>
+              <div className="text-xs font-bold text-slate-200 mt-0.5">
                 {selectedWard.signal_strength_dbm.toFixed(0)} dBm
               </div>
             </div>

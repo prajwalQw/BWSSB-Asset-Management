@@ -39,6 +39,8 @@ class DeviceStatus(BaseModel):
 class PumpTelemetryState(BaseModel):
     pump_id: str
     tag: str
+    display_name: Optional[str] = None
+    role: Optional[str] = None
     station_id: str
     run_state: PumpRunState
     auto_control_mode: str = "Automatic"

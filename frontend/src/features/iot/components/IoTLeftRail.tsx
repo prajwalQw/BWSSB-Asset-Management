@@ -147,14 +147,14 @@ export const IoTLeftRail: React.FC<IoTLeftRailProps> = ({
           <>
             {/* Pumping Stations Tree */}
             <div>
-              <div className="px-1.5 py-1 text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">
-                Pumping Stations & Plant Assets
+              <div className="px-1 py-1 text-xs font-semibold text-slate-400">
+                Pumping stations and plant assets
               </div>
               <div className="space-y-1 mt-1">
                 {stations.map((stn) => {
                   const isExp = !!expandedStations[stn.id];
                   return (
-                    <div key={stn.id} className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 overflow-hidden">
+                    <div key={stn.id} className="rounded-lg border border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 overflow-hidden">
                       {/* Station Level */}
                       <button
                         type="button"
@@ -166,18 +166,18 @@ export const IoTLeftRail: React.FC<IoTLeftRailProps> = ({
                       >
                         <div className="flex items-center gap-1.5 truncate">
                           {isExp ? <ChevronDown className="w-3.5 h-3.5 text-slate-400" /> : <ChevronRight className="w-3.5 h-3.5 text-slate-400" />}
-                          <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">
+                          <span className="font-semibold text-slate-800 dark:text-slate-200 text-[15px] truncate">
                             {stn.name}
                           </span>
                         </div>
-                        <span className="text-[10px] font-mono px-1 rounded bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300">
+                        <span className="text-xs px-2 py-0.5 rounded bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-medium">
                           {stn.pumps.length} Pumps
                         </span>
                       </button>
 
                       {/* Pumps & Devices Children */}
                       {isExp && (
-                        <div className="pl-6 pr-2 pb-2 space-y-1 border-t border-slate-100 dark:border-slate-800/60 pt-1.5 text-[11px]">
+                        <div className="pl-6 pr-2 pb-2 space-y-1 border-t border-slate-100 dark:border-slate-800/60 pt-1.5 text-xs">
                           {stn.pumps.map((p) => {
                             const isRunning = p.run_state === 'RUNNING';
                             return (
@@ -191,13 +191,17 @@ export const IoTLeftRail: React.FC<IoTLeftRailProps> = ({
                                     : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
                                 }`}
                               >
-                                <div className="flex items-center gap-1.5">
-                                  <Zap className={`w-3 h-3 ${isRunning ? 'text-emerald-500' : 'text-slate-400'}`} />
-                                  <span>{p.tag} Pump ({p.active_power_kw.toFixed(0)} kW)</span>
+                                <div className="flex items-center gap-1.5 truncate">
+                                  <Zap className={`w-3.5 h-3.5 ${isRunning ? 'text-emerald-500' : 'text-slate-400'}`} />
+                                  <span className="truncate">{p.display_name || p.tag}</span>
+                                  <span className="text-[10px] font-mono text-slate-400">[{p.tag}]</span>
                                 </div>
-                                <span className={`text-[9px] font-mono font-bold ${isRunning ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`}>
-                                  {p.run_state}
-                                </span>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-xs font-mono tabular-nums text-slate-500">{p.active_power_kw.toFixed(0)} kW</span>
+                                  <span className={`text-[10px] font-semibold ${isRunning ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`}>
+                                    {isRunning ? 'Active' : 'Off'}
+                                  </span>
+                                </div>
                               </button>
                             );
                           })}
@@ -209,15 +213,16 @@ export const IoTLeftRail: React.FC<IoTLeftRailProps> = ({
                               onClick={() => onSelectDevice(d.tag)}
                               className={`w-full px-2 py-1 rounded flex items-center justify-between transition-colors ${
                                 selectedId === d.tag
-                                  ? 'bg-sky-100 dark:bg-sky-950/70 text-sky-700 dark:text-sky-300 font-semibold'
-                                  : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
+                                    ? 'bg-sky-100 dark:bg-sky-950/70 text-sky-700 dark:text-sky-300 font-semibold'
+                                    : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
                               }`}
                             >
-                              <div className="flex items-center gap-1.5">
-                                <Gauge className="w-3 h-3 text-slate-400" />
-                                <span className="font-mono text-[10px]">{d.tag}</span>
+                              <div className="flex items-center gap-1.5 truncate">
+                                <Gauge className="w-3.5 h-3.5 text-slate-400" />
+                                <span className="truncate">{d.name || d.tag}</span>
+                                <span className="text-[10px] font-mono text-slate-400">[{d.tag}]</span>
                               </div>
-                              <span className="text-[9px] text-slate-400 font-mono">
+                              <span className="text-xs text-slate-400 font-medium">
                                 {d.type_code}
                               </span>
                             </button>
@@ -232,14 +237,14 @@ export const IoTLeftRail: React.FC<IoTLeftRailProps> = ({
 
             {/* Smart Meter Divisions */}
             <div>
-              <div className="px-1.5 py-1 text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">
-                BWSSB Divisions & Smart Meters
+              <div className="px-1 py-1 text-xs font-semibold text-slate-400">
+                Divisions and smart meters
               </div>
               <div className="space-y-1 mt-1">
                 {divisions.map((div) => {
                   const isExp = !!expandedDivisions[div.division_name];
                   return (
-                    <div key={div.division_name} className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 overflow-hidden">
+                    <div key={div.division_name} className="rounded-lg border border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 overflow-hidden">
                       <button
                         type="button"
                         onClick={() => {
@@ -251,11 +256,11 @@ export const IoTLeftRail: React.FC<IoTLeftRailProps> = ({
                         <div className="flex items-center gap-1.5 truncate">
                           {isExp ? <ChevronDown className="w-3.5 h-3.5 text-slate-400" /> : <ChevronRight className="w-3.5 h-3.5 text-slate-400" />}
                           <Building className="w-3.5 h-3.5 text-sky-500" />
-                          <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">
+                          <span className="font-semibold text-slate-800 dark:text-slate-200 text-[15px] truncate">
                             {div.division_name}
                           </span>
                         </div>
-                        <span className="text-[10px] font-mono text-slate-500">
+                        <span className="text-xs text-slate-500 font-medium">
                           {div.total_wards} Wards
                         </span>
                       </button>
@@ -315,8 +320,8 @@ export const IoTLeftRail: React.FC<IoTLeftRailProps> = ({
           /* Layers Tab with Toggles and Legend */
           <div className="space-y-3 p-1">
             <div className="space-y-1">
-              <span className="text-[10px] font-mono uppercase font-bold text-slate-400 block tracking-wider">
-                Map Layer Visibility
+              <span className="text-xs font-semibold text-slate-400 block">
+                Map layer visibility
               </span>
               <p className="text-[11px] text-slate-500">
                 Toggle live IoT layers and telemetry overlays on the map stage.
@@ -373,10 +378,10 @@ export const IoTLeftRail: React.FC<IoTLeftRailProps> = ({
 
             {/* Symbology Legend Reference */}
             <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2">
-              <span className="text-[10px] font-mono uppercase font-bold text-slate-400 block tracking-wider">
-                Symbology Legend
+              <span className="text-xs font-semibold text-slate-400 block">
+                Symbology legend
               </span>
-              <div className="space-y-1.5 text-[11px] font-mono text-slate-600 dark:text-slate-300">
+              <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
                 <div className="flex items-center gap-2">
                   <span className="w-3.5 h-3.5 rounded-full border-2 border-emerald-500 bg-emerald-500/20 inline-block" />
                   <span>Normal Asset (Healthy / Active)</span>
