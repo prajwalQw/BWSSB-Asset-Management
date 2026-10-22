@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
+import { sseManager } from '../../services/sseManager';
 import { ProvenanceChip } from '../common/ProvenanceChip';
 import { 
   Cpu, 
@@ -85,18 +86,12 @@ export const HydraulicsStudio: React.FC<HydraulicsStudioProps> = ({
 
   useEffect(() => {
     loadAllData();
-    const eventSource = new EventSource('/api/v1/telemetry/stream');
-    eventSource.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        setTelemetry(data);
-      } catch (err) {
-        console.error('SSE parse error:', err);
-      }
-    };
+    const cleanup = sseManager.subscribe('telemetry', (data) => {
+      setTelemetry(data);
+    });
 
     return () => {
-      eventSource.close();
+      cleanup();
     };
   }, []);
 
