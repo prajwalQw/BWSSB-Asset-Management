@@ -292,5 +292,20 @@ Alerts strictly follow the ISA-18.2 compliant lifecycle:
 
 ---
 
+## D-27 · Click-to-Inspect Telemetry Standards (GIS & IoT)
+
+- Pump Inspector: Header with pump name and Active/Not active chip (Automatic mode); 3-phase Voltage (V) & Current (A), kW, PF, cumulative kWh, run hours, and flow/pressure sensor readings.
+- Twin 220px Line Charts: Bus Voltage vs time (normal band ±5% shaded) and Motor Current vs time (normal band shaded with startup inrush marker) plus thin ON/OFF step strip.
+- Station & STP Inspector: Summary KPI row, equipment list with 96px sparklines (clickable to drill down into pump telemetry), and twin 220px trends (Total power kW, Discharge flow MLD).
+- Sensor Inspector: Sensor-specific instrumentation displays:
+  - Flow meter: flow in L/s, m³/h, and MLD with mechanical/LCD `MeterBoard` register, pipe full/forward flags.
+  - Pressure: bar with low/high alarm limits.
+  - Level: % and depth in meters.
+  - Water quality: pH, turbidity (NTU), free chlorine (mg/L) with IS 10500:2012 limits.
+  - Valves & Borewells: valve % open, groundwater depth, extraction rate.
+- Cross-Module Inspect: `sectionRegistry` enables telemetry inspection directly from the GIS map while preserving source attributes, rendering "Not published" for blank parameters.
+
+---
+
 *Updated: 2026-10-22*
 

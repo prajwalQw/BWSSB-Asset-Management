@@ -400,10 +400,12 @@ export const App: React.FC = () => {
           <IoTRightInspector
             selectedType={iotStore.selectedInspectorType}
             selectedPump={iotStore.selectedPump}
+            selectedStation={iotStore.selectedStation}
             selectedDevice={iotStore.selectedDevice}
             selectedDivision={iotStore.selectedDivision}
             onClose={() => iotStore.setSelectedInspectorType(null)}
             onZoomTo={(coords) => setFlyToTarget(coords)}
+            onSelectPump={handleSelectIoTPump}
           />
         )}
       </div>

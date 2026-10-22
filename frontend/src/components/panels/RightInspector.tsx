@@ -501,19 +501,19 @@ export const RightInspector: React.FC<RightInspectorProps> = ({
           <div className="space-y-1.5 text-[11px]">
             <div className="flex justify-between">
               <span className="text-slate-500">Diameter:</span>
-              <span className="font-mono tabular-nums">{asset.properties?.diameter_mm || 400} mm</span>
+              <span className="font-mono tabular-nums">{asset.properties?.diameter_mm ? `${asset.properties.diameter_mm} mm` : 'Not published'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Material:</span>
-              <span className="font-mono">{asset.properties?.material || 'Ductile Iron (DI)'}</span>
+              <span className="font-mono">{asset.properties?.material || 'Not published'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Length:</span>
-              <span className="font-mono tabular-nums">{asset.properties?.length_m || 850} m</span>
+              <span className="font-mono tabular-nums">{asset.properties?.length_m ? `${asset.properties.length_m} m` : 'Not published'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Hazen-Williams C:</span>
-              <span className="font-mono tabular-nums">130</span>
+              <span className="font-mono tabular-nums">{asset.properties?.roughness_c || 130}</span>
             </div>
           </div>
         </div>

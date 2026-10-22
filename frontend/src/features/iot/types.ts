@@ -29,6 +29,8 @@ export interface DeviceTelemetry {
 export interface PumpTelemetry {
   pump_id: string;
   tag: string;
+  display_name?: string;
+  role?: string;
   station_id: string;
   run_state: PumpRunState;
   auto_control_mode: string;
@@ -78,6 +80,9 @@ export interface StationOverview {
   pumps: PumpTelemetry[];
   devices: DeviceTelemetry[];
   data_tier: DataTier;
+  total_power_kw?: number;
+  discharge_flow_mld?: number;
+  active_alerts_count?: number;
 }
 
 export interface IoTAlertItem {
