@@ -27,6 +27,7 @@ from .models import (
 from .sim.engine import sim_engine
 from .sim.ring_buffer import ring_buffer
 from .bus import event_bus
+from .scheduler.executor import plan_executor
 
 logger = logging.getLogger("bwssb_iot.router")
 
@@ -283,4 +284,33 @@ async def iot_sse_stream(request: Request):
             "X-Accel-Buffering": "no"
         }
     )
+
+@router.get("/plan/current")
+async def get_current_supply_plan():
+    check_iot_enabled()
+    return plan_executor.get_or_create_plan(sim_engine.sim_time)
+
+@router.post("/plan/recalculate")
+async def recalculate_supply_plan():
+    check_iot_enabled()
+    return plan_executor.replan(sim_engine.sim_time, reason="Manual operator recalculation")
+
+@router.get("/water-movement")
+async def get_water_movement():
+    check_iot_enabled()
+    return plan_executor.compute_water_movement(sim_engine.sim_time)
+
+@router.post("/sim/clock")
+async def set_simulation_clock(payload: Dict[str, Any]):
+    check_iot_enabled()
+    speed = payload.get("speed", 1.0)
+    paused = payload.get("paused", False)
+    sim_engine.set_sim_clock(speed, paused)
+    return {
+        "status": "OK",
+        "speed": plan_executor.speed_multiplier,
+        "paused": plan_executor.is_paused,
+        "sim_time": sim_engine.sim_time
+    }
+
 

@@ -8,7 +8,7 @@ from pathlib import Path
 import yaml
 import json
 
-IOT_ENABLED = os.environ.get("IOT_ENABLED", "false").lower() in ("true", "1", "yes")
+IOT_ENABLED = os.environ.get("IOT_ENABLED", "true").lower() in ("true", "1", "yes")
 SIM_SEED = int(os.environ.get("SIM_SEED", "42"))
 
 # Directory paths

@@ -19,9 +19,11 @@ import os
 import asyncio
 from typing import Dict, List, Optional, Any, Tuple
 import pandas as pd
+import numpy as np
 import logging
 
 import hashlib
+import json
 import re
 
 from ..config import (
@@ -58,6 +60,7 @@ from ..bus import event_bus
 from ..storage import iot_storage
 from .ring_buffer import ring_buffer
 from .leak_detector import PipeSegmentLeakMonitor
+from ..scheduler.executor import plan_executor
 
 logger = logging.getLogger("bwssb_iot.engine")
 
@@ -641,9 +644,16 @@ class IoTSimulationEngine:
         frac = hour - int(hour)
         return self.diurnal_factors[idx] * (1.0 - frac) + self.diurnal_factors[next_idx] * frac
 
+    def set_sim_clock(self, speed: float, paused: bool):
+        plan_executor.speed_multiplier = max(1.0, float(speed))
+        plan_executor.is_paused = bool(paused)
+
     def tick(self, dt_sec: float = 1.0):
         """Advances physics simulation by dt_sec."""
-        self.sim_time += dt_sec
+        if plan_executor.is_paused:
+            return
+        effective_dt = dt_sec * plan_executor.speed_multiplier
+        self.sim_time += effective_dt
         self.tick_count += 1
         now_epoch = time.time()
         curr_hour = (self.tick_count / 3600.0) % 24.0
@@ -882,7 +892,35 @@ class IoTSimulationEngine:
             w["current_day_volume_kl"] = round(w["current_day_volume_kl"] + vol_add_kl, 2)
             w["cumulative_totaliser_kl"] = round(w["cumulative_totaliser_kl"] + vol_add_kl, 2)
 
-        # 4. Periodic Snapshot (every 30 seconds to SQLite)
+        # 4. Check Supply Plan Replan Triggers (every 15 ticks)
+        if self.tick_count % 15 == 0:
+            has_pump_trip = any(
+                p.get("state") == "TRIPPED"
+                for s in self.stations_state.values()
+                for p in s.get("pumps", {}).values()
+            )
+            has_low_tank = any(
+                s.get("tank", {}).get("level_pct", 50.0) < 20.0
+                for s in self.stations_state.values()
+                if "tank" in s and s["tank"]
+            )
+            has_active_leak = any(
+                a.active and a.category == "HYDRAULIC_INTEGRITY"
+                for a in self.alerts.values()
+            )
+            tank_levels = {
+                "GLR_MOUNT_JOY": self.stations_state.get("PS_TATAGUNI", {}).get("tank", {}).get("level_pct", 55.0),
+                "GLR_HIGH_GROUNDS": 62.0
+            }
+            plan_executor.check_replan_triggers(
+                self.sim_time,
+                has_pump_trip,
+                has_low_tank,
+                has_active_leak,
+                tank_levels
+            )
+
+        # 5. Periodic Snapshot (every 30 seconds to SQLite)
         if self.tick_count % 30 == 0:
             self.snapshot_state()
 

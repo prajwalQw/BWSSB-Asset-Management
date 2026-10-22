@@ -13,6 +13,7 @@ import {
   Radio 
 } from 'lucide-react';
 import { useTwinStore, BasemapTheme } from '../../store/useTwinStore';
+import { SimClockControl } from './SimClockControl';
 
 export interface TopBarProps {
   alertsCount: number;
@@ -94,6 +95,9 @@ export const TopBar: React.FC<TopBarProps> = ({
           </button>
         </div>
       )}
+
+      {/* Simulation Clock Control */}
+      <SimClockControl />
 
       {/* 4 KPI Tiles */}
       <div className="hidden lg:flex items-center gap-2">
