@@ -105,7 +105,7 @@ class MonitoringAgent:
             self.restart_counts["detector"] += 1
 
         # Check 5: Bridge Connection Health
-        if bridge.is_connected or True: # passive read-only bridge
+        if getattr(bridge, "is_connected", getattr(bridge, "_running", True)):
             passed_count += 1
 
         # Check 6: Pressure / Hydraulic Stability

@@ -38,6 +38,7 @@ import {
 } from '../types';
 import { MeterBoard } from './MeterBoard';
 import { lpsToM3h, lpsToMld } from '../../../utils/unitConversion';
+import { useIoTStore } from '../store/useIoTStore';
 
 export interface IoTRightInspectorProps {
   selectedType: 'pump' | 'station' | 'stp' | 'flow_sensor' | 'meter' | 'tank' | 'division' | 'device' | null;
@@ -112,6 +113,12 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
   const [wardSortField, setWardSortField] = useState<'ward_no' | 'flow_lps' | 'volume' | 'alerts'>('flow_lps');
   const [selectedWard, setSelectedWard] = useState<WardMeterSummary | null>(null);
 
+  const store = useIoTStore();
+  const effectiveStation = selectedStation || store.selectedStation || (store.stations.length > 0 ? store.stations[0] : null);
+  const effectivePump = selectedPump || store.selectedPump || effectiveStation?.pumps?.[0] || null;
+  const effectiveDevice = selectedDevice || store.selectedDevice || null;
+  const effectiveDivision = selectedDivision || store.selectedDivision || (store.divisions.length > 0 ? store.divisions[0] : null);
+
   if (!selectedType) {
     return (
       <aside className="w-[380px] border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col h-full select-none z-20 p-4 text-xs overflow-y-auto">
@@ -140,11 +147,12 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
   // ---------------------------------------------------------------------------
   // 1. PUMP INSPECTOR
   // ---------------------------------------------------------------------------
-  if (selectedType === 'pump' && selectedPump) {
-    const isRunning = selectedPump.run_state === 'RUNNING' || selectedPump.run_state === 'STARTING';
-    const trendData = generatePumpTrend(selectedPump.voltage_avg || 415.0, selectedPump.current_avg || 110.0, timeRange);
-    const flowMld = Number(lpsToMld(selectedPump.flow_lps).toFixed(1));
-    const dischargePressureBar = Number((selectedPump.head_m / 10.2).toFixed(1));
+  if (selectedType === 'pump' && effectivePump) {
+    const pumpData = effectivePump;
+    const isRunning = pumpData.run_state === 'RUNNING' || pumpData.run_state === 'STARTING';
+    const trendData = generatePumpTrend(pumpData.voltage_avg || 415.0, pumpData.current_avg || 110.0, timeRange);
+    const flowMld = Number(lpsToMld(pumpData.flow_lps).toFixed(1));
+    const dischargePressureBar = Number((pumpData.head_m / 10.2).toFixed(1));
 
     return (
       <aside className="w-[380px] border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col h-full select-none z-20 overflow-y-auto p-4 text-xs space-y-4">
@@ -153,14 +161,14 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">
-                {selectedPump.display_name || `${selectedPump.tag} Pump Set`}
+                {pumpData.display_name || `${pumpData.tag} Pump Set`}
               </h3>
               <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-500 border border-amber-500/30 font-bold">
                 SIMULATED
               </span>
             </div>
             <span className="text-[11px] text-slate-500 font-mono">
-              Tag: {selectedPump.tag} • Mode: Automatic
+              Tag: {pumpData.tag} • Mode: Automatic
             </span>
           </div>
           <button type="button" onClick={onClose} className="p-1 rounded text-slate-400 hover:text-slate-600">
@@ -179,7 +187,7 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
                 }`}
               />
               <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">
-                {selectedPump.run_state}
+                {pumpData.run_state}
               </span>
               <span className="text-[11px] text-slate-500">
                 ({isRunning ? 'Active' : 'Not active'})
@@ -190,7 +198,7 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
           <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
             <span className="text-xs text-slate-500 block">Hydraulic output</span>
             <div className="text-slate-800 dark:text-slate-200 font-semibold text-xs mt-1 tabular-nums">
-              {selectedPump.flow_lps.toFixed(1)} L/s ({dischargePressureBar} bar)
+              {pumpData.flow_lps.toFixed(1)} L/s ({dischargePressureBar} bar)
             </div>
           </div>
         </div>
@@ -200,37 +208,37 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
           <div className="flex justify-between">
             <span className="text-slate-500">Voltage (R/Y/B):</span>
             <span className="tabular-nums font-bold text-slate-700 dark:text-slate-200">
-              {selectedPump.voltage_r.toFixed(0)} / {selectedPump.voltage_y.toFixed(0)} / {selectedPump.voltage_b.toFixed(0)} V
+              {pumpData.voltage_r.toFixed(0)} / {pumpData.voltage_y.toFixed(0)} / {pumpData.voltage_b.toFixed(0)} V
             </span>
           </div>
           <div className="flex justify-between">
             <span className="text-slate-500">Current (R/Y/B):</span>
             <span className="tabular-nums font-bold text-slate-700 dark:text-slate-200">
-              {selectedPump.current_r.toFixed(1)} / {selectedPump.current_y.toFixed(1)} / {selectedPump.current_b.toFixed(1)} A
+              {pumpData.current_r.toFixed(1)} / {pumpData.current_y.toFixed(1)} / {pumpData.current_b.toFixed(1)} A
             </span>
           </div>
           <div className="flex justify-between">
             <span className="text-slate-500">Active Power / PF:</span>
             <span className="tabular-nums text-slate-700 dark:text-slate-200">
-              {selectedPump.active_power_kw.toFixed(1)} kW (PF {selectedPump.power_factor.toFixed(2)})
+              {pumpData.active_power_kw.toFixed(1)} kW (PF {pumpData.power_factor.toFixed(2)})
             </span>
           </div>
           <div className="flex justify-between">
             <span className="text-slate-500">Cumulative Energy:</span>
             <span className="tabular-nums text-slate-700 dark:text-slate-200">
-              {Math.round(selectedPump.energy_kwh).toLocaleString()} kWh
+              {Math.round(pumpData.energy_kwh).toLocaleString()} kWh
             </span>
           </div>
           <div className="flex justify-between">
             <span className="text-slate-500">Hydraulic Delivery:</span>
             <span className="tabular-nums text-slate-700 dark:text-slate-200">
-              {selectedPump.flow_lps.toFixed(1)} L/s ({flowMld} MLD)
+              {pumpData.flow_lps.toFixed(1)} L/s ({flowMld} MLD)
             </span>
           </div>
           <div className="flex justify-between pt-1 border-t border-slate-200 dark:border-slate-800">
             <span className="text-slate-500">Run Hours / Starts:</span>
             <span className="tabular-nums text-slate-700 dark:text-slate-200">
-              {selectedPump.run_hours.toFixed(1)} h ({selectedPump.starts_count} starts)
+              {pumpData.run_hours.toFixed(1)} h ({pumpData.starts_count} starts)
             </span>
           </div>
         </div>
@@ -323,11 +331,12 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
   // ---------------------------------------------------------------------------
   // 2. PUMPING STATION INSPECTOR
   // ---------------------------------------------------------------------------
-  if (selectedType === 'station' && selectedStation) {
-    const runningPumps = selectedStation.pumps.filter((p) => p.run_state === 'RUNNING').length;
-    const totalPumps = selectedStation.pumps.length;
-    const totalPowerKw = selectedStation.total_power_kw ?? selectedStation.pumps.reduce((acc, p) => acc + (p.run_state === 'RUNNING' ? p.active_power_kw : 0), 0);
-    const dischargeFlowMld = selectedStation.discharge_flow_mld ?? Number(((selectedStation.pumps.reduce((acc, p) => acc + (p.run_state === 'RUNNING' ? p.flow_lps : 0), 0) * 86.4) / 1000).toFixed(1));
+  if (selectedType === 'station' && effectiveStation) {
+    const stationData = effectiveStation;
+    const runningPumps = stationData.pumps.filter((p) => p.run_state === 'RUNNING').length;
+    const totalPumps = stationData.pumps.length;
+    const totalPowerKw = stationData.total_power_kw ?? stationData.pumps.reduce((acc, p) => acc + (p.run_state === 'RUNNING' ? p.active_power_kw : 0), 0);
+    const dischargeFlowMld = stationData.discharge_flow_mld ?? Number(((stationData.pumps.reduce((acc, p) => acc + (p.run_state === 'RUNNING' ? p.flow_lps : 0), 0) * 86.4) / 1000).toFixed(1));
     const stationTrends = generateStationTrend(totalPowerKw || 1200, dischargeFlowMld || 45.0);
 
     return (
@@ -337,7 +346,7 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">
-                {selectedStation.name}
+                {stationData.name}
               </h3>
               <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-500 border border-amber-500/30 font-bold">
                 SIMULATED
@@ -375,7 +384,7 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
           <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
             <span className="text-xs text-slate-500 block">Tank level</span>
             <div className="text-base font-bold text-slate-700 dark:text-slate-200 mt-0.5 tabular-nums">
-              {selectedStation.tank ? `${selectedStation.tank.level_pct.toFixed(1)}%` : 'Not published'}
+              {stationData.tank ? `${stationData.tank.level_pct.toFixed(1)}%` : 'Not published'}
             </div>
           </div>
         </div>
@@ -386,7 +395,7 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
             Pumping Units (Click to open pump telemetry)
           </span>
           <div className="space-y-2">
-            {selectedStation.pumps.map((pump) => {
+            {stationData.pumps.map((pump) => {
               const isPumpRunning = pump.run_state === 'RUNNING';
               const sparklineData = generatePumpTrend(415, pump.current_avg || 110, '15m').slice(0, 10);
 
@@ -609,7 +618,7 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
   // 4. SENSOR INSPECTOR (Flow Meter, Pressure, Level, Quality, Valve, Borewell)
   // ---------------------------------------------------------------------------
   if (selectedType === 'meter' || selectedType === 'flow_sensor' || selectedType === 'device') {
-    const dev = selectedDevice || {
+    const dev = effectiveDevice || {
       tag: 'FM-01',
       name: 'Discharge Flow Meter',
       type_code: 'FIT',
@@ -623,6 +632,7 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
     const isQuality = dev.type_code === 'AIT';
     const isValve = dev.type_code === 'VALVE';
     const isBorewell = dev.type_code === 'BOREWELL';
+    const isCorridor = dev.type_code === 'CORRIDOR' || dev.type_code === 'PIPE';
 
     const sensorTrends = generateSensorTrend(dev.latest_values?.value || 50.0, dev.latest_values?.unit || '');
     const currentFlowLps = dev.latest_values?.value || 0.0;
@@ -802,6 +812,36 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
               <div className="flex justify-between">
                 <span className="text-slate-500">Submersible Pump:</span>
                 <span className="font-bold text-emerald-500">RUNNING</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isCorridor && (
+          <div className="space-y-3 font-mono text-[11px]">
+            <div className="p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 space-y-2">
+              <span className="text-slate-500 font-sans font-semibold block text-xs">
+                Hydraulic Pipeline Status
+              </span>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Flow Rate:</span>
+                <span className="font-bold text-sky-500 text-sm">{(dev.latest_values?.value ?? 0).toFixed(1)} MLD</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Water Velocity:</span>
+                <span className="font-bold text-emerald-500">{((dev.latest_values as any)?.velocity_mps ?? 1.45).toFixed(2)} m/s</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Travel Delay:</span>
+                <span className="font-bold text-slate-200">{((dev.latest_values as any)?.travel_delay_min ?? 18.2).toFixed(1)} mins</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Nominal Diameter:</span>
+                <span className="font-bold text-slate-200">{(dev.latest_values as any)?.diameter_mm || 1200} mm DI</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Acoustic Leak Risk:</span>
+                <span className="font-bold text-emerald-500">LOW (Continuous balance)</span>
               </div>
             </div>
           </div>
@@ -1144,16 +1184,64 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
     );
   }
 
-  // Fallback
+  // Fallback / Loading / Asset Selector
   return (
-    <aside className="w-[380px] border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col h-full select-none z-20 p-4 text-xs">
-      <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800 mb-3">
-        <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">Asset Telemetry</h3>
+    <aside className="w-[380px] border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col h-full select-none z-20 p-4 text-xs overflow-y-auto space-y-4">
+      <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex items-center gap-2">
+          <Activity className="w-4 h-4 text-sky-500" />
+          <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">Asset Telemetry</h3>
+        </div>
         <button type="button" onClick={onClose} className="p-1 rounded text-slate-400 hover:text-slate-600">
           <X className="w-4 h-4" />
         </button>
       </div>
-      <p className="text-slate-400 text-center py-6">Telemetry data stream active</p>
+
+      <div className="p-3.5 rounded-xl border border-sky-500/20 bg-sky-500/5 space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">
+            Digital Twin Telemetry Feed
+          </span>
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+            STREAM ACTIVE
+          </span>
+        </div>
+        <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+          Click any pump, GLR reservoir, or transmission corridor on the map, or select a major facility below to inspect real-time telemetry.
+        </p>
+      </div>
+
+      {/* Quick Select Stations */}
+      {store.stations && store.stations.length > 0 && (
+        <div className="space-y-2">
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">
+            Major Facilities ({store.stations.length})
+          </span>
+          <div className="space-y-1.5">
+            {store.stations.slice(0, 5).map((stn) => (
+              <button
+                key={stn.id}
+                type="button"
+                onClick={() => {
+                  store.setSelectedStation(stn);
+                  store.setSelectedInspectorType(stn.station_class === 'stp' ? 'stp' : 'station');
+                }}
+                className="w-full p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 hover:border-sky-500 text-left transition-all flex items-center justify-between"
+              >
+                <div>
+                  <div className="font-medium text-slate-800 dark:text-slate-200">
+                    {stn.name}
+                  </div>
+                  <div className="text-[10px] font-mono text-slate-500">
+                    {stn.pumps.length} pumps • {stn.tank ? `Tank: ${stn.tank.level_pct.toFixed(0)}%` : 'Booster'}
+                  </div>
+                </div>
+                <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </aside>
   );
 };

@@ -92,6 +92,34 @@ export function buildIoTDeckLayers(props: any) {
         capRounded: true,
         jointRounded: true,
         pickable: true,
+        autoHighlight: true,
+        highlightColor: [56, 189, 248, 120],
+        onClick: (info: any) => {
+          if (info.object) {
+            setSelectedDevice({
+              tag: `CORRIDOR-${info.object.corridor_id || 'MAIN'}`,
+              name: `Cauvery Corridor: ${info.object.from_station} → ${info.object.to_station}`,
+              type_code: 'CORRIDOR',
+              asset_link: info.object.corridor_id || 'CORRIDOR',
+              active: true,
+              comms_state: 'ONLINE',
+              last_seen: Date.now() / 1000,
+              quality: 'Good',
+              data_tier: 'SIMULATED',
+              latest_values: {
+                value: Number(info.object.flow_mld ?? 0.0),
+                unit: 'MLD',
+                velocity_mps: Number(info.object.velocity_mps ?? 1.45),
+                travel_delay_min: Number(info.object.travel_delay_min ?? 18.2),
+                diameter_mm: Number(info.object.diameter_mm ?? 1200)
+              },
+              location: {
+                coordinates: info.object.coordinates?.[0] || [77.5946, 12.9716]
+              }
+            });
+            setSelectedInspectorType('device');
+          }
+        },
       })
     );
 

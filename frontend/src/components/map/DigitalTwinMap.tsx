@@ -135,10 +135,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
       return { features: [] };
     };
 
-    const apiHost =
-      typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-        ? 'http://127.0.0.1:8000/api/v1'
-        : '/api/v1';
+    const apiHost = '/api/v1';
 
     const loadDatasets = async (attempt = 1) => {
       try {

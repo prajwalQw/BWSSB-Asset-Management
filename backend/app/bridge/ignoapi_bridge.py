@@ -40,6 +40,10 @@ class IgnoApiReadOnlyBridge:
         self.running = False
         self.connected = False
         self.last_packet_time = 0.0
+
+    @property
+    def is_connected(self) -> bool:
+        return self.connected
         self.raw_telemetry: Dict[str, Any] = {}
         
         # Load sensor map and variables config

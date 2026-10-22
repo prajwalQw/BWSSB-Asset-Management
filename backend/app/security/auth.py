@@ -7,8 +7,11 @@ Passwords: Salted & hashed using bcrypt.
 
 import os
 import time
+import json
+import base64
+import hmac
+import hashlib
 import secrets
-import bcrypt
 import sqlite3
 import logging
 from typing import Optional, Dict, Any, List
@@ -16,8 +19,20 @@ from datetime import datetime, timedelta
 
 from fastapi import Depends, HTTPException, status, Request, Response
 from fastapi.security import HTTPBearer
-from jose import jwt, JWTError
 from pydantic import BaseModel, Field
+
+try:
+    import bcrypt
+    HAS_BCRYPT = True
+except ImportError:
+    HAS_BCRYPT = False
+
+try:
+    from jose import jwt, JWTError
+    HAS_JOSE = True
+except ImportError:
+    HAS_JOSE = False
+    JWTError = Exception
 
 logger = logging.getLogger("bwssb.security.auth")
 
@@ -43,6 +58,64 @@ class UserProfile(BaseModel):
     full_name: str
     created_at: str
 
+def hash_password(password: str) -> str:
+    if HAS_BCRYPT:
+        salt = bcrypt.gensalt(rounds=12)
+        return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
+    salt = secrets.token_hex(16)
+    dk = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt.encode('utf-8'), 100_000)
+    return f"pbkdf2:sha256:100000${salt}${dk.hex()}"
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    try:
+        if hashed_password.startswith("pbkdf2:"):
+            parts = hashed_password.split("$")
+            salt = parts[1]
+            expected_hex = parts[2]
+            dk = hashlib.pbkdf2_hmac('sha256', plain_password.encode('utf-8'), salt.encode('utf-8'), 100_000)
+            return hmac.compare_digest(dk.hex(), expected_hex)
+        elif HAS_BCRYPT:
+            return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
+        return False
+    except Exception:
+        return False
+
+def _b64url_encode(data: bytes) -> str:
+    return base64.urlsafe_b64encode(data).rstrip(b'=').decode('utf-8')
+
+def _b64url_decode(s: str) -> bytes:
+    s += '=' * (-len(s) % 4)
+    return base64.urlsafe_b64decode(s)
+
+def _jwt_encode(payload: dict) -> str:
+    if HAS_JOSE:
+        return jwt.encode(payload, JWT_SECRET, algorithm=ALGORITHM)
+    header = {"alg": "HS256", "typ": "JWT"}
+    h_bytes = _b64url_encode(json.dumps(header).encode('utf-8'))
+    p_bytes = _b64url_encode(json.dumps(payload, default=str).encode('utf-8'))
+    signing_input = f"{h_bytes}.{p_bytes}".encode('utf-8')
+    sig = _b64url_encode(hmac.new(JWT_SECRET.encode('utf-8'), signing_input, hashlib.sha256).digest())
+    return f"{h_bytes}.{p_bytes}.{sig}"
+
+def _jwt_decode(token: str) -> dict:
+    if HAS_JOSE:
+        return jwt.decode(token, JWT_SECRET, algorithms=[ALGORITHM])
+    parts = token.split('.')
+    if len(parts) != 3:
+        raise HTTPException(status_code=401, detail="Malformed JWT")
+    h_bytes, p_bytes, sig = parts
+    signing_input = f"{h_bytes}.{p_bytes}".encode('utf-8')
+    expected_sig = _b64url_encode(hmac.new(JWT_SECRET.encode('utf-8'), signing_input, hashlib.sha256).digest())
+    if not hmac.compare_digest(sig, expected_sig):
+        raise HTTPException(status_code=401, detail="Invalid token signature")
+    payload = json.loads(_b64url_decode(p_bytes).decode('utf-8'))
+    exp = payload.get("exp")
+    if exp:
+        exp_ts = exp if isinstance(exp, (int, float)) else datetime.fromisoformat(str(exp)).timestamp()
+        if time.time() > exp_ts:
+            raise HTTPException(status_code=401, detail="Session expired")
+    return payload
+
 def init_security_db():
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     with sqlite3.connect(DB_PATH) as conn:
@@ -61,21 +134,20 @@ def init_security_db():
         if cur.fetchone()[0] == 0:
             admin_user = os.environ.get("ADMIN_USERNAME", "admin")
             admin_pass = os.environ.get("ADMIN_PASSWORD", "Bwssb@2026!Admin")
-            salt = bcrypt.gensalt(rounds=12)
-            pwd_hash = bcrypt.hashpw(admin_pass.encode("utf-8"), salt).decode("utf-8")
+            pwd_hash = hash_password(admin_pass)
             cur.execute("""
                 INSERT INTO users (username, password_hash, role, full_name, created_at)
                 VALUES (?, ?, ?, ?, ?)
             """, (admin_user, pwd_hash, "admin", "System Administrator", datetime.utcnow().isoformat()))
 
             # Also seed operator and viewer for test workflows
-            op_hash = bcrypt.hashpw(b"Operator@2026!", salt).decode("utf-8")
+            op_hash = hash_password("Operator@2026!")
             cur.execute("""
                 INSERT INTO users (username, password_hash, role, full_name, created_at)
                 VALUES (?, ?, ?, ?, ?)
             """, ("operator", op_hash, "operator", "SCADA Operator", datetime.utcnow().isoformat()))
 
-            vw_hash = bcrypt.hashpw(b"Viewer@2026!", salt).decode("utf-8")
+            vw_hash = hash_password("Viewer@2026!")
             cur.execute("""
                 INSERT INTO users (username, password_hash, role, full_name, created_at)
                 VALUES (?, ?, ?, ?, ?)
@@ -84,12 +156,6 @@ def init_security_db():
             logger.info("Seeded initial users: admin, operator, viewer.")
 
 init_security_db()
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    try:
-        return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
-    except Exception:
-        return False
 
 def get_user_by_username(username: str) -> Optional[Dict[str, Any]]:
     with sqlite3.connect(DB_PATH) as conn:
@@ -102,14 +168,14 @@ def get_user_by_username(username: str) -> Optional[Dict[str, Any]]:
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    to_encode.update({"exp": expire, "type": "access"})
-    return jwt.encode(to_encode, JWT_SECRET, algorithm=ALGORITHM)
+    to_encode.update({"exp": expire.timestamp(), "type": "access"})
+    return _jwt_encode(to_encode)
 
 def create_refresh_token(data: dict) -> str:
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
-    to_encode.update({"exp": expire, "type": "refresh"})
-    return jwt.encode(to_encode, JWT_SECRET, algorithm=ALGORITHM)
+    to_encode.update({"exp": expire.timestamp(), "type": "refresh"})
+    return _jwt_encode(to_encode)
 
 async def get_current_user(request: Request) -> Dict[str, Any]:
     # Check HttpOnly cookie first, then fallback to Authorization header
@@ -125,11 +191,13 @@ async def get_current_user(request: Request) -> Dict[str, Any]:
         return {"username": "anonymous", "role": "viewer"}
 
     try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[ALGORITHM])
+        payload = _jwt_decode(token)
         username: str = payload.get("sub")
         if username is None:
             raise HTTPException(status_code=401, detail="Invalid session token")
-    except JWTError:
+    except Exception as ex:
+        if isinstance(ex, HTTPException):
+            raise ex
         raise HTTPException(status_code=401, detail="Session expired or invalid signature")
 
     user = get_user_by_username(username)

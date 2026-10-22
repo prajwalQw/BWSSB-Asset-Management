@@ -8,10 +8,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
 
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
-from slowapi.middleware import SlowAPIMiddleware
+try:
+    from slowapi import Limiter, _rate_limit_exceeded_handler
+    from slowapi.util import get_remote_address
+    from slowapi.errors import RateLimitExceeded
+    from slowapi.middleware import SlowAPIMiddleware
+    HAS_SLOWAPI = True
+except ImportError:
+    HAS_SLOWAPI = False
+    Limiter = None
+    _rate_limit_exceeded_handler = None
+    RateLimitExceeded = Exception
+    SlowAPIMiddleware = None
 
 from .config import SERVER_HOST, SERVER_PORT
 from .bridge.ignoapi_bridge import bridge
@@ -29,7 +37,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("bwssb_digital_twin")
 
-limiter = Limiter(key_func=get_remote_address, default_limits=["240/minute"])
+limiter = Limiter(key_func=get_remote_address, default_limits=["240/minute"]) if HAS_SLOWAPI else None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -68,9 +76,10 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-app.add_middleware(SlowAPIMiddleware)
+if HAS_SLOWAPI and limiter:
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+    app.add_middleware(SlowAPIMiddleware)
 
 @app.middleware("http")
 async def security_headers_middleware(request: Request, call_next):
