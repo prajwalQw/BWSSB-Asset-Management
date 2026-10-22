@@ -37,6 +37,7 @@ import {
   WardMeterSummary
 } from '../types';
 import { MeterBoard } from './MeterBoard';
+import { lpsToM3h, lpsToMld } from '../../../utils/unitConversion';
 
 export interface IoTRightInspectorProps {
   selectedType: 'pump' | 'station' | 'stp' | 'flow_sensor' | 'meter' | 'tank' | 'division' | 'device' | null;
@@ -142,7 +143,7 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
   if (selectedType === 'pump' && selectedPump) {
     const isRunning = selectedPump.run_state === 'RUNNING' || selectedPump.run_state === 'STARTING';
     const trendData = generatePumpTrend(selectedPump.voltage_avg || 415.0, selectedPump.current_avg || 110.0, timeRange);
-    const flowMld = Number(((selectedPump.flow_lps * 86.4) / 1000).toFixed(1));
+    const flowMld = Number(lpsToMld(selectedPump.flow_lps).toFixed(1));
     const dischargePressureBar = Number((selectedPump.head_m / 10.2).toFixed(1));
 
     return (
@@ -613,7 +614,7 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
       name: 'Discharge Flow Meter',
       type_code: 'FIT',
       comms_state: 'ONLINE',
-      latest_values: { value: 885.2, unit: 'L/s' }
+      latest_values: { value: 0.0, unit: 'L/s' }
     };
 
     const isFlowMeter = dev.type_code === 'FIT' || selectedType === 'meter' || selectedType === 'flow_sensor';
@@ -624,6 +625,7 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
     const isBorewell = dev.type_code === 'BOREWELL';
 
     const sensorTrends = generateSensorTrend(dev.latest_values?.value || 50.0, dev.latest_values?.unit || '');
+    const currentFlowLps = dev.latest_values?.value || 0.0;
 
     return (
       <aside className="w-[380px] border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col h-full select-none z-20 overflow-y-auto p-4 text-xs space-y-4">
@@ -677,11 +679,11 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
               meterId={dev.tag}
               tag={dev.tag}
               name={dev.name}
-              flowRateLps={dev.latest_values?.value || 885.2}
+              flowRateLps={currentFlowLps}
               totaliserKl={451208.5}
               isOnline={true}
               hasAlarm={false}
-              isFlowing={true}
+              isFlowing={currentFlowLps > 0}
               unit="L/s"
               pipeDnMm={800}
             />
@@ -690,13 +692,13 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
               <div className="flex justify-between">
                 <span className="text-slate-500">Flow in m³/h:</span>
                 <span className="font-bold tabular-nums">
-                  {((dev.latest_values?.value || 885.2) * 3.6).toFixed(1)} m³/h
+                  {lpsToM3h(currentFlowLps).toFixed(1)} m³/h
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Flow in MLD:</span>
                 <span className="font-bold text-sky-500 tabular-nums">
-                  {(((dev.latest_values?.value || 885.2) * 86.4) / 1000).toFixed(1)} MLD
+                  {lpsToMld(currentFlowLps).toFixed(1)} MLD
                 </span>
               </div>
               <div className="flex justify-between">

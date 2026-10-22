@@ -37,3 +37,17 @@
    - Shows "Possible leak between {From} and {To}", loss (L/s and kL/day), confidence, uncertainty corridor along pipe, affected systems, advisory steps, and action buttons ("Show on map", "Acknowledge", "Snooze").
    - LocalStorage deduplication key: `dismissed_alert_{alert_id}_{first_seen}`, ensuring new alert occurrences are never suppressed.
    - "Running now" section lists active leaks with Stop buttons, and POST failures trigger an in-app error toast.
+
+## Priority 3: Hardcoded Values, Timeseries Backfill, and DeckGL Modernization
+1. **Unit Conversion Utility**:
+   - Standardized in `frontend/src/utils/unitConversion.ts` using canonical relationships:
+     $m^3/h = L/s \times 3.6$
+     $MLD = (m^3/h \times 24) / 1000 = (L/s \times 86.4) / 1000$
+   - Replaced all manual calculation literals across `IoTRightInspector.tsx` and removed hardcoded `885.2` fallbacks.
+2. **Timeseries Backfill & Non-Empty Chart Rendering**:
+   - At engine startup, `RingBufferStore.backfill_30min_history()` pre-populates 30 minutes of history at 5-second resolution (360 points) following diurnal profiles and physics baselines.
+   - `get_timeseries()` guarantees at least 2 data points for any queried tag/signal so Recharts line charts always render visible lines with fixed heights and axes.
+3. **deck.gl Modernization**:
+   - Replaced deprecated `backgroundColor` in `TextLayer` with `background: true, getBackgroundColor: ...`.
+   - Added `fontSettings: { sdf: true }` to text layers for crisp outline rendering.
+   - Stripped raw emoji characters from label text to prevent WebGL glyph rendering warnings.

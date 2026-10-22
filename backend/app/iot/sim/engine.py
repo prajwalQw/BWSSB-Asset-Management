@@ -121,6 +121,7 @@ class IoTSimulationEngine:
         self._init_leak_monitors()
         self._init_smart_meters()
         self._load_persisted_state()
+        ring_buffer.backfill_30min_history()
 
     def normalize_division_name(self, name: str) -> str:
         if not name:

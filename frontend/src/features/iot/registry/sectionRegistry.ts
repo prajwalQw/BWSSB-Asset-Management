@@ -83,7 +83,7 @@ sectionRegistry.register({
         last_seen: Date.now() / 1000,
         quality: 'Good',
         data_tier: 'SIMULATED',
-        latest_values: { value: 885.2, unit: 'L/s' }
+        latest_values: { value: Number(asset.properties?.flow_lps ?? asset.properties?.value ?? 0.0), unit: 'L/s' }
       },
       onClose,
       onZoomTo,

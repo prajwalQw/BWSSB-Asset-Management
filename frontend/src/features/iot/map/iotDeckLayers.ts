@@ -140,7 +140,8 @@ export function buildIoTDeckLayers(props: any) {
           getText: (d: any) => d.text,
           getSize: 11,
           getColor: [248, 250, 252, 255],
-          backgroundColor: [15, 23, 42, 210],
+          background: true,
+          getBackgroundColor: () => [15, 23, 42, 210],
           backgroundPadding: [4, 2],
           fontFamily: 'monospace',
           fontWeight: 'bold',
@@ -173,10 +174,11 @@ export function buildIoTDeckLayers(props: any) {
           id: 'iot-leak-alert-labels',
           data: activeLeakAlerts,
           getPosition: (d: IoTAlertItem) => d.coordinates || [77.5380, 12.9050],
-          getText: (d: IoTAlertItem) => `⚠️ Leak Detected (${d.estimated_loss_lps ?? 45} L/s)`,
+          getText: (d: IoTAlertItem) => `[LEAK] Detected (${d.estimated_loss_lps ?? 45} L/s)`,
           getSize: 12,
           getColor: [255, 255, 255, 255],
-          backgroundColor: [225, 29, 72, 230],
+          background: true,
+          getBackgroundColor: () => [225, 29, 72, 230],
           backgroundPadding: [6, 3],
           fontFamily: 'monospace',
           fontWeight: 'bold',
@@ -235,7 +237,7 @@ export function buildIoTDeckLayers(props: any) {
         id: 'iot-smart-meter-labels',
         data: divisions,
         getPosition: (d: DivisionBoardSummary) => d.centroid_coordinates,
-        getText: (d: DivisionBoardSummary) => `📟 ${d.division_name.replace(' Division', '')} (${d.inlet_mld.toFixed(1)} MLD)`,
+        getText: (d: DivisionBoardSummary) => `${d.division_name.replace(' Division', '')} (${d.inlet_mld.toFixed(1)} MLD)`,
         getSize: zoom >= 13 ? 12 : 10,
         getColor: [248, 250, 252, 255],
         getPixelOffset: [0, -18],
@@ -244,6 +246,7 @@ export function buildIoTDeckLayers(props: any) {
         fontWeight: 'bold',
         outlineWidth: 2.5,
         outlineColor: [15, 23, 42, 255],
+        fontSettings: { sdf: true },
       })
     );
   }
@@ -344,6 +347,7 @@ export function buildIoTDeckLayers(props: any) {
         fontWeight: 'bold',
         outlineWidth: 3,
         outlineColor: [2, 6, 23, 255],
+        fontSettings: { sdf: true },
       })
     );
   }
@@ -414,6 +418,7 @@ export function buildIoTDeckLayers(props: any) {
           fontFamily: 'monospace',
           outlineWidth: 2,
           outlineColor: [15, 23, 42, 255],
+          fontSettings: { sdf: true },
         })
       );
     }
@@ -510,6 +515,7 @@ export function buildIoTDeckLayers(props: any) {
           fontFamily: 'monospace',
           outlineWidth: 2,
           outlineColor: [15, 23, 42, 255],
+          fontSettings: { sdf: true },
         })
       );
     }
