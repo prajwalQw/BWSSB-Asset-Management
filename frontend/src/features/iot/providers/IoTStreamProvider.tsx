@@ -1,142 +1,104 @@
 /**
- * Single App-Level SSE Provider for IoT Digital Twin.
- * Ensures only ONE EventSource connection exists across route transitions and page refreshes.
- * Handles snapshot hydration, reconnect with exponential backoff, and error banner notifications.
+ * App-Level SSE & State Hydration Provider for IoT Digital Twin.
+ * Uses the module-level singleton SSEManager to guarantee ONE EventSource app-wide.
+ * Hydrates consolidated /api/v1/snapshot and merges typed SSE deltas.
+ * Shows "Backend unreachable. Retrying…" when snapshot fails without using local defaults.
  */
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useIoTStore } from '../store/useIoTStore';
 import { iotApi } from '../services/iotApi';
+import { sseManager } from '../../../services/sseManager';
 import { AlertCircle, X } from 'lucide-react';
 
 interface IoTStreamProviderProps {
   children: React.ReactNode;
 }
 
-const SSE_URL =
-  typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://127.0.0.1:8000/api/v1/iot/stream'
-    : '/api/v1/iot/stream';
-
 export const IoTStreamProvider: React.FC<IoTStreamProviderProps> = ({ children }) => {
   const { setSnapshot, mergeSSEDeltas, apiErrorBanner, setApiErrorBanner } = useIoTStore();
-  const eventSourceRef = useRef<EventSource | null>(null);
-  const reconnectTimeoutRef = useRef<any>(null);
-  const backoffDelayRef = useRef<number>(1000);
   const isMountedRef = useRef<boolean>(true);
-  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [retryCount, setRetryCount] = useState(0);
+
+  const hydrateSnapshot = useCallback(async () => {
+    try {
+      const snapshot = await iotApi.getSnapshot();
+      if (isMountedRef.current) {
+        setSnapshot(snapshot);
+        setApiErrorBanner(null);
+      }
+    } catch (err: any) {
+      if (isMountedRef.current) {
+        setApiErrorBanner('Backend unreachable. Retrying…');
+        // Retry snapshot with backoff
+        setTimeout(() => {
+          if (isMountedRef.current) {
+            setRetryCount((prev) => prev + 1);
+          }
+        }, 5000);
+      }
+    }
+  }, [setSnapshot, setApiErrorBanner]);
+
+  useEffect(() => {
+    hydrateSnapshot();
+  }, [hydrateSnapshot, retryCount]);
 
   useEffect(() => {
     isMountedRef.current = true;
+    sseManager.retain();
 
-    // 1. Initial Snapshot Hydration
-    const hydrateSnapshot = async () => {
-      try {
-        const snapshot = await iotApi.getSnapshot();
-        if (isMountedRef.current) {
-          setSnapshot(snapshot);
-          setApiErrorBanner(null);
-        }
-      } catch (err: any) {
-        console.warn('[IoTStreamProvider] Initial snapshot fetch failed, falling back to local defaults:', err);
-        if (isMountedRef.current) {
-          // Attempt standard station/meter fetch if /snapshot endpoint is not yet ready
-          try {
-            const [stns, divs, flowsData, alrts] = await Promise.all([
-              iotApi.getStations(),
-              iotApi.getSmartMeters(),
-              iotApi.getMldFlows(),
-              iotApi.getAlerts()
-            ]);
-            if (isMountedRef.current) {
-              setSnapshot({
-                ts: Date.now() / 1000,
-                clock_utc: new Date().toISOString(),
-                stations: stns,
-                alerts: alrts,
-                smart_meters: divs,
-                corridors: flowsData.corridors,
-                water_balance: flowsData.water_balance
-              });
-            }
-          } catch (fallbackErr) {
-            setApiErrorBanner('Unable to connect to IoT Telemetry Service. Retrying...');
-          }
-        }
-      }
-    };
-
-    hydrateSnapshot();
-
-    // 2. Connect SSE Stream with Exponential Backoff
-    const connectSSE = () => {
+    // Subscribe to typed SSE deltas
+    const unsubTelemetry = sseManager.subscribe('telemetry', (payload) => {
       if (!isMountedRef.current) return;
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
+      mergeSSEDeltas(payload);
+    });
+
+    const unsubAlert = sseManager.subscribe('alert', (alerts) => {
+      if (!isMountedRef.current) return;
+      mergeSSEDeltas({
+        ts: Date.now() / 1000,
+        clock_utc: new Date().toISOString(),
+        alerts: Array.isArray(alerts) ? alerts : [],
+      });
+    });
+
+    const unsubLeak = sseManager.subscribe('leak', (leaks) => {
+      if (!isMountedRef.current) return;
+      const store = useIoTStore.getState();
+      const currentInjections = { ...store.activeInjections };
+      const leakMap: Record<string, any> = {};
+      if (Array.isArray(leaks)) {
+        leaks.forEach((l) => {
+          if (l.pipe_segment_id) leakMap[l.pipe_segment_id] = l;
+        });
       }
+      currentInjections.leaks = leakMap;
+      useIoTStore.setState({ activeInjections: currentInjections });
+    });
 
-      try {
-        const es = new EventSource(SSE_URL);
-        eventSourceRef.current = es;
-
-        es.onopen = () => {
-          if (!isMountedRef.current) return;
-          setIsConnected(true);
-          backoffDelayRef.current = 1000; // Reset backoff
-          setApiErrorBanner(null);
-        };
-
-        es.onmessage = (event) => {
-          if (!isMountedRef.current) return;
-          try {
-            const payload = JSON.parse(event.data);
-            mergeSSEDeltas(payload);
-          } catch (parseErr) {
-            console.error('[IoTStreamProvider] SSE message JSON parse error:', parseErr);
-          }
-        };
-
-        es.onerror = (err) => {
-          if (!isMountedRef.current) return;
-          setIsConnected(false);
-          es.close();
-          eventSourceRef.current = null;
-
-          // Exponential backoff up to 10 seconds
-          const delay = backoffDelayRef.current;
-          backoffDelayRef.current = Math.min(delay * 2, 10000);
-
-          reconnectTimeoutRef.current = setTimeout(() => {
-            if (isMountedRef.current) {
-              connectSSE();
-            }
-          }, delay);
-        };
-      } catch (e: any) {
-        console.error('[IoTStreamProvider] Error establishing EventSource:', e);
+    const unsubConn = sseManager.subscribe('connection', (conn) => {
+      if (!isMountedRef.current) return;
+      if (conn.isLive && apiErrorBanner === 'Backend unreachable. Retrying…') {
+        setApiErrorBanner(null);
       }
-    };
-
-    connectSSE();
+    });
 
     return () => {
       isMountedRef.current = false;
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-      }
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
-      }
+      unsubTelemetry();
+      unsubAlert();
+      unsubLeak();
+      unsubConn();
+      sseManager.release();
     };
-  }, []);
+  }, [mergeSSEDeltas, apiErrorBanner, setApiErrorBanner]);
 
   return (
     <>
-      {/* In-app Small Error Banner for Failed API Calls */}
+      {/* Small Banner for API Unreachability */}
       {apiErrorBanner && (
-        <div className="fixed top-14 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-3 py-1.5 rounded-md bg-amber-500/90 text-white text-xs font-medium shadow-lg backdrop-blur animate-in fade-in slide-in-from-top-2">
+        <div className="fixed top-14 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-3 py-1.5 rounded-md bg-amber-500/95 text-white text-xs font-medium shadow-lg backdrop-blur animate-in fade-in slide-in-from-top-2">
           <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
           <span>{apiErrorBanner}</span>
           <button

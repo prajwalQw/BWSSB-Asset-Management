@@ -2,12 +2,16 @@
  * TanStack Query-compatible hooks for digital twin data querying and SSE streaming.
  * Features:
  * - Cache key management
- * - Strict 3-state reporting: Loading, Error with Retry, Empty / Data
- * - Minimum 2-point validation for telemetry/trend series
- * - Auto-reconnecting SSE with exponential backoff
+ * - Stable query keys
+ * - refetchInterval >= 5000 ms and only for visible queries
+ * - refetchOnWindowFocus: false
+ * - Max 2 retries with exponential backoff
+ * - AbortController cleanup on unmount & StrictMode safe
+ * - Delegated SSE streaming via sseManager singleton
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { sseManager } from '../services/sseManager';
 
 export interface QueryResult<T> {
   data: T | null;
@@ -20,18 +24,25 @@ export interface QueryResult<T> {
 const memoryCache = new Map<string, { data: any; timestamp: number }>();
 
 /**
- * Robust async query hook with caching and retry.
+ * Robust async query hook with caching, AbortController, backoff retry, and visibility-aware polling.
  */
 export function useTwinQuery<T>(
   queryKey: string,
-  queryFn: () => Promise<T>,
+  queryFn: (signal?: AbortSignal) => Promise<T>,
   options: {
     refetchInterval?: number;
     enabled?: boolean;
     cacheTimeMs?: number;
+    refetchOnWindowFocus?: boolean;
+    retry?: number;
   } = {}
 ): QueryResult<T> {
-  const { refetchInterval = 0, enabled = true, cacheTimeMs = 5000 } = options;
+  const {
+    refetchInterval = 0,
+    enabled = true,
+    cacheTimeMs = 5000,
+    retry = 2,
+  } = options;
 
   const [data, setData] = useState<T | null>(() => {
     const cached = memoryCache.get(queryKey);
@@ -45,37 +56,74 @@ export function useTwinQuery<T>(
   const [error, setError] = useState<Error | null>(null);
 
   const isMountedRef = useRef(true);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const retryCountRef = useRef(0);
+  const queryFnRef = useRef(queryFn);
+  queryFnRef.current = queryFn;
 
   const executeFetch = useCallback(async () => {
     if (!enabled) return;
-    try {
-      setIsError(false);
-      setError(null);
-      const res = await queryFn();
-      if (!isMountedRef.current) return;
-      memoryCache.set(queryKey, { data: res, timestamp: Date.now() });
-      setData(res);
-      setIsLoading(false);
-    } catch (err: any) {
-      if (!isMountedRef.current) return;
-      console.warn(`[useTwinQuery:${queryKey}] fetch failed:`, err);
-      setIsError(true);
-      setError(err instanceof Error ? err : new Error(String(err)));
-      setIsLoading(false);
+    if (typeof document !== 'undefined' && document.visibilityState === 'hidden' && refetchInterval > 0) {
+      // Don't refetch background tabs
+      return;
     }
-  }, [queryKey, queryFn, enabled]);
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const ac = new AbortController();
+    abortControllerRef.current = ac;
+
+    const runAttempt = async (attempt: number): Promise<void> => {
+      try {
+        setIsError(false);
+        setError(null);
+        const res = await queryFnRef.current(ac.signal);
+        if (!isMountedRef.current || ac.signal.aborted) return;
+        memoryCache.set(queryKey, { data: res, timestamp: Date.now() });
+        setData(res);
+        setIsLoading(false);
+        retryCountRef.current = 0;
+      } catch (err: any) {
+        if (!isMountedRef.current || ac.signal.aborted) return;
+        if (attempt < retry) {
+          const delay = Math.pow(2, attempt) * 1000;
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          if (!isMountedRef.current || ac.signal.aborted) return;
+          return runAttempt(attempt + 1);
+        }
+        console.warn(`[useTwinQuery:${queryKey}] fetch failed after retries:`, err);
+        setIsError(true);
+        setError(err instanceof Error ? err : new Error(String(err)));
+        setIsLoading(false);
+      }
+    };
+
+    await runAttempt(0);
+  }, [queryKey, enabled, refetchInterval, retry]);
 
   useEffect(() => {
     isMountedRef.current = true;
     if (enabled) {
       executeFetch();
     }
+
     let intervalId: any = null;
-    if (refetchInterval > 0 && enabled) {
-      intervalId = setInterval(executeFetch, refetchInterval);
+    // Enforce refetchInterval >= 5000 ms to eliminate request storms
+    const safeInterval = refetchInterval > 0 ? Math.max(refetchInterval, 5000) : 0;
+    if (safeInterval > 0 && enabled) {
+      intervalId = setInterval(() => {
+        if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+          executeFetch();
+        }
+      }, safeInterval);
     }
+
     return () => {
       isMountedRef.current = false;
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
       if (intervalId) clearInterval(intervalId);
     };
   }, [executeFetch, refetchInterval, enabled]);
@@ -90,62 +138,32 @@ export function useTwinQuery<T>(
 }
 
 /**
- * Auto-reconnecting SSE hook with exponential backoff for live IGNOAPI updates.
+ * Singleton-backed SSE hook for backward compatibility.
+ * Redirects to the global sseManager.
  */
 export function useSSELiveTelemetry(
-  url: string,
+  _url: string,
   onMessage: (data: any) => void,
   onStatusChange: (isLive: boolean) => void
 ) {
+  const onMessageRef = useRef(onMessage);
+  onMessageRef.current = onMessage;
+  const onStatusChangeRef = useRef(onStatusChange);
+  onStatusChangeRef.current = onStatusChange;
+
   useEffect(() => {
-    let sse: EventSource | null = null;
-    let reconnectTimeout: any = null;
-    let backoffDelay = 1000;
-    let isCancelled = false;
-
-    function connect() {
-      if (isCancelled) return;
-      try {
-        sse = new EventSource(url);
-
-        const handlePacket = (e: MessageEvent) => {
-          backoffDelay = 1000; // Reset backoff on successful packet
-          onStatusChange(true);
-          try {
-            const parsed = JSON.parse(e.data);
-            onMessage(parsed);
-          } catch {
-            // Ignore parse errors
-          }
-        };
-
-        sse.onmessage = handlePacket;
-        sse.addEventListener('telemetry', handlePacket);
-
-        sse.onerror = () => {
-          onStatusChange(false);
-          if (sse) {
-            sse.close();
-            sse = null;
-          }
-          if (!isCancelled) {
-            reconnectTimeout = setTimeout(() => {
-              backoffDelay = Math.min(backoffDelay * 1.5, 10000);
-              connect();
-            }, backoffDelay);
-          }
-        };
-      } catch {
-        onStatusChange(false);
-      }
-    }
-
-    connect();
+    sseManager.retain();
+    const unsubTelemetry = sseManager.subscribe('telemetry', (payload) => {
+      onMessageRef.current(payload);
+    });
+    const unsubConn = sseManager.subscribe('connection', (status) => {
+      onStatusChangeRef.current(status.isLive);
+    });
 
     return () => {
-      isCancelled = true;
-      if (reconnectTimeout) clearTimeout(reconnectTimeout);
-      if (sse) sse.close();
+      unsubTelemetry();
+      unsubConn();
+      sseManager.release();
     };
-  }, [url, onMessage, onStatusChange]);
+  }, []);
 }

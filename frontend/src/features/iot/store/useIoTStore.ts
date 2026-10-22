@@ -308,6 +308,7 @@ export interface IoTStoreHook {
   (): IoTStoreState;
   <T>(selector: (state: IoTStoreState) => T): T;
   getState: () => IoTStoreState;
+  setState: (partial: Partial<IoTStoreState>) => void;
 }
 
 export const useIoTStore: IoTStoreHook = Object.assign(
@@ -321,6 +322,10 @@ export const useIoTStore: IoTStoreHook = Object.assign(
     );
   },
   {
-    getState: () => state
+    getState: () => state,
+    setState: (partial: Partial<IoTStoreState>) => {
+      state = { ...state, ...partial };
+      notify();
+    }
   }
 );

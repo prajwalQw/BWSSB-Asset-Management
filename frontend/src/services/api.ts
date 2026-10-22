@@ -1,9 +1,6 @@
 import { AlertItem } from '../types';
 
-const API_BASE =
-  typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://127.0.0.1:8000/api/v1'
-    : '/api/v1';
+const API_BASE = '/api/v1';
 
 async function safeJson<T = any>(res: Response, fallback: T): Promise<T> {
   if (!res || !res.ok) {

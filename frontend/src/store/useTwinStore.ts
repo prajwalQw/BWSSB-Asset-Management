@@ -52,11 +52,25 @@ export interface TwinState {
   activeLeakPipeId: string | null;
   setActiveLeakPipeId: (id: string | null) => void;
 
-  // Live Telemetry Feed State
+  // Live Telemetry Feed State & Watchdog
   isFeedFresh: boolean;
   setIsFeedFresh: (fresh: boolean) => void;
   lastFeedTime: number;
   setLastFeedTime: (time: number) => void;
+
+  // Unified KPIs
+  kpis: {
+    runningPumps: number;
+    totalPumps: number;
+    energyMwh: number;
+    energyCostLakhs: number;
+    waterLossKld: number;
+  };
+  setKpis: (kpis: Partial<TwinState['kpis']>) => void;
+
+  // Unified Alerts
+  alerts: AlertItem[];
+  setAlerts: (alerts: AlertItem[]) => void;
 
   // Simulated Time Clock
   simulatedHour: number;
@@ -153,6 +167,24 @@ state = {
     notify();
   },
 
+  kpis: {
+    runningPumps: 2,
+    totalPumps: 3,
+    energyMwh: 57.1,
+    energyCostLakhs: 4.28,
+    waterLossKld: 0.0,
+  },
+  setKpis: (newKpis) => {
+    state = { ...state, kpis: { ...state.kpis, ...newKpis } };
+    notify();
+  },
+
+  alerts: [],
+  setAlerts: (alerts) => {
+    state = { ...state, alerts };
+    notify();
+  },
+
   simulatedHour: 12,
   setSimulatedHour: (simulatedHour) => {
     state = { ...state, simulatedHour };
@@ -189,14 +221,28 @@ state = {
   },
 };
 
-export function useTwinStore(): TwinState;
-export function useTwinStore<T>(selector: (state: TwinState) => T): T;
-export function useTwinStore<T>(selector?: (state: TwinState) => T): T | TwinState {
-  return useSyncExternalStore(
-    (onStoreChange) => {
-      listeners.add(onStoreChange);
-      return () => listeners.delete(onStoreChange);
-    },
-    () => (selector ? selector(state) : state)
-  );
+export interface TwinStoreHook {
+  (): TwinState;
+  <T>(selector: (state: TwinState) => T): T;
+  getState: () => TwinState;
+  setState: (partial: Partial<TwinState>) => void;
 }
+
+export const useTwinStore: TwinStoreHook = Object.assign(
+  function useTwinStore<T>(selector?: (state: TwinState) => T): T | TwinState {
+    return useSyncExternalStore(
+      (onStoreChange) => {
+        listeners.add(onStoreChange);
+        return () => listeners.delete(onStoreChange);
+      },
+      () => (selector ? selector(state) : state)
+    );
+  },
+  {
+    getState: () => state,
+    setState: (partial: Partial<TwinState>) => {
+      state = { ...state, ...partial };
+      notify();
+    },
+  }
+);

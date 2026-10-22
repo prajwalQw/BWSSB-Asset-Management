@@ -25,14 +25,23 @@ async def get_sensor_feed_health():
 @router.get("/stream")
 async def stream_live_telemetry():
     """
-    SSE stream emitting live sensor updates every 1 second.
+    SSE stream emitting live sensor updates and 5-second heartbeats.
     Carries data_tier: 'LIVE' chip on every packet.
     """
+    import time
+
     async def event_generator():
+        last_heartbeat = time.time()
         while True:
+            now = time.time()
+            if now - last_heartbeat >= 5.0:
+                last_heartbeat = now
+                yield f"event: heartbeat\ndata: {json.dumps({'ts': now, 'status': 'OK'})}\n\n"
+
             data = bridge.get_latest_telemetry()
             payload = json.dumps(data)
             yield f"event: telemetry\ndata: {payload}\n\n"
+            yield f"data: {payload}\n\n"
             await asyncio.sleep(1.0)
 
     return StreamingResponse(

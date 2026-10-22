@@ -233,16 +233,21 @@ async def get_iot_admin_config():
 async def iot_sse_stream(request: Request):
     """
     Server-Sent Events (SSE) telemetry stream.
-    Multiplexes real-time deltas and alert notifications to frontend.
-    Single backend singleton with Last-Event-ID support.
+    Multiplexes real-time deltas, alerts, leaks, and 5-second heartbeats.
     """
     check_iot_enabled()
 
     async def event_generator():
-        last_event_id = request.headers.get("last-event-id")
+        last_heartbeat = time.time()
         while True:
             if await request.is_disconnected():
                 break
+            now = time.time()
+            # 1. 5-second Heartbeat
+            if now - last_heartbeat >= 5.0:
+                last_heartbeat = now
+                yield f"event: heartbeat\ndata: {json.dumps({'ts': now, 'status': 'OK'})}\n\n"
+
             try:
                 stations = sim_engine.get_stations()
                 alerts = sim_engine.get_alerts_list()
@@ -256,6 +261,14 @@ async def iot_sse_stream(request: Request):
                     "stations": [s.model_dump() for s in stations],
                     "alerts": [a.model_dump() for a in alerts]
                 }
+                # Emit typed telemetry event
+                yield f"event: telemetry\ndata: {json.dumps(payload)}\n\n"
+                # Emit typed alert event
+                yield f"event: alert\ndata: {json.dumps([a.model_dump() for a in alerts])}\n\n"
+                # Emit typed leak event
+                leaks = list(sim_engine.active_injections.get("leaks", {}).values())
+                yield f"event: leak\ndata: {json.dumps(leaks)}\n\n"
+                # Default data packet
                 yield f"id: {event_id}\ndata: {json.dumps(payload)}\n\n"
             except Exception as e:
                 logger.error(f"SSE serialization error: {e}")
