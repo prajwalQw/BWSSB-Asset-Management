@@ -156,7 +156,7 @@ export function buildIoTDeckLayers(props: any) {
           const midIdx = Math.floor(c.coordinates.length / 2);
           return {
             coord: c.coordinates[midIdx],
-            text: `${c.flow_mld.toFixed(0)} MLD`,
+            text: `${(c.flow_mld ?? 0).toFixed(0)} MLD`,
           };
         });
 
@@ -265,7 +265,7 @@ export function buildIoTDeckLayers(props: any) {
         id: 'iot-smart-meter-labels',
         data: divisions,
         getPosition: (d: DivisionBoardSummary) => d.centroid_coordinates,
-        getText: (d: DivisionBoardSummary) => `${d.division_name.replace(' Division', '')} (${d.inlet_mld.toFixed(1)} MLD)`,
+        getText: (d: DivisionBoardSummary) => `${d.division_name.replace(' Division', '')} (${(d.inlet_mld ?? 0).toFixed(1)} MLD)`,
         getSize: zoom >= 13 ? 12 : 10,
         getColor: [248, 250, 252, 255],
         getPixelOffset: [0, -18],
@@ -468,7 +468,7 @@ export function buildIoTDeckLayers(props: any) {
           ...p,
           coord,
           stationId: stn.id,
-          tag: `${p.tag} (${p.active_power_kw.toFixed(0)} kW)`,
+          tag: `${p.tag} (${(p.active_power_kw ?? 0).toFixed(0)} kW)`,
         };
       });
 
@@ -526,7 +526,7 @@ export function buildIoTDeckLayers(props: any) {
       const siteLabels = [
         ...pumpUnitsData.map((u: any) => ({ coord: u.coord, text: u.tag })),
         ...(layerToggles.tanks && stn.tank
-          ? [{ coord: offsetMetersToLngLat(origin, [40.0, 15.0], rot), text: `${stn.tank.name} (${stn.tank.level_pct.toFixed(0)}%)` }]
+          ? [{ coord: offsetMetersToLngLat(origin, [40.0, 15.0], rot), text: `${stn.tank.name} (${(stn.tank.level_pct ?? 0).toFixed(0)}%)` }]
           : []),
       ];
 

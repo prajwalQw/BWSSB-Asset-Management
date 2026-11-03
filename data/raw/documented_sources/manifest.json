@@ -1,0 +1,72 @@
+[
+  {
+    "id": "DOC-YOKO-01",
+    "title": "Yokogawa Centralized SCADA System for Bangalore Water Supply and Sewerage Board",
+    "url": "https://www.yokogawa.com/library/resources/references/successstory-bangalore-water-supply-and-sewerage-board/",
+    "file": "yokogawa_bwssb_scada_case_study.pdf",
+    "sha256": "75d236b603f363e277a119cb0f22eb0c341367743282aa231c6b2575343addb6",
+    "size_bytes": 251474,
+    "license": "Commercial Technical Case Study / Public Reference",
+    "retrieval_date": "2026-10-16"
+  },
+  {
+    "id": "DOC-JICA-12300372",
+    "title": "JICA Bengaluru Water Supply & Sewerage Project Phase 3 Final Report (Supporting Report)",
+    "url": "https://openjicareport.jica.go.jp/pdf/12300372_01.pdf",
+    "file": "jica_phase3_supporting_report_12300372.pdf",
+    "sha256": "219829a107452367fad41ac2ca48d9c160ddc348c6f1953de6632c8eac440189",
+    "size_bytes": 7662130,
+    "license": "JICA Official Development Assistance Report / Open Access",
+    "retrieval_date": "2026-10-16"
+  },
+  {
+    "id": "DOC-JICA-12300380",
+    "title": "JICA Bengaluru Water Supply & Sewerage Project Phase 3 Final Report (Data Report)",
+    "url": "https://openjicareport.jica.go.jp/pdf/12300380_01.pdf",
+    "file": "jica_phase3_data_report_12300380.pdf",
+    "sha256": "6cf6c60ac9a71a372f3b22a4b6db242dc655e94cc0d61605977c0aa1a2226f4d",
+    "size_bytes": 18875710,
+    "license": "JICA Official Development Assistance Report / Open Access",
+    "retrieval_date": "2026-10-16"
+  },
+  {
+    "id": "DOC-JICA-12300398",
+    "title": "JICA Bengaluru Water Supply & Sewerage Project Phase 3 Final Report (Drawings)",
+    "url": "https://openjicareport.jica.go.jp/pdf/12300398_01.pdf",
+    "file": "jica_phase3_drawings_12300398.pdf",
+    "sha256": "6615d16bb1439aa212b32fcdf1cd9b2c011d1f725647019c69aadef1e85c49d0",
+    "size_bytes": 10412759,
+    "license": "JICA Official Development Assistance Report / Open Access",
+    "retrieval_date": "2026-10-16"
+  },
+  {
+    "id": "DOC-NIE-20260930",
+    "title": "By March \u201927, BWSSB to install IoT devices on its 6,000 borewells",
+    "url": "https://www.newindianexpress.com/cities/bengaluru/2026/Sep/30/by-march-27-bwssb-to-install-iot-devices-on-its-6000-borewells",
+    "file": "nie_borewell_iot_20260930.txt",
+    "sha256": "c56064a97354534b6c797f7066b54e33a033f9df637e26998231b7d6f82dc694",
+    "size_bytes": 1262,
+    "license": "News Media Copyright / Fair Dealing Reference",
+    "retrieval_date": "2026-10-16"
+  },
+  {
+    "id": "DOC-NIE-20260115",
+    "title": "BWSSB turns to AI to cut power bills at pumping stations",
+    "url": "https://www.newindianexpress.com/cities/bengaluru/2026/Jan/15/bwssb-turns-to-ai-to-cut-power-bills",
+    "file": "nie_ai_pump_monitoring_20260115.txt",
+    "sha256": "70ca293ef417cb8a62073a495815279d5f17ce8053b88a0310957a81a79e8283",
+    "size_bytes": 1230,
+    "license": "News Media Copyright / Fair Dealing Reference",
+    "retrieval_date": "2026-10-16"
+  },
+  {
+    "id": "DOC-IWP-GIS",
+    "title": "Using GIS in water management system: case study, BWSSB",
+    "url": "https://www.indiawaterportal.org/amp/story/environment/sustainability/using-gis-water-management-system-case-study-bangalore-water-supply-and-sewerage-board",
+    "file": "india_water_portal_gis_case_study.txt",
+    "sha256": "bc77a3e098511abded9a05b8fd14073445ccab2d2381810caa796440533b969e",
+    "size_bytes": 1143,
+    "license": "Open Educational / Technical Case Study",
+    "retrieval_date": "2026-10-16"
+  }
+]

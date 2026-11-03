@@ -1,0 +1,56 @@
+# Demo Configuration — Leak Response Demo Flow
+# All durations in real seconds. Adjust speed_multiplier to accelerate.
+# Default preset "demo" completes entire flow in ~90 s wall time.
+
+demo:
+  # Source of the leak (derived from network graph: High-Lift Pump 1 feeds CORR_TATAGUNI_MOUNT_JOY)
+  pipe_segment_id: "CORR_TATAGUNI_MOUNT_JOY"
+  feeding_pump_id: "PUMP_TG_H1"
+  feeding_pump_name: "High-Lift Pump 1 (TG-HLP-01)"
+  isolation_valve_name: "BFV-104 (Motorised Butterfly Valve)"
+  from_station: "Tataguni Terminal Pumping Station"
+  to_station: "Mount Joy GLR"
+  leak_position_pct: 50.0       # midpoint of the pipe
+  leak_rate_lps: 45.0           # default 45 L/s leak
+
+  # Approval mode: "auto" (countdown then act) or "ask" (operator approves)
+  approval_mode: "auto"
+  approval_countdown_s: 3       # countdown seconds before auto-isolation
+
+  # Timing — wall seconds (demo speed)
+  detection_delay_s: 10         # how long before the detector raises alert
+  agent_diagnose_delay_s: 3     # agent diagnosis delay after detection
+  repair_crew_delay_s: 20       # time to "Repair crew dispatched"
+  repair_duration_s: 20         # time for repair to complete
+  restore_verify_delay_s: 5     # pre-start pressure check
+  restore_ramp_s: 10            # pump restart ramp
+
+  # Impact description (used in agent response card)
+  impacted_wards:
+    - "Basavanagudi"
+    - "Hanumanthanagar"
+    - "Chamarajpet"
+  alternate_source: "Harohalli Stage V via High Grounds GLR"
+  alternate_coverage_pct: 65
+  alternate_coverage_hours: 4
+
+  # Map
+  leak_coordinates: [77.5380, 12.9050]   # midpoint of CORR_TATAGUNI_MOUNT_JOY
+
+  speed_presets:
+    demo:
+      description: "Fast demo mode (~90 s total)"
+      detection_delay_s: 10
+      agent_diagnose_delay_s: 3
+      repair_crew_delay_s: 20
+      repair_duration_s: 20
+      restore_verify_delay_s: 5
+      restore_ramp_s: 10
+    realistic:
+      description: "Realistic mode (~10 min total)"
+      detection_delay_s: 60
+      agent_diagnose_delay_s: 30
+      repair_crew_delay_s: 300
+      repair_duration_s: 300
+      restore_verify_delay_s: 60
+      restore_ramp_s: 30

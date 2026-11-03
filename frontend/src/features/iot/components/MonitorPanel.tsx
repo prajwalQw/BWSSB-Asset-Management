@@ -8,9 +8,15 @@ import {
   FileText,
   Clock,
   Radio,
-  X
+  X,
+  Play,
+  RotateCcw,
+  Download
 } from 'lucide-react';
 import { sseManager } from '../../../services/sseManager';
+import { demoApi, DemoStatus } from '../services/demoApi';
+import { DemoStepper } from './DemoStepper';
+import { AgentResponseCard } from './AgentResponseCard';
 
 export interface IncidentReport {
   id: string;
@@ -34,9 +40,19 @@ export const MonitorPanel: React.FC = () => {
     last_heartbeat_s: 0,
     incidents_count: 0
   });
+  const [demoStatus, setDemoStatus] = useState<DemoStatus | null>(null);
   const [incidents, setIncidents] = useState<IncidentReport[]>([]);
   const [activityFeed, setActivityFeed] = useState<string[]>([]);
   const [selectedIncident, setSelectedIncident] = useState<IncidentReport | null>(null);
+  const [isDemoRunning, setIsDemoRunning] = useState(false);
+
+  const fetchDemoStatus = () => {
+    demoApi.getStatus()
+      .then((data) => {
+        if (data) setDemoStatus(data);
+      })
+      .catch(() => {});
+  };
 
   useEffect(() => {
     // 1. Initial status fetch
@@ -46,6 +62,7 @@ export const MonitorPanel: React.FC = () => {
         if (data) {
           setAgentStatus(data);
           if (data.incidents) setIncidents(data.incidents);
+          if (data.demo) setDemoStatus(data.demo);
         }
       })
       .catch(() => {});
@@ -57,17 +74,60 @@ export const MonitorPanel: React.FC = () => {
       })
       .catch(() => {});
 
-    // 2. SSE subscription
-    const unsub = sseManager.subscribe('agent', (data: any) => {
+    fetchDemoStatus();
+
+    // 2. SSE subscriptions
+    const unsubAgent = sseManager.subscribe('agent', (data: any) => {
       if (data) {
         setAgentStatus(data);
         if (data.incidents) setIncidents(data.incidents);
         if (data.activity_feed) setActivityFeed(data.activity_feed);
+        if (data.demo) setDemoStatus(data.demo);
       }
     });
 
-    return () => unsub();
+    const unsubDemo = sseManager.subscribe('demo', (data: any) => {
+      if (data) setDemoStatus(data);
+    });
+
+    // Fallback polling for demo status while active
+    const pollInterval = setInterval(() => {
+      fetchDemoStatus();
+    }, 1500);
+
+    return () => {
+      unsubAgent();
+      unsubDemo();
+      clearInterval(pollInterval);
+    };
   }, []);
+
+  const handleStartDemo = async () => {
+    try {
+      setIsDemoRunning(true);
+      await demoApi.startDemo();
+      fetchDemoStatus();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsDemoRunning(false);
+    }
+  };
+
+  const handleResetDemo = async () => {
+    try {
+      await demoApi.resetDemo();
+      fetchDemoStatus();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const currentDemoState = demoStatus?.state || 'IDLE';
+  const showDemoAgentCard = Boolean(
+    demoStatus &&
+    currentDemoState !== 'IDLE'
+  );
 
   return (
     <div className="h-full w-full bg-slate-950 text-slate-100 p-4 select-none flex flex-col space-y-4 overflow-y-auto">
@@ -81,11 +141,53 @@ export const MonitorPanel: React.FC = () => {
           <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold">
             ALWAYS-ON (supervised)
           </span>
+          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/30 font-bold">
+            SIMULATED
+          </span>
         </div>
-        <div className="text-[11px] font-mono text-slate-400">
-          Checks: <span className="font-bold text-emerald-400">{agentStatus.checks_passing || 6}/{agentStatus.total_checks || 6} Passing</span>
+
+        {/* Demo trigger controls in monitor panel */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleStartDemo}
+            disabled={isDemoRunning || (currentDemoState !== 'IDLE' && currentDemoState !== 'RESTORED')}
+            className={`h-7 px-3 rounded text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm ${
+              currentDemoState !== 'IDLE' && currentDemoState !== 'RESTORED'
+                ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                : 'bg-rose-600 hover:bg-rose-500 text-white'
+            }`}
+          >
+            <Play className="w-3 h-3 fill-current" />
+            <span>Run leak demo</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleResetDemo}
+            className="h-7 px-3 rounded text-xs font-semibold flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors"
+          >
+            <RotateCcw className="w-3 h-3" />
+            <span>Reset demo</span>
+          </button>
         </div>
       </div>
+
+      {/* Slim Demo Status Stepper (Requirement) */}
+      <DemoStepper
+        state={currentDemoState}
+        elapsedS={demoStatus?.elapsed_s || 0}
+      />
+
+      {/* Live Agent Response Card (Requirement) */}
+      {showDemoAgentCard && demoStatus && (
+        <AgentResponseCard
+          demoStatus={demoStatus}
+          onApprove={fetchDemoStatus}
+          onReject={fetchDemoStatus}
+          onReset={fetchDemoStatus}
+        />
+      )}
 
       {/* Grid: 3 Health Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -109,9 +211,9 @@ export const MonitorPanel: React.FC = () => {
           <div>
             <span className="text-[11px] text-slate-400 block">SSE Heartbeat</span>
             <div className="font-mono text-sm font-bold text-sky-400">
-              5s Interval Nominal
+              1s Stream Active
             </div>
-            <span className="text-[10px] text-slate-500 font-mono">Lag &lt; 0.2s</span>
+            <span className="text-[10px] text-slate-500 font-mono">Event: telemetry • alert • demo</span>
           </div>
         </div>
 
@@ -181,16 +283,11 @@ export const MonitorPanel: React.FC = () => {
               <Activity className="w-4 h-4 text-sky-400" />
               <span>Monitoring Agent Activity Feed</span>
             </h3>
-            <span className="text-[10px] font-mono text-emerald-400">Loop active (5s)</span>
+            <span className="text-[10px] font-mono text-emerald-400">Always-On Feed</span>
           </div>
 
-          <div className="space-y-1.5 overflow-y-auto flex-1 max-h-[300px] text-xs font-mono">
-            {(activityFeed.length > 0 ? activityFeed : [
-              '17:30:00 [Supervisor] All background tasks healthy: detector, scheduler, bridge.',
-              '17:30:05 [DataHealth] Verified 198 smart meters and 6 transmission meters: 0 flatlines.',
-              '17:30:10 [Hydraulics] Mass balance across Tataguni -> Mount Joy corridor evaluated: Delta = 0.4 L/s (within 3σ tolerance).',
-              '17:30:15 [Supervisor] SSE Heartbeat verified. Simulation clock progressing without lag.'
-            ]).map((log, idx) => (
+          <div className="space-y-1.5 overflow-y-auto flex-1 max-h-[320px] text-xs font-mono">
+            {activityFeed.map((log, idx) => (
               <div key={idx} className="p-2 rounded bg-slate-950/60 border border-slate-800/40 text-slate-300">
                 {log}
               </div>
@@ -199,7 +296,7 @@ export const MonitorPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* Incident Detail Modal */}
+      {/* Incident Detail Modal with Download Report Button */}
       {selectedIncident && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="w-full max-w-lg rounded-xl border border-slate-800 bg-slate-900 shadow-2xl p-5 space-y-4 text-xs">
@@ -248,7 +345,17 @@ export const MonitorPanel: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-800 flex justify-end">
+            <div className="pt-3 border-t border-slate-800 flex justify-between items-center">
+              <a
+                href="/api/v1/demo/report/html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-semibold flex items-center gap-1.5"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download Report (HTML/PDF)</span>
+              </a>
+
               <button
                 type="button"
                 onClick={() => setSelectedIncident(null)}

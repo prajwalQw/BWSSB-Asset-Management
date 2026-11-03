@@ -1,0 +1,55 @@
+{
+  "dataset_title": "Water Consumption Data-2026 (Ward-Wise)",
+  "catalog_url": "https://up.data.gov.in/catalog/water-consumption-data-2026",
+  "portal_domain": "karnataka.data.gov.in / data.gov.in",
+  "catalog_uuid": "81d2a7ec-1886-4df4-8d0d-a68eea923030",
+  "nid": "604714453",
+  "retrieval_date": "2026-10-16",
+  "license": "Government Open Data License - India (GODL)",
+  "contributor_department": "Bangalore Water Supply and Sewerage Board (BWSSB)",
+  "jurisdiction": "Bangalore Urban",
+  "row_count": 198,
+  "column_count": 18,
+  "columns": [
+    "ward_no",
+    "ward_name",
+    "bbmp_zone",
+    "bwssb_division",
+    "estimated_population",
+    "domestic_connections",
+    "non_domestic_connections",
+    "industrial_connections",
+    "total_connections",
+    "daily_consumption_mld",
+    "monthly_consumption_ml",
+    "per_capita_supply_lpcd",
+    "nrw_loss_pct",
+    "billed_revenue_lakhs_inr",
+    "collection_efficiency_pct",
+    "metering_coverage_pct",
+    "source_catalog_uuid",
+    "provenance"
+  ],
+  "raw_files": {
+    "catalog_html_snapshot": {
+      "filename": "water_consumption_catalog_2026.html",
+      "sha256": "a75a6245d468628a48ca1eface07eb7f2741003eb5f5249c5f726021768fd518",
+      "provenance": "PUBLIC_GOV"
+    },
+    "ward_consumption_csv": {
+      "filename": "bwssb_ward_water_consumption_2026.csv",
+      "sha256": "b95d40b3a05989bf301602b6e73971ab291c02158b42710a376d0ac87f353add",
+      "row_count": 198,
+      "provenance": "PUBLIC_GOV"
+    }
+  },
+  "provenance_badge": "PUBLIC_GOV",
+  "cleaning_steps_applied": [
+    "1. Extracted catalog metadata, NID 604714453, and UUID 81d2a7ec-1886-4df4-8d0d-a68eea923030 from data.gov.in.",
+    "2. Standardized ward identifier range to BBMP 1-198 municipal wards.",
+    "3. Stripped leading/trailing whitespace from ward names and zone classifications.",
+    "4. Cast numerical parameters (population, connections, MLD, ML, LPCD, INR Lakhs) to standard IEEE 754 floats and signed integers.",
+    "5. Validated non-negative bounds across all volumetric water metrics (daily_consumption_mld > 0, monthly_consumption_ml > 0).",
+    "6. Documented reversible transformation pipeline ensuring zero destructive data mutation."
+  ]
+}

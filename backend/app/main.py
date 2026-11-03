@@ -3,9 +3,24 @@ Main FastAPI Application Entrypoint.
 Bengaluru Water Network Digital Twin Backend.
 """
 
+import sys
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+if hasattr(sys.stderr, "reconfigure"):
+    try:
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Optional, Dict, Any, List
+from pydantic import BaseModel
 from contextlib import asynccontextmanager
+import asyncio
 import logging
 
 try:
@@ -266,9 +281,14 @@ async def multiplexed_stream(request: Request):
             yield f"event: plan\ndata: {json.dumps(plan_payload)}\n\n"
 
             # 6. Monitoring Agent event
-            yield f"event: agent\ndata: {json.dumps(monitoring_agent.get_status())}\n\n"
+            agent_payload = monitoring_agent.get_status()
+            agent_payload["demo"] = leak_response_sm.get_status()
+            yield f"event: agent\ndata: {json.dumps(agent_payload)}\n\n"
 
-            # 7. Default message
+            # 7. Leak Demo State Machine event
+            yield f"event: demo\ndata: {json.dumps(leak_response_sm.get_status())}\n\n"
+
+            # 8. Default message
             yield f"data: {json.dumps(telemetry_payload)}\n\n"
 
             await asyncio.sleep(1.0)
@@ -285,11 +305,89 @@ async def multiplexed_stream(request: Request):
 
 @app.get("/api/v1/agent/status")
 async def get_agent_status():
-    return monitoring_agent.get_status()
+    status = monitoring_agent.get_status()
+    status["demo"] = leak_response_sm.get_status()
+    return status
 
 @app.get("/api/v1/agent/log")
 async def get_agent_log():
     return monitoring_agent.get_log()
+
+# ─── Demo Endpoints ────────────────────────────────────────────────────────
+from .agents.leak_response import leak_response_sm
+from fastapi.responses import HTMLResponse
+
+class DemoStartPayload(BaseModel):
+    ward: Optional[str] = "Basavanagudi"
+
+@app.post("/api/v1/demo/start")
+async def demo_start(payload: Optional[DemoStartPayload] = None, ward: Optional[str] = None):
+    """Start the leak demo flow (idempotent if already running) with optional ward."""
+    selected_ward = (payload.ward if payload and payload.ward else None) or ward or "Basavanagudi"
+    ok = leak_response_sm.start_demo(ward=selected_ward)
+    return {
+        "started": ok,
+        "state": leak_response_sm.state.value,
+        "ward": leak_response_sm.selected_ward,
+        "data_tier": "SIMULATED"
+    }
+
+@app.post("/api/v1/demo/repair-done")
+async def demo_repair_done():
+    """Mark emergency pipeline repair as completed by operator."""
+    ok = leak_response_sm.mark_repair_done()
+    return {
+        "marked_done": ok,
+        "state": leak_response_sm.state.value,
+        "ward_notice": leak_response_sm.ward_notice,
+        "data_tier": "SIMULATED"
+    }
+
+@app.post("/api/v1/demo/reset")
+async def demo_reset():
+    """Reset demo to baseline IDLE."""
+    leak_response_sm.reset_demo()
+    return {"state": "IDLE", "data_tier": "SIMULATED"}
+
+@app.get("/api/v1/demo/status")
+async def demo_status():
+    """Current state machine status, step log, agent response, and report."""
+    return leak_response_sm.get_status()
+
+class DemoApprovalPayload(BaseModel):
+    operator: str = "OPERATOR"
+    role: str = "OPERATOR"
+
+@app.post("/api/v1/demo/approve")
+async def demo_approve(payload: Optional[DemoApprovalPayload] = None, operator: Optional[str] = None, role: Optional[str] = None):
+    """Approve isolation (ask mode only). Viewer role cannot approve."""
+    from fastapi import HTTPException
+    op = (payload.operator if payload else None) or operator or "OPERATOR"
+    r = (payload.role if payload else None) or role or "OPERATOR"
+    if r.upper() in ("VIEWER", "READ_ONLY", "ANONYMOUS"):
+        raise HTTPException(403, "Viewer role is not authorized to approve isolation.")
+    ok, reason = leak_response_sm.approve_isolation(operator=op, role=r)
+    if not ok:
+        raise HTTPException(400, f"Cannot approve: {reason}")
+    return {"approved": True, "operator": op, "role": r, "data_tier": "SIMULATED"}
+
+@app.post("/api/v1/demo/reject")
+async def demo_reject(payload: Optional[DemoApprovalPayload] = None, operator: Optional[str] = None, role: Optional[str] = None):
+    """Reject isolation (ask mode only). Viewer role cannot reject."""
+    from fastapi import HTTPException
+    op = (payload.operator if payload else None) or operator or "OPERATOR"
+    r = (payload.role if payload else None) or role or "OPERATOR"
+    if r.upper() in ("VIEWER", "READ_ONLY", "ANONYMOUS"):
+        raise HTTPException(403, "Viewer role is not authorized to reject isolation.")
+    ok, reason = leak_response_sm.reject_isolation(operator=op, role=r)
+    if not ok:
+        raise HTTPException(400, f"Cannot reject: {reason}")
+    return {"rejected": True, "operator": op, "role": r, "data_tier": "SIMULATED"}
+
+@app.get("/api/v1/demo/report/html", response_class=HTMLResponse)
+async def demo_report_html():
+    """Downloadable print-to-PDF ready HTML report for closed demo incident."""
+    return HTMLResponse(content=leak_response_sm.generate_report_html(), media_type="text/html")
 
 @app.get("/healthz")
 async def health_check():
@@ -304,3 +402,4 @@ async def health_check():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("backend.app.main:app", host=SERVER_HOST, port=SERVER_PORT, reload=False)
+

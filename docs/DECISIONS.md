@@ -107,3 +107,30 @@
    - Security headers middleware injecting `Content-Security-Policy`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `X-XSS-Protection`, and `Referrer-Policy`.
 5. **Security Posture Drawer in UI**:
    - Integrated into `AdminDrawer.tsx` under "Security", providing live audit chain verification and posture display.
+
+## Priority 7: Fast Self-Contained Leak Demo Flow & Agent Response
+1. **End-to-End Demo State Machine (`backend/app/agents/leak_response.py`)**:
+   - Self-contained asynchronous state machine driving the full operational lifecycle:
+     `IDLE -> LEAK_INJECTED -> DETECTED -> AGENT_DIAGNOSED -> AWAITING_APPROVAL / COUNTDOWN -> ISOLATING -> ISOLATED -> REPAIR_DISPATCHED -> REPAIR_IN_PROGRESS -> VERIFYING -> RESTORING -> RESTORED`.
+   - Wall-time acceleration and timings configured in `config/demo.yaml`. Demo preset completes in ~90 seconds of wall time.
+2. **Dynamic Network Graph Resolution (`resolve_from_network_graph`)**:
+   - Avoids hardcoded pump or valve IDs. Dynamically resolves corridor `CORR_TATAGUNI_MOUNT_JOY` through `config/iot/network_flows.yaml`, `config/iot/stations.yaml`, and `config/simulated_zone.yaml`.
+   - Resolves:
+     - Feeding pump: `PUMP_TG_H1` (High-Lift Pump 1, 1200 kW).
+     - Isolation valve: `BFV-104` (Motorised Butterfly Valve).
+     - Terminals: Tataguni Terminal Complex -> Mount Joy GLR.
+     - Impacted wards: Basavanagudi, Hanumanthanagar, Chamarajpet.
+     - Alternate source: Harohalli Stage V via High Grounds GLR (covers 65% for 4 hours).
+3. **Physical Simulator Integration (SIMULATED Only)**:
+   - All actions strictly manipulate digital twin simulated state; real IGNOAPI bridge remains strictly passive read-only.
+   - Isolation: Feeding pump commanded to `STOPPING` -> `OFF` with `[LOCKED]` tag and current dropping to 0 A. Valve `BFV-104` transitions to `CLOSED`. Leaking segment depressurises and leak loss decays to 0 L/s.
+   - Restoration: Hydrostatic pressure verification test passes. Valve reopens. Pump starts via soft-start ramp profile (inrush current spike followed by exponential decay to nominal operating current plateau).
+4. **Governance & Role-Based Approval Modes**:
+   - `auto` mode: 3-second supervisor countdown with an immediate Cancel button.
+   - `ask` mode: Pauses in `AWAITING_APPROVAL` until approved.
+   - RBAC: `OPERATOR` and `ADMIN` roles are authorized to approve/reject isolation; `VIEWER` and read-only users receive HTTP 403 Forbidden (`VIEWER_UNAUTHORIZED`).
+5. **Deck.gl & UI Symbology**:
+   - Deck.gl pipeline overlay: leaking section turns red with uncertainty halo scatterplot layer; isolated section turns grey with halted flow particle animation; valve shows closed icon; repair crew wrench icon displayed at chainage 6+400; pump unit shows OFF state with stopped impeller.
+6. **Post-Mortem Incident Closure Report**:
+   - Generates downloadable print-to-PDF ready HTML report (`/api/v1/demo/report/html`) with full timeline, cumulative volume lost, energy saved, operator sign-off, and compliance disclaimers.
+

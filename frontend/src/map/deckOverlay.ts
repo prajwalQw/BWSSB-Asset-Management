@@ -12,7 +12,7 @@
  *   valves, meters, instrument tags, and 1 Hz rotating impeller glyphs
  */
 
-import { PathLayer, IconLayer, TextLayer, PolygonLayer } from '@deck.gl/layers';
+import { PathLayer, IconLayer, TextLayer, PolygonLayer, ScatterplotLayer } from '@deck.gl/layers';
 import { TripsLayer } from '@deck.gl/geo-layers';
 import { BasemapTheme, MAP_THEMES, STATUS_COLORS, DATA_TIER_COLORS, AssetStatus, DataTier } from './theme';
 import { LOD_CONFIG } from './lodConfig';
@@ -30,7 +30,9 @@ export interface DeckOverlayProps {
   isAnimationPaused: boolean;
   selectedAsset: SelectedAsset | null;
   activeLeakPipeId?: string;
+  demoStatus?: any;
   onSelectAsset: (asset: SelectedAsset) => void;
+  onNavigateToMonitor?: () => void;
   networkData: {
     mainsLines: any[];
     simZonePipes: any[];
@@ -55,6 +57,12 @@ function getAtlas() {
   }
   return cachedAtlas;
 }
+
+// Module-level caches for geometry to prevent allocating thousands of objects every animation frame
+let cachedRawPipesRef: any[] | null = null;
+let cachedFlatPipes: FlatPipeSegment[] = [];
+let cachedTripsRef: FlatPipeSegment[] | null = null;
+let cachedTripsData: any[] = [];
 
 export interface FlatPipeSegment {
   id: string;
@@ -192,12 +200,15 @@ export function buildDeckLayers(props: DeckOverlayProps) {
     }
   }
 
-  // Combine transmission and simulated zone pipes and flatten any MultiLineStrings
-  const rawPipes = [
-    ...(networkData.mainsLines || []),
-    ...(networkData.simZonePipes || []),
-  ];
-  const allFlatPipes = flattenPipes(rawPipes);
+  // Combine transmission and simulated zone pipes with memoized flattening
+  const rawMains = networkData.mainsLines || [];
+  const rawSim = networkData.simZonePipes || [];
+  if (cachedRawPipesRef !== rawMains) {
+    cachedRawPipesRef = rawMains;
+    cachedFlatPipes = flattenPipes([...rawMains, ...rawSim]);
+    cachedTripsRef = null; // Invalidate trips cache when underlying data changes
+  }
+  const allFlatPipes = cachedFlatPipes;
 
   // Filter pipes by diameter class based on Zoom LOD
   const visiblePipes = allFlatPipes.filter((p) => {
@@ -215,6 +226,22 @@ export function buildDeckLayers(props: DeckOverlayProps) {
   // 3. Two-Pass Pipe Styling: PASS 1 - WIDER CASING (PathLayer)
   // ---------------------------------------------------------------------------
   if (visiblePipes.length > 0) {
+    const demoState = props.demoStatus?.state || 'IDLE';
+    const isLeakingPhase = Boolean(props.demoStatus && props.demoStatus.state !== 'IDLE' && props.demoStatus.state !== 'RESTORED');
+    const isIsolatedPhase = ['ISOLATING', 'ISOLATED'].includes(demoState);
+
+    const isDemoCorridor = (pipeId?: string) => {
+      if (!pipeId) return false;
+      const norm = String(pipeId).toUpperCase();
+      return (
+        norm === 'CORR_TATAGUNI_MOUNT_JOY' ||
+        norm === 'CORR_TG_MJ' ||
+        pipeId === activeLeakPipeId ||
+        (norm.includes('TATAGUNI') && norm.includes('MOUNT_JOY')) ||
+        norm === 'PIPE_CORRIDOR_01'
+      );
+    };
+
     layers.push(
       new PathLayer({
         id: 'pipes-casing-layer',
@@ -224,10 +251,14 @@ export function buildDeckLayers(props: DeckOverlayProps) {
         getColor: (d: FlatPipeSegment) => {
           const isSelected = selectedAsset && (selectedAsset.id === d.properties?.id || selectedAsset.id === d.id);
           const isSuspect = activeLeakPipeId && (activeLeakPipeId === d.properties?.id || activeLeakPipeId === d.id);
-          if (isSelected || isSuspect) return [244, 63, 94, 255]; // Red highlight casing
+          const isCorr = isDemoCorridor(d.properties?.id || d.id);
+          if (isCorr && isLeakingPhase) return [239, 68, 68, 255]; // Red leaked pipe during demo until repair done
+          if (isSelected || isSuspect) return [239, 68, 68, 255]; // Red highlight casing
           return tokens.pipeCasing;
         },
         getWidth: (d: FlatPipeSegment) => {
+          const isCorr = isDemoCorridor(d.properties?.id || d.id);
+          if (isCorr && isLeakingPhase) return 18.0; // Thicker casing for prominent visual
           const diam = d.properties?.diameter_mm || 350;
           if (diam >= 600) return LOD_CONFIG.pipeClasses.trunk.casingWidthMeters;
           if (diam >= 300) return LOD_CONFIG.pipeClasses.mains.casingWidthMeters;
@@ -235,7 +266,7 @@ export function buildDeckLayers(props: DeckOverlayProps) {
         },
         widthUnits: 'meters',
         widthMinPixels: 3.5,
-        widthMaxPixels: 14.0,
+        widthMaxPixels: 18.0,
         capRounded: true,
         jointRounded: true,
       })
@@ -251,6 +282,8 @@ export function buildDeckLayers(props: DeckOverlayProps) {
         opacity: props.activeModule === 'IOT' ? 0.35 : 1.0,
         getPath: (d: FlatPipeSegment) => d.path,
         getColor: (d: FlatPipeSegment) => {
+          const isCorr = isDemoCorridor(d.properties?.id || d.id);
+          if (isCorr && isLeakingPhase) return [255, 30, 60, 255]; // Vivid red leaked pipe core
           const status = (d.properties?.status || 'NORMAL') as AssetStatus;
           if (status === 'ALERT' || status === ('BURST' as any) || status === ('LEAK_SUSPECTED' as any)) {
             return tokens.pipeCoreAlert;
@@ -297,32 +330,56 @@ export function buildDeckLayers(props: DeckOverlayProps) {
   // 5. Flow Pulse Animation with TripsLayer
   // ---------------------------------------------------------------------------
   if (!isAnimationPaused && zoom >= lod.trunkMainsMinZoom && visiblePipes.length > 0) {
-    // Generate clean paths with velocity timestamps
-    const tripsData = visiblePipes
-      .filter((p) => p.path && p.path.length >= 2)
-      .map((p) => {
-        const coords = p.path;
-        const velocity = p.properties?.current_velocity_mps || LOD_CONFIG.flowAnimation.defaultVelocityMps;
-        let cumulativeTime = 0;
-        const cleanPath: [number, number][] = [];
-        const timestamps: number[] = [];
+    const demoState = props.demoStatus?.state || 'IDLE';
+    const isIsolatedPhase = ['ISOLATING', 'ISOLATED', 'REPAIR_DISPATCHED', 'REPAIR_IN_PROGRESS', 'VERIFYING'].includes(demoState);
+    const isDemoCorridor = (pipeId?: string) => {
+      if (!pipeId) return false;
+      const norm = String(pipeId).toUpperCase();
+      return (
+        norm === 'CORR_TATAGUNI_MOUNT_JOY' ||
+        norm === 'CORR_TG_MJ' ||
+        pipeId === activeLeakPipeId ||
+        (norm.includes('TATAGUNI') && norm.includes('MOUNT_JOY')) ||
+        norm === 'PIPE_CORRIDOR_01'
+      );
+    };
 
-        coords.forEach((pt, i) => {
-          if (i > 0) {
-            const segDist = alongLine([coords[i - 1], pt], 9999).coord;
-            const dist = 50; // estimated segment meters
-            cumulativeTime += dist / Math.max(0.5, velocity);
-          }
-          cleanPath.push([pt[0], pt[1]]);
-          timestamps.push(cumulativeTime);
+    // Generate clean paths with velocity timestamps (memoized across frames)
+    if (cachedTripsRef !== visiblePipes) {
+      cachedTripsRef = visiblePipes;
+      cachedTripsData = visiblePipes
+        .filter((p) => {
+          if (!p.path || p.path.length < 2) return false;
+          return true;
+        })
+        .map((p) => {
+          const coords = p.path;
+          const velocity = p.properties?.current_velocity_mps || LOD_CONFIG.flowAnimation.defaultVelocityMps;
+          let cumulativeTime = 0;
+          const cleanPath: [number, number][] = [];
+          const timestamps: number[] = [];
+
+          coords.forEach((pt, i) => {
+            if (i > 0) {
+              const segDist = alongLine([coords[i - 1], pt], 9999).coord;
+              const dist = 50; // estimated segment meters
+              cumulativeTime += dist / Math.max(0.5, velocity);
+            }
+            cleanPath.push([pt[0], pt[1]]);
+            timestamps.push(cumulativeTime);
+          });
+
+          return {
+            id: p.id,
+            path: cleanPath,
+            timestamps: timestamps,
+          };
         });
+    }
 
-        return {
-          id: p.id,
-          path: cleanPath,
-          timestamps: timestamps,
-        };
-      });
+    const tripsData = isIsolatedPhase
+      ? cachedTripsData.filter((t) => !isDemoCorridor(t.id))
+      : cachedTripsData;
 
     layers.push(
       new TripsLayer({
@@ -338,6 +395,72 @@ export function buildDeckLayers(props: DeckOverlayProps) {
         getWidth: 2.5,
       })
     );
+  }
+
+  // ---------------------------------------------------------------------------
+  // 5b. Demo Leak Markers: Uncertainty Halo, Closed Valve, Repair Marker
+  // ---------------------------------------------------------------------------
+  if (props.demoStatus && props.demoStatus.state !== 'IDLE' && props.demoStatus.state !== 'RESTORED') {
+    const demoState = props.demoStatus.state;
+    const isLeakingPhase = ['LEAK_INJECTED', 'DETECTED', 'AGENT_DIAGNOSED', 'AWAITING_APPROVAL', 'COUNTDOWN'].includes(demoState);
+    const isIsolatedPhase = ['ISOLATING', 'ISOLATED', 'REPAIR_DISPATCHED', 'REPAIR_IN_PROGRESS', 'VERIFYING'].includes(demoState);
+    const leakCoords: [number, number] = props.demoStatus.config?.leak_coordinates || [77.5380, 12.9050];
+
+    // Uncertainty halo layer at leak spot during leaking phase
+    if (isLeakingPhase) {
+      layers.push(
+        new ScatterplotLayer({
+          id: 'demo-leak-uncertainty-halo',
+          data: [{ position: leakCoords }],
+          getPosition: (d: any) => d.position,
+          getRadius: () => 140,
+          getFillColor: () => [244, 63, 94, 65],
+          getLineColor: () => [244, 63, 94, 220],
+          stroked: true,
+          filled: true,
+          lineWidthMinPixels: 2,
+          radiusUnits: 'meters',
+        })
+      );
+    }
+
+    if (isIsolatedPhase) {
+      // Closed valve icon / marker
+      layers.push(
+        new TextLayer({
+          id: 'demo-valve-closed-marker',
+          data: [{ position: [77.5725, 12.9360], text: '[VALVE BFV-104 CLOSED]' }],
+          getPosition: (d: any) => d.position,
+          getText: (d: any) => d.text,
+          getSize: 12,
+          getColor: () => [255, 255, 255, 255],
+          background: true,
+          getBackgroundColor: () => [30, 41, 59, 240],
+          backgroundPadding: [6, 4],
+          fontFamily: 'monospace',
+          getTextAnchor: 'middle',
+        })
+      );
+
+      // Repair marker
+      if (demoState === 'REPAIR_DISPATCHED' || demoState === 'REPAIR_IN_PROGRESS') {
+        layers.push(
+          new TextLayer({
+            id: 'demo-repair-wrench-marker',
+            data: [{ position: leakCoords, text: '[REPAIR IN PROGRESS]' }],
+            getPosition: (d: any) => d.position,
+            getText: (d: any) => d.text,
+            getSize: 12,
+            getColor: () => [255, 255, 255, 255],
+            background: true,
+            getBackgroundColor: () => [2, 132, 199, 240],
+            backgroundPadding: [6, 4],
+            fontFamily: 'monospace',
+            getTextAnchor: 'middle',
+          })
+        );
+      }
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -535,17 +658,21 @@ export function buildDeckLayers(props: DeckOverlayProps) {
       );
 
       // Individual Pump Units in a row + 1 Hz Rotating Impeller Glyphs
+      const demoStateForPump = props.demoStatus?.state || 'IDLE';
+      const isIsolatedPumpPhase = ['ISOLATING', 'ISOLATED', 'REPAIR_DISPATCHED', 'REPAIR_IN_PROGRESS', 'VERIFYING'].includes(demoStateForPump);
       const pumpUnitsData = siteConfig.pump_units.map((unit) => {
         const unitCoord = offsetMetersToLngLat(origin, unit.offset_m, rot);
         const suctionValveCoord = offsetMetersToLngLat(origin, unit.suction_valve_offset_m, rot);
         const dischargeValveCoord = offsetMetersToLngLat(origin, unit.discharge_valve_offset_m, rot);
+        const isIsolated = isIsolatedPumpPhase && (unit.tag === 'P1' || unit.id === 'PUMP_TG_H1');
 
         return {
           ...unit,
           coord: unitCoord,
           suctionValveCoord,
           dischargeValveCoord,
-          impellerIcon: impellerFrame === 0 ? 'pump_impeller_0' : 'pump_impeller_1',
+          isIsolated,
+          impellerIcon: isIsolated ? 'pump_unit' : (impellerFrame === 0 ? 'pump_impeller_0' : 'pump_impeller_1'),
         };
       });
 
@@ -665,6 +792,66 @@ export function buildDeckLayers(props: DeckOverlayProps) {
   const extraLayers = layerRegistry.getAllLayers(props);
   if (extraLayers.length > 0) {
     layers.push(...extraLayers);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Leak Demo Callout & Pulsing Marker (shows approx leaking amount & location)
+  // ---------------------------------------------------------------------------
+  if (props.demoStatus && props.demoStatus.state !== 'IDLE' && props.demoStatus.state !== 'RESTORED') {
+    const leakCoords = props.demoStatus.config?.leak_coordinates || [77.5380, 12.9050];
+    const leakLps = props.demoStatus.config?.leak_rate_lps || 45.0;
+    const leakKld = Math.round(leakLps * 86.4);
+    const landmark = props.demoStatus.config?.landmark || 'Pipeline Road Ch 6+400';
+    const ward = props.demoStatus.selected_ward || 'Basavanagudi';
+
+    const handleLeakClick = () => {
+      if (props.onNavigateToMonitor) {
+        props.onNavigateToMonitor();
+      }
+    };
+
+    layers.push(
+      new ScatterplotLayer({
+        id: 'leak-pulsing-beacon',
+        data: [{ position: leakCoords }],
+        getPosition: (d: any) => d.position,
+        getRadius: 28 + Math.sin(currentTime * 4) * 8,
+        radiusUnits: 'pixels',
+        getFillColor: [239, 68, 68, 160],
+        getLineColor: [255, 255, 255, 240],
+        getLineWidth: 2.5,
+        lineWidthUnits: 'pixels',
+        pickable: true,
+        onClick: handleLeakClick,
+      })
+    );
+
+    layers.push(
+      new TextLayer({
+        id: 'leak-approx-amount-badge',
+        data: [{
+          position: leakCoords,
+          text: `[LEAK] ~${leakLps.toFixed(1)} L/s (${leakKld.toLocaleString()} kL/day)\n[LOCATION] ${ward} - ${landmark}\n(Click to open Monitor)`
+        }],
+        getPosition: (d: any) => d.position,
+        getText: (d: any) => d.text,
+        getSize: 12,
+        getColor: [255, 255, 255, 255],
+        getPixelOffset: [0, -32],
+        getTextAnchor: 'middle',
+        getAlignmentBaseline: 'bottom',
+        fontFamily: 'Inter, system-ui, sans-serif',
+        fontWeight: 700,
+        background: true,
+        getBackgroundColor: () => [190, 24, 24, 240],
+        backgroundPadding: [8, 6],
+        fontSettings: { sdf: true },
+        outlineWidth: 2,
+        outlineColor: [0, 0, 0, 220],
+        pickable: true,
+        onClick: handleLeakClick,
+      })
+    );
   }
 
   return layers;

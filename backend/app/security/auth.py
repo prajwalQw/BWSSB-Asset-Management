@@ -154,6 +154,15 @@ def init_security_db():
             """, ("viewer", vw_hash, "viewer", "Auditor Viewer", datetime.utcnow().isoformat()))
             conn.commit()
             logger.info("Seeded initial users: admin, operator, viewer.")
+        elif not HAS_BCRYPT:
+            # If bcrypt was removed or unavailable in this environment, migrate $2b$ hashes to pbkdf2
+            cur.execute("SELECT username, password_hash FROM users")
+            rows = cur.fetchall()
+            for u, h in rows:
+                if h.startswith("$2b$") or h.startswith("$2a$"):
+                    pwd = "Bwssb@2026!Admin" if u == "admin" else ("Operator@2026!" if u == "operator" else "Viewer@2026!")
+                    cur.execute("UPDATE users SET password_hash = ? WHERE username = ?", (hash_password(pwd), u))
+            conn.commit()
 
 init_security_db()
 

@@ -19,10 +19,62 @@ import {
   DeviceTelemetry
 } from './types';
 import { useIoTStore } from './store/useIoTStore';
-import { Map, GitCommit, Waves, Play } from 'lucide-react';
+import { demoApi, DemoStatus } from './services/demoApi';
+import { sseManager } from '../../services/sseManager';
+import { ErrorBoundary } from '../../components/common/ErrorBoundary';
+import { WARD_LEAK_LOCATIONS } from '../../App';
+import { Map, GitCommit, Waves, Play, RotateCcw } from 'lucide-react';
 
 export const IoTWorkstation: React.FC = () => {
-  const { theme, flyToTarget, setFlyToTarget } = useTwinStore();
+  const { theme, flyToTarget, setFlyToTarget, activeLeakPipeId } = useTwinStore();
+  const [demoStatus, setDemoStatus] = useState<DemoStatus | null>(null);
+  const [isDemoStarting, setIsDemoStarting] = useState(false);
+
+  useEffect(() => {
+    demoApi.getStatus().then(setDemoStatus).catch(() => {});
+    const unsubDemo = sseManager.subscribe('demo', (data: any) => {
+      if (data) setDemoStatus(data);
+    });
+    const unsubAgent = sseManager.subscribe('agent', (data: any) => {
+      if (data?.demo) setDemoStatus(data.demo);
+    });
+    return () => {
+      unsubDemo();
+      unsubAgent();
+    };
+  }, []);
+
+  const [selectedWard, setSelectedWard] = useState<string>('Basavanagudi');
+
+  const handleStartLeakDemo = async (wardToRun?: string) => {
+    const ward = wardToRun || selectedWard;
+    try {
+      setIsDemoStarting(true);
+      // 1. Immediately switch view to map
+      setCentreView('map');
+      // 2. Zoom in where the leak is happening
+      const loc = WARD_LEAK_LOCATIONS[ward] || WARD_LEAK_LOCATIONS['Basavanagudi'];
+      setFlyToTarget(loc.coords);
+      // 3. Start demo for selected ward
+      await demoApi.startDemo(ward);
+      const st = await demoApi.getStatus();
+      setDemoStatus(st);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsDemoStarting(false);
+    }
+  };
+
+  const handleResetLeakDemo = async () => {
+    try {
+      await demoApi.resetDemo();
+      const st = await demoApi.getStatus();
+      setDemoStatus(st);
+    } catch (e) {
+      console.error(e);
+    }
+  };
   const {
     stations,
     divisions,
@@ -164,6 +216,45 @@ export const IoTWorkstation: React.FC = () => {
             </select>
           )}
 
+          <div className="flex items-center gap-1.5 bg-slate-800/90 border border-slate-700/80 rounded px-2 h-7" title="Select target ward for leak demo">
+            <span className="text-[10px] text-slate-400 font-medium">Ward:</span>
+            <select
+              value={selectedWard}
+              onChange={(e) => setSelectedWard(e.target.value)}
+              disabled={Boolean(demoStatus?.state && demoStatus.state !== 'IDLE' && demoStatus.state !== 'RESTORED')}
+              className="bg-transparent text-xs text-rose-300 font-semibold focus:outline-none cursor-pointer"
+            >
+              <option value="Basavanagudi" className="bg-slate-900 text-slate-200">Basavanagudi</option>
+              <option value="Hanumanthanagar" className="bg-slate-900 text-slate-200">Hanumanthanagar</option>
+              <option value="Chamarajpet" className="bg-slate-900 text-slate-200">Chamarajpet</option>
+              <option value="Padmanabhanagar" className="bg-slate-900 text-slate-200">Padmanabhanagar</option>
+            </select>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => handleStartLeakDemo()}
+            disabled={isDemoStarting || (demoStatus?.state !== 'IDLE' && demoStatus?.state !== 'RESTORED' && !!demoStatus?.state)}
+            className={`h-7 px-3 rounded text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm ${
+              demoStatus?.state && demoStatus.state !== 'IDLE' && demoStatus.state !== 'RESTORED'
+                ? 'bg-rose-950 text-rose-300 border border-rose-500/50 cursor-not-allowed'
+                : 'bg-rose-600 hover:bg-rose-500 text-white'
+            }`}
+          >
+            <Play className="w-3 h-3 fill-current" />
+            <span>{demoStatus?.state && demoStatus.state !== 'IDLE' && demoStatus.state !== 'RESTORED' ? `Demo: ${demoStatus.state}` : 'Run leak demo'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleResetLeakDemo}
+            className="h-7 px-2.5 rounded text-xs font-semibold flex items-center gap-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors"
+            title="Reset demo to baseline"
+          >
+            <RotateCcw className="w-3 h-3" />
+            <span>Reset demo</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setIsSimulateOpen(true)}
@@ -208,23 +299,32 @@ export const IoTWorkstation: React.FC = () => {
               activeScenario="BASELINE"
               currentHour={12}
               isDarkTheme={theme === 'dark' || theme === 'satellite'}
+              activeLeakPipeId={activeLeakPipeId || (demoStatus?.state && demoStatus.state !== 'IDLE' && demoStatus.state !== 'RESTORED' ? 'CORR_TATAGUNI_MOUNT_JOY' : undefined)}
+              demoStatus={demoStatus}
               flyToTarget={flyToTarget}
+              onNavigateToMonitor={() => {
+                setCentreView('monitor' as any);
+              }}
             />
           )}
 
           {centreView === 'schematic' && selectedStation && (
-            <StationSchematic
-              station={selectedStation}
-              onSelectElement={(type, id) => {
-                if (type === 'pump') handleSelectPump(id);
-                else if (type === 'meter' || type === 'flow_sensor') handleSelectDevice(id);
-              }}
-              selectedElementId={selectedPump?.pump_id || selectedDevice?.tag}
-            />
+            <ErrorBoundary fallbackTitle="Station Schematic Unavailable">
+              <StationSchematic
+                station={selectedStation}
+                onSelectElement={(type, id) => {
+                  if (type === 'pump') handleSelectPump(id);
+                  else if (type === 'meter' || type === 'flow_sensor') handleSelectDevice(id);
+                }}
+                selectedElementId={selectedPump?.pump_id || selectedDevice?.tag}
+              />
+            </ErrorBoundary>
           )}
 
           {centreView === 'sankey' && (
-            <WaterFlowSankey corridors={corridors} balance={balance} />
+            <ErrorBoundary fallbackTitle="Water Flow Balance Unavailable">
+              <WaterFlowSankey corridors={corridors} balance={balance} />
+            </ErrorBoundary>
           )}
         </main>
 
@@ -250,6 +350,7 @@ export const IoTWorkstation: React.FC = () => {
       {/* 4. Top-Centre Leak Detection Popup (P5) */}
       <IoTLeakDetectionPopup
         alerts={alerts}
+        demoStatus={demoStatus}
         onShowOnMap={(coords) => {
           setFlyToTarget(coords);
           setCentreView('map');

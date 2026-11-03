@@ -1,0 +1,74 @@
+{
+  "audit_reference": "Comptroller and Auditor General of India, Karnataka Report No. 3 of 2022, paras 2.2.7.1-2.2.7.3",
+  "total_water_supply_km": 11646.04,
+  "total_sewerage_ugd_km": 9989.53,
+  "gis_mapping_coverage_pct": 100.0,
+  "audit_findings": {
+    "datum_shift_discrepancies": "Alignment shifts observed between 2002 road survey base and satellite imagery",
+    "missing_attributes_records_count": 84916,
+    "total_records_audited": 202788,
+    "missing_critical_attributes": [
+      "Pipe Depth",
+      "Operating Pressure",
+      "Flow Direction",
+      "Installation Year"
+    ]
+  },
+  "network_segments": [
+    {
+      "segment_id": "PIPE-CWSS-MS-1200",
+      "name": "Cauvery Master Steel Transmission Main",
+      "material": "Mild Steel",
+      "diameter_mm": 1200,
+      "length_km": 84.5,
+      "age_years": 42,
+      "criticality": "CRITICAL",
+      "vulnerability_index": 76.5,
+      "provenance": "DOCUMENTED"
+    },
+    {
+      "segment_id": "PIPE-DI-DIST-600-CENTRAL",
+      "name": "Central Division Feeder Main",
+      "material": "Ductile Iron",
+      "diameter_mm": 600,
+      "length_km": 38.2,
+      "age_years": 16,
+      "criticality": "HIGH",
+      "vulnerability_index": 38.0,
+      "provenance": "DOCUMENTED"
+    },
+    {
+      "segment_id": "PIPE-CI-DIST-300-OLDTOWN",
+      "name": "Basavanagudi / Malleshwaram Legacy Feeder",
+      "material": "Cast Iron",
+      "diameter_mm": 300,
+      "length_km": 112.4,
+      "age_years": 58,
+      "criticality": "HIGH",
+      "vulnerability_index": 82.4,
+      "provenance": "DOCUMENTED"
+    },
+    {
+      "segment_id": "PIPE-PSC-TRANSM-1000",
+      "name": "Prestressed Concrete Transmission Ring",
+      "material": "Prestressed Concrete (PSC)",
+      "diameter_mm": 1000,
+      "length_km": 64.0,
+      "age_years": 34,
+      "criticality": "HIGH",
+      "vulnerability_index": 62.0,
+      "provenance": "DOCUMENTED"
+    },
+    {
+      "segment_id": "PIPE-HDPE-SUB-150-EAST",
+      "name": "Whitefield Peripheral Distribution Network",
+      "material": "High-Density Polyethylene (HDPE)",
+      "diameter_mm": 150,
+      "length_km": 145.0,
+      "age_years": 7,
+      "criticality": "MEDIUM",
+      "vulnerability_index": 18.5,
+      "provenance": "DOCUMENTED"
+    }
+  ]
+}

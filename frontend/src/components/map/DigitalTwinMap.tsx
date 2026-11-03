@@ -31,7 +31,9 @@ interface DigitalTwinMapProps {
   currentHour: number;
   isDarkTheme: boolean;
   activeLeakPipeId?: string;
+  demoStatus?: any;
   flyToTarget?: [number, number] | null;
+  onNavigateToMonitor?: () => void;
 }
 
 // Module-level network dataset cache to prevent re-fetching and flashing across tab switches
@@ -54,7 +56,9 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
   currentHour,
   isDarkTheme,
   activeLeakPipeId,
+  demoStatus,
   flyToTarget,
+  onNavigateToMonitor,
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -89,7 +93,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
     waterBodies: [],
   });
 
-  const { theme: storeTheme, isLegendOpen, setIsLegendOpen } = useTwinStore();
+  const { theme: storeTheme, isLegendOpen, setIsLegendOpen, flyToTarget: storeFlyToTarget } = useTwinStore();
 
   // Keep internal theme in sync with global store
   useEffect(() => {
@@ -98,6 +102,21 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
       switchBasemapTheme(mapRef.current, storeTheme);
     }
   }, [storeTheme, mapReady]);
+
+  // Camera flyTo listener for zooming into exact leak location
+  useEffect(() => {
+    const target = flyToTarget || storeFlyToTarget;
+    if (mapRef.current && mapReady && target && Array.isArray(target) && target.length === 2) {
+      mapRef.current.flyTo({
+        center: target as [number, number],
+        zoom: 15.5,
+        pitch: 45,
+        bearing: -15,
+        duration: 1800,
+        essential: true,
+      });
+    }
+  }, [flyToTarget, storeFlyToTarget, mapReady]);
 
   // Resilient dataset loader: attempts live API first with 2.5s timeout, falls back to bundled static GeoJSON
   useEffect(() => {
@@ -335,7 +354,9 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
       isAnimationPaused: isPaused,
       selectedAsset,
       activeLeakPipeId,
+      demoStatus,
       onSelectAsset,
+      onNavigateToMonitor,
       networkData,
     });
 
@@ -346,22 +367,31 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
     coords.zoom,
     selectedAsset,
     activeLeakPipeId,
+    demoStatus,
     onSelectAsset,
+    onNavigateToMonitor,
     networkData,
     mapReady,
   ]);
 
-  // Continuous animation frame loop
+  // Throttled continuous animation frame loop (capped at ~30 FPS for optimal performance and no lag)
   useEffect(() => {
     if (!mapReady) return;
 
     let lastTime = performance.now();
+    let lastRenderTime = 0;
+    const FRAME_INTERVAL_MS = 33.3; // ~30 fps cap for smooth performance without GPU overhead
+
     const animate = (now: number) => {
       const dt = (now - lastTime) / 1000;
       lastTime = now;
 
       currentTimeRef.current += dt * 25; // animation clock speed
-      renderDeckLayers();
+
+      if (now - lastRenderTime >= FRAME_INTERVAL_MS) {
+        lastRenderTime = now;
+        renderDeckLayers();
+      }
 
       animationFrameRef.current = requestAnimationFrame(animate);
     };

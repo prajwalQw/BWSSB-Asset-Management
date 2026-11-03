@@ -1,0 +1,16 @@
+Title: By March ’27, BWSSB to install IoT devices on its 6,000 borewells
+Publication Date: September 30, 2026
+Source: The New Indian Express, Bengaluru
+URL: https://www.newindianexpress.com/cities/bengaluru/2026/Sep/30/by-march-27-bwssb-to-install-iot-devices-on-its-6000-borewells
+
+BENGALURU: With an aim to monitor groundwater extraction and ensure optimal functioning of pumps, the Bangalore Water Supply and Sewerage Board (BWSSB) will install Internet of Things (IoT) devices on 6,000 borewells across the city by March 2027.
+
+Speaking to TNIE, BWSSB Chairperson Dr. Ram Prasath Manohar said the board manages nearly 16,000 borewells across Bengaluru. "Currently, 1,800 borewells have been fitted with IoT devices under the first phase. By March 2027, an additional 6,000 borewells will be equipped with telemetry," he said.
+
+Documented Telemetry Parameters:
+1. Groundwater depth (piezometric water table level)
+2. Extracted water quantity (volumetric discharge flow)
+3. Pump operating hours (cumulative run-time and dry-run protection)
+4. Telemetry device battery / power status
+
+The data is transmitted in real time to two dedicated digital dashboards to prevent dry-running of pump motors and avert motor burnout during low-yield cycles.

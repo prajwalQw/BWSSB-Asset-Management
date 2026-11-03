@@ -17,7 +17,8 @@ import {
   Building,
   ChevronRight,
   Filter,
-  Check
+  Check,
+  Lock
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -52,24 +53,44 @@ export interface IoTRightInspectorProps {
 }
 
 // Deterministic telemetry generators for 220px main charts and 96px sparklines
-function generatePumpTrend(ratedV: number, ratedI: number, timeRange: string) {
+function generatePumpTrend(ratedV: number, ratedI: number, timeRange: string, runState?: string) {
   const points = [];
   const count = timeRange === '15m' ? 15 : timeRange === '1h' ? 24 : 30;
+  const isOff = runState === 'OFF' || ratedI <= 0.5;
+  const isStarting = runState === 'STARTING';
+  const isStopping = runState === 'STOPPING';
+
   for (let i = 0; i < count; i++) {
-    const isStart = i === 3;
-    const inrushMult = isStart ? 2.2 : 1.0;
-    const v = ratedV * (isStart ? 0.94 : 0.99) + (Math.sin(i * 0.4) * 6.0);
-    const curr = (ratedI * 0.85 * inrushMult) + (Math.sin(i * 0.3) * 2.5);
+    const isRecent = i >= count - 4;
+    let curr = 0.0;
+    let v = ratedV + (Math.sin(i * 0.4) * 6.0);
+
+    if (isOff) {
+      // Prior points might have had current, latest points are 0
+      curr = i < count - 5 ? ratedI * 0.85 : 0.0;
+    } else if (isStarting) {
+      // Current spike then plateau
+      const isSpike = i === count - 2;
+      curr = isSpike ? ratedI * 2.1 : ratedI * 0.85 + (Math.sin(i * 0.3) * 2.0);
+    } else if (isStopping) {
+      // Ramp down to 0
+      const frac = Math.max(0, 1.0 - (i / count));
+      curr = ratedI * frac;
+    } else {
+      // Steady running
+      curr = ratedI > 0 ? (ratedI * 0.86) + (Math.sin(i * 0.3) * 2.0) : 108.3 + (Math.sin(i * 0.3) * 2.0);
+    }
+
     points.push({
       time: `${i * (timeRange === '15m' ? 1 : 2)}m`,
       voltage: Math.round(v),
       voltageBandLow: Math.round(ratedV * 0.95),
       voltageBandHigh: Math.round(ratedV * 1.05),
-      current: Number(curr.toFixed(1)),
+      current: Number(Math.max(0, curr).toFixed(1)),
       currentBandLow: Number((ratedI * 0.75).toFixed(1)),
       currentBandHigh: Number((ratedI * 0.95).toFixed(1)),
-      isRunning: i >= 3 ? 1 : 0,
-      isStartupMarker: isStart
+      isRunning: curr > 1.0 ? 1 : 0,
+      isStartupMarker: isStarting && i === count - 2
     });
   }
   return points;
@@ -149,8 +170,12 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
   // ---------------------------------------------------------------------------
   if (selectedType === 'pump' && effectivePump) {
     const pumpData = effectivePump;
+    const isIsolatedByAgent = Boolean(
+      pumpData.run_state === 'OFF' &&
+      ((pumpData as any).isolated_by_agent || (pumpData as any).lock_tag)
+    );
     const isRunning = pumpData.run_state === 'RUNNING' || pumpData.run_state === 'STARTING';
-    const trendData = generatePumpTrend(pumpData.voltage_avg || 415.0, pumpData.current_avg || 110.0, timeRange);
+    const trendData = generatePumpTrend(pumpData.voltage_avg || 415.0, pumpData.current_avg ?? 0.0, timeRange, pumpData.run_state);
     const flowMld = Number(lpsToMld(pumpData.flow_lps).toFixed(1));
     const dischargePressureBar = Number((pumpData.head_m / 10.2).toFixed(1));
 
@@ -180,19 +205,34 @@ export const IoTRightInspector: React.FC<IoTRightInspectorProps> = ({
         <div className="grid grid-cols-2 gap-2">
           <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
             <span className="text-xs text-slate-500 block">Pump run status</span>
-            <div className="flex items-center gap-1.5 mt-1">
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  isRunning ? 'bg-emerald-500' : 'bg-slate-400'
-                }`}
-              />
-              <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">
-                {pumpData.run_state}
-              </span>
-              <span className="text-[11px] text-slate-500">
-                ({isRunning ? 'Active' : 'Not active'})
-              </span>
-            </div>
+            {isIsolatedByAgent ? (
+              <div className="mt-1 space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                  <span className="font-bold text-rose-400 text-xs">
+                    OFF - isolated by monitoring agent
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold inline-flex items-center gap-1">
+                  <Lock className="w-2.5 h-2.5 inline" />
+                  <span>LOCKED</span>
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 mt-1">
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    isRunning ? 'bg-emerald-500' : 'bg-slate-400'
+                  }`}
+                />
+                <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">
+                  {pumpData.run_state}
+                </span>
+                <span className="text-[11px] text-slate-500">
+                  ({isRunning ? 'Active' : 'Not active'})
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">

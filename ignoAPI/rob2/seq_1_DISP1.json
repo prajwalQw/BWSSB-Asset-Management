@@ -1,0 +1,1184 @@
+{
+    "metadata": {
+        "version": "1.0",
+        "kind": "ignofms_sequence",
+        "name": "DISP1",
+        "timestamp": "2026-08-22 11:08:01",
+        "unit": "m"
+    },
+    "picks": [
+        {
+            "zone": "1",
+            "fid": null,
+            "track": null
+        },
+        {
+            "zone": "3",
+            "fid": {
+                "id": "13",
+                "type": "6x6",
+                "ang": "0"
+            },
+            "track": null
+        },
+        {
+            "zone": "4",
+            "fid": {
+                "id": "2",
+                "type": "6x6",
+                "ang": "0"
+            },
+            "track": null
+        },
+        {
+            "zone": "8",
+            "fid": {
+                "id": "9",
+                "type": "6x6",
+                "ang": "0"
+            },
+            "track": null
+        },
+        {
+            "zone": "7",
+            "fid": {
+                "id": "L11",
+                "type": "track",
+                "ang": "0"
+            },
+            "track": "L11"
+        },
+        {
+            "zone": "6",
+            "fid": {
+                "id": "5",
+                "type": "6x6",
+                "ang": "0"
+            },
+            "track": null
+        },
+        {
+            "zone": "7",
+            "fid": {
+                "id": "8",
+                "type": "6x6",
+                "ang": "0"
+            },
+            "track": "L11"
+        },
+        {
+            "zone": "8",
+            "fid": {
+                "id": "12",
+                "type": "6x6",
+                "ang": "0"
+            },
+            "track": null
+        },
+        {
+            "zone": "9",
+            "fid": {
+                "id": "L12",
+                "type": "track",
+                "ang": "0"
+            },
+            "track": null
+        },
+        {
+            "zone": "10",
+            "fid": {
+                "id": "L13",
+                "type": "track",
+                "ang": "0"
+            },
+            "track": "L13"
+        },
+        {
+            "zone": "5",
+            "fid": {
+                "id": "1",
+                "type": "6x6",
+                "ang": "0"
+            },
+            "track": null
+        },
+        {
+            "zone": "2",
+            "fid": {
+                "id": "18",
+                "type": "6x6",
+                "ang": "0"
+            },
+            "track": null
+        },
+        {
+            "zone": "1",
+            "fid": {
+                "id": "4",
+                "type": "6x6",
+                "ang": "0"
+            },
+            "track": null
+        }
+    ],
+    "zones": [
+        "1",
+        "3",
+        "4",
+        "8",
+        "7",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "5",
+        "2",
+        "1"
+    ],
+    "via": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "8",
+        "7",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "5",
+        "2",
+        "1"
+    ],
+    "legs": [
+        {
+            "from": "1",
+            "to": "3",
+            "zones": [
+                "1",
+                "2",
+                "3"
+            ],
+            "runs": [
+                1,
+                1
+            ],
+            "length": 5.9,
+            "fid": {
+                "id": "13",
+                "type": "6x6",
+                "ang": "0"
+            },
+            "fid_at": [
+                -5.7794,
+                1.0875
+            ]
+        },
+        {
+            "from": "3",
+            "to": "4",
+            "zones": [
+                "3",
+                "4"
+            ],
+            "runs": [
+                2
+            ],
+            "length": 11.3,
+            "fid": {
+                "id": "2",
+                "type": "6x6",
+                "ang": "0"
+            },
+            "fid_at": [
+                -5.7794,
+                12.3875
+            ]
+        },
+        {
+            "from": "4",
+            "to": "8",
+            "zones": [
+                "4",
+                "8"
+            ],
+            "runs": [
+                3
+            ],
+            "length": 14.5,
+            "fid": {
+                "id": "9",
+                "type": "6x6",
+                "ang": "0"
+            },
+            "fid_at": [
+                -20.2794,
+                12.3875
+            ]
+        },
+        {
+            "from": "8",
+            "to": "7",
+            "zones": [
+                "8",
+                "7"
+            ],
+            "runs": [
+                "L11"
+            ],
+            "length": 2.4,
+            "fid": {
+                "id": "L11",
+                "type": "track",
+                "ang": "0"
+            },
+            "fid_at": [
+                -20.2794,
+                9.9885
+            ]
+        },
+        {
+            "from": "7",
+            "to": "6",
+            "zones": [
+                "7",
+                "6"
+            ],
+            "runs": [
+                5
+            ],
+            "length": 1.55,
+            "fid": {
+                "id": "5",
+                "type": "6x6",
+                "ang": "0"
+            },
+            "fid_at": [
+                -18.7294,
+                9.9885
+            ]
+        },
+        {
+            "from": "6",
+            "to": "7",
+            "zones": [
+                "6",
+                "7"
+            ],
+            "runs": [
+                5
+            ],
+            "length": 1.55,
+            "fid": {
+                "id": "8",
+                "type": "6x6",
+                "ang": "0"
+            },
+            "fid_at": [
+                -20.2794,
+                9.9885
+            ]
+        },
+        {
+            "from": "7",
+            "to": "8",
+            "zones": [
+                "7",
+                "8"
+            ],
+            "runs": [
+                "L11"
+            ],
+            "length": 2.4,
+            "fid": {
+                "id": "12",
+                "type": "6x6",
+                "ang": "0"
+            },
+            "fid_at": [
+                -20.2794,
+                12.3875
+            ]
+        },
+        {
+            "from": "8",
+            "to": "9",
+            "zones": [
+                "8",
+                "9"
+            ],
+            "runs": [
+                "L12"
+            ],
+            "length": 3.4,
+            "fid": {
+                "id": "L12",
+                "type": "track",
+                "ang": "0"
+            },
+            "fid_at": [
+                -23.6794,
+                12.3875
+            ]
+        },
+        {
+            "from": "9",
+            "to": "10",
+            "zones": [
+                "9",
+                "10"
+            ],
+            "runs": [
+                "L13"
+            ],
+            "length": 2.47,
+            "fid": {
+                "id": "L13",
+                "type": "track",
+                "ang": "0"
+            },
+            "fid_at": [
+                -23.6794,
+                14.8575
+            ]
+        },
+        {
+            "from": "10",
+            "to": "5",
+            "zones": [
+                "10",
+                "5"
+            ],
+            "runs": [
+                8
+            ],
+            "length": 19.6,
+            "fid": {
+                "id": "1",
+                "type": "6x6",
+                "ang": "0"
+            },
+            "fid_at": [
+                -4.0794,
+                14.8575
+            ]
+        },
+        {
+            "from": "5",
+            "to": "2",
+            "zones": [
+                "5",
+                "2"
+            ],
+            "runs": [
+                9
+            ],
+            "length": 14.03,
+            "fid": {
+                "id": "18",
+                "type": "6x6",
+                "ang": "0"
+            },
+            "fid_at": [
+                -4.0794,
+                0.831
+            ]
+        },
+        {
+            "from": "2",
+            "to": "1",
+            "zones": [
+                "2",
+                "1"
+            ],
+            "runs": [
+                1
+            ],
+            "length": 4.18,
+            "fid": {
+                "id": "4",
+                "type": "6x6",
+                "ang": "0"
+            },
+            "fid_at": [
+                0.031,
+                0.063
+            ]
+        }
+    ],
+    "length": 83.28,
+    "subroutines": [],
+    "adjacency": {
+        "1": [
+            {
+                "to": "2",
+                "kind": "path",
+                "run": 1,
+                "length": 4.1813,
+                "width": 0.7
+            },
+            {
+                "to": "2",
+                "kind": "path",
+                "run": 10,
+                "length": 4.1815,
+                "width": 0.7
+            }
+        ],
+        "10": [
+            {
+                "to": "5",
+                "kind": "path",
+                "run": 8,
+                "length": 19.6,
+                "width": 0.7
+            },
+            {
+                "to": "9",
+                "kind": "track",
+                "run": "L13",
+                "length": 2.47,
+                "width": 0.7
+            }
+        ],
+        "2": [
+            {
+                "to": "1",
+                "kind": "path",
+                "run": 1,
+                "length": 4.1813,
+                "width": 0.7
+            },
+            {
+                "to": "1",
+                "kind": "path",
+                "run": 10,
+                "length": 4.1815,
+                "width": 0.7
+            },
+            {
+                "to": "3",
+                "kind": "path",
+                "run": 1,
+                "length": 1.7187,
+                "width": 0.7
+            },
+            {
+                "to": "5",
+                "kind": "path",
+                "run": 9,
+                "length": 14.0265,
+                "width": 0.7
+            }
+        ],
+        "3": [
+            {
+                "to": "2",
+                "kind": "path",
+                "run": 1,
+                "length": 1.7187,
+                "width": 0.7
+            },
+            {
+                "to": "4",
+                "kind": "path",
+                "run": 2,
+                "length": 11.3,
+                "width": 0.7
+            }
+        ],
+        "4": [
+            {
+                "to": "3",
+                "kind": "path",
+                "run": 2,
+                "length": 11.3,
+                "width": 0.7
+            },
+            {
+                "to": "8",
+                "kind": "path",
+                "run": 3,
+                "length": 14.5,
+                "width": 0.7
+            }
+        ],
+        "5": [
+            {
+                "to": "10",
+                "kind": "path",
+                "run": 8,
+                "length": 19.6,
+                "width": 0.7
+            },
+            {
+                "to": "2",
+                "kind": "path",
+                "run": 9,
+                "length": 14.0265,
+                "width": 0.7
+            }
+        ],
+        "6": [
+            {
+                "to": "7",
+                "kind": "path",
+                "run": 5,
+                "length": 1.55,
+                "width": 0.7
+            }
+        ],
+        "7": [
+            {
+                "to": "6",
+                "kind": "path",
+                "run": 5,
+                "length": 1.55,
+                "width": 0.7
+            },
+            {
+                "to": "8",
+                "kind": "track",
+                "run": "L11",
+                "length": 2.399,
+                "width": 0.7
+            }
+        ],
+        "8": [
+            {
+                "to": "4",
+                "kind": "path",
+                "run": 3,
+                "length": 14.5,
+                "width": 0.7
+            },
+            {
+                "to": "7",
+                "kind": "track",
+                "run": "L11",
+                "length": 2.399,
+                "width": 0.7
+            },
+            {
+                "to": "9",
+                "kind": "track",
+                "run": "L12",
+                "length": 3.4,
+                "width": 0.7
+            }
+        ],
+        "9": [
+            {
+                "to": "10",
+                "kind": "track",
+                "run": "L13",
+                "length": 2.47,
+                "width": 0.7
+            },
+            {
+                "to": "8",
+                "kind": "track",
+                "run": "L12",
+                "length": 3.4,
+                "width": 0.7
+            }
+        ]
+    },
+    "classification": {
+        "counts": {
+            "nodes": 10,
+            "advantage": 8,
+            "critical": 2,
+            "handover": 1,
+            "junctions": 2,
+            "dead_ends": 1,
+            "runs": 11
+        },
+        "nodes": [
+            {
+                "key": "1",
+                "name": "Zone 1",
+                "kind": "zone",
+                "class": "advantage",
+                "handover": false,
+                "role": "pass_through",
+                "degree": 2,
+                "x": 0.031,
+                "y": 0.063,
+                "neighbours": [
+                    "2",
+                    "2"
+                ],
+                "circuit_m": 8.36,
+                "circuit": [
+                    "1",
+                    "2",
+                    "1"
+                ],
+                "fids": []
+            },
+            {
+                "key": "10",
+                "name": "Zone 10",
+                "kind": "zone",
+                "class": "advantage",
+                "handover": false,
+                "role": "pass_through",
+                "degree": 2,
+                "x": -23.6794,
+                "y": 14.8575,
+                "neighbours": [
+                    "5",
+                    "9"
+                ],
+                "circuit_m": 67.02,
+                "circuit": [
+                    "10",
+                    "5",
+                    "2",
+                    "3",
+                    "4",
+                    "8",
+                    "9",
+                    "10"
+                ],
+                "fids": []
+            },
+            {
+                "key": "2",
+                "name": "Zone 2",
+                "kind": "zone",
+                "class": "advantage",
+                "handover": false,
+                "role": "junction",
+                "degree": 4,
+                "x": -4.0794,
+                "y": 0.831,
+                "neighbours": [
+                    "1",
+                    "1",
+                    "3",
+                    "5"
+                ],
+                "circuit_m": 8.36,
+                "circuit": [
+                    "2",
+                    "1",
+                    "2"
+                ],
+                "fids": []
+            },
+            {
+                "key": "3",
+                "name": "Zone 3",
+                "kind": "zone",
+                "class": "advantage",
+                "handover": false,
+                "role": "pass_through",
+                "degree": 2,
+                "x": -5.7794,
+                "y": 1.0875,
+                "neighbours": [
+                    "2",
+                    "4"
+                ],
+                "circuit_m": 67.02,
+                "circuit": [
+                    "3",
+                    "2",
+                    "5",
+                    "10",
+                    "9",
+                    "8",
+                    "4",
+                    "3"
+                ],
+                "fids": []
+            },
+            {
+                "key": "4",
+                "name": "Zone 4",
+                "kind": "zone",
+                "class": "advantage",
+                "handover": false,
+                "role": "pass_through",
+                "degree": 2,
+                "x": -5.7794,
+                "y": 12.3875,
+                "neighbours": [
+                    "3",
+                    "8"
+                ],
+                "circuit_m": 67.02,
+                "circuit": [
+                    "4",
+                    "3",
+                    "2",
+                    "5",
+                    "10",
+                    "9",
+                    "8",
+                    "4"
+                ],
+                "fids": []
+            },
+            {
+                "key": "5",
+                "name": "Zone 5",
+                "kind": "zone",
+                "class": "advantage",
+                "handover": false,
+                "role": "pass_through",
+                "degree": 2,
+                "x": -4.0794,
+                "y": 14.8575,
+                "neighbours": [
+                    "10",
+                    "2"
+                ],
+                "circuit_m": 67.02,
+                "circuit": [
+                    "5",
+                    "10",
+                    "9",
+                    "8",
+                    "4",
+                    "3",
+                    "2",
+                    "5"
+                ],
+                "fids": []
+            },
+            {
+                "key": "6",
+                "name": "Zone 6",
+                "kind": "zone",
+                "class": "critical",
+                "handover": false,
+                "role": "dead_end",
+                "degree": 1,
+                "x": -18.7294,
+                "y": 9.9885,
+                "neighbours": [
+                    "7"
+                ],
+                "circuit_m": null,
+                "circuit": [],
+                "fids": []
+            },
+            {
+                "key": "7",
+                "name": "Zone 7",
+                "kind": "zone",
+                "class": "critical",
+                "handover": false,
+                "role": "pass_through",
+                "degree": 2,
+                "x": -20.2794,
+                "y": 9.9885,
+                "neighbours": [
+                    "6",
+                    "8"
+                ],
+                "circuit_m": null,
+                "circuit": [],
+                "fids": []
+            },
+            {
+                "key": "8",
+                "name": "Zone 8",
+                "kind": "zone",
+                "class": "advantage",
+                "handover": true,
+                "role": "junction",
+                "degree": 3,
+                "x": -20.2794,
+                "y": 12.3875,
+                "neighbours": [
+                    "4",
+                    "7",
+                    "9"
+                ],
+                "circuit_m": 67.02,
+                "circuit": [
+                    "8",
+                    "4",
+                    "3",
+                    "2",
+                    "5",
+                    "10",
+                    "9",
+                    "8"
+                ],
+                "fids": []
+            },
+            {
+                "key": "9",
+                "name": "Zone 9",
+                "kind": "zone",
+                "class": "advantage",
+                "handover": false,
+                "role": "pass_through",
+                "degree": 2,
+                "x": -23.6794,
+                "y": 12.3875,
+                "neighbours": [
+                    "10",
+                    "8"
+                ],
+                "circuit_m": 67.02,
+                "circuit": [
+                    "9",
+                    "8",
+                    "4",
+                    "3",
+                    "2",
+                    "5",
+                    "10",
+                    "9"
+                ],
+                "fids": []
+            }
+        ],
+        "links": [
+            {
+                "undirected_id": 0,
+                "from": "1",
+                "from_name": "Zone 1",
+                "from_class": "advantage",
+                "to": "2",
+                "to_name": "Zone 2",
+                "to_class": "advantage",
+                "relation": "advantage-advantage",
+                "is_boundary": false,
+                "run_kind": "path",
+                "run": 1,
+                "length_m": 4.1813,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 7,
+                "from": "1",
+                "from_name": "Zone 1",
+                "from_class": "advantage",
+                "to": "2",
+                "to_name": "Zone 2",
+                "to_class": "advantage",
+                "relation": "advantage-advantage",
+                "is_boundary": false,
+                "run_kind": "path",
+                "run": 10,
+                "length_m": 4.1815,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 5,
+                "from": "10",
+                "from_name": "Zone 10",
+                "from_class": "advantage",
+                "to": "5",
+                "to_name": "Zone 5",
+                "to_class": "advantage",
+                "relation": "advantage-advantage",
+                "is_boundary": false,
+                "run_kind": "path",
+                "run": 8,
+                "length_m": 19.6,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 10,
+                "from": "10",
+                "from_name": "Zone 10",
+                "from_class": "advantage",
+                "to": "9",
+                "to_name": "Zone 9",
+                "to_class": "advantage",
+                "relation": "advantage-advantage",
+                "is_boundary": false,
+                "run_kind": "track",
+                "run": "L13",
+                "length_m": 2.47,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 0,
+                "from": "2",
+                "from_name": "Zone 2",
+                "from_class": "advantage",
+                "to": "1",
+                "to_name": "Zone 1",
+                "to_class": "advantage",
+                "relation": "advantage-advantage",
+                "is_boundary": false,
+                "run_kind": "path",
+                "run": 1,
+                "length_m": 4.1813,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 7,
+                "from": "2",
+                "from_name": "Zone 2",
+                "from_class": "advantage",
+                "to": "1",
+                "to_name": "Zone 1",
+                "to_class": "advantage",
+                "relation": "advantage-advantage",
+                "is_boundary": false,
+                "run_kind": "path",
+                "run": 10,
+                "length_m": 4.1815,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 1,
+                "from": "2",
+                "from_name": "Zone 2",
+                "from_class": "advantage",
+                "to": "3",
+                "to_name": "Zone 3",
+                "to_class": "advantage",
+                "relation": "advantage-advantage",
+                "is_boundary": false,
+                "run_kind": "path",
+                "run": 1,
+                "length_m": 1.7187,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 6,
+                "from": "2",
+                "from_name": "Zone 2",
+                "from_class": "advantage",
+                "to": "5",
+                "to_name": "Zone 5",
+                "to_class": "advantage",
+                "relation": "advantage-advantage",
+                "is_boundary": false,
+                "run_kind": "path",
+                "run": 9,
+                "length_m": 14.0265,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 1,
+                "from": "3",
+                "from_name": "Zone 3",
+                "from_class": "advantage",
+                "to": "2",
+                "to_name": "Zone 2",
+                "to_class": "advantage",
+                "relation": "advantage-advantage",
+                "is_boundary": false,
+                "run_kind": "path",
+                "run": 1,
+                "length_m": 1.7187,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 2,
+                "from": "3",
+                "from_name": "Zone 3",
+                "from_class": "advantage",
+                "to": "4",
+                "to_name": "Zone 4",
+                "to_class": "advantage",
+                "relation": "advantage-advantage",
+                "is_boundary": false,
+                "run_kind": "path",
+                "run": 2,
+                "length_m": 11.3,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 2,
+                "from": "4",
+                "from_name": "Zone 4",
+                "from_class": "advantage",
+                "to": "3",
+                "to_name": "Zone 3",
+                "to_class": "advantage",
+                "relation": "advantage-advantage",
+                "is_boundary": false,
+                "run_kind": "path",
+                "run": 2,
+                "length_m": 11.3,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 3,
+                "from": "4",
+                "from_name": "Zone 4",
+                "from_class": "advantage",
+                "to": "8",
+                "to_name": "Zone 8",
+                "to_class": "advantage",
+                "relation": "advantage-advantage",
+                "is_boundary": false,
+                "run_kind": "path",
+                "run": 3,
+                "length_m": 14.5,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 5,
+                "from": "5",
+                "from_name": "Zone 5",
+                "from_class": "advantage",
+                "to": "10",
+                "to_name": "Zone 10",
+                "to_class": "advantage",
+                "relation": "advantage-advantage",
+                "is_boundary": false,
+                "run_kind": "path",
+                "run": 8,
+                "length_m": 19.6,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 6,
+                "from": "5",
+                "from_name": "Zone 5",
+                "from_class": "advantage",
+                "to": "2",
+                "to_name": "Zone 2",
+                "to_class": "advantage",
+                "relation": "advantage-advantage",
+                "is_boundary": false,
+                "run_kind": "path",
+                "run": 9,
+                "length_m": 14.0265,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 4,
+                "from": "6",
+                "from_name": "Zone 6",
+                "from_class": "critical",
+                "to": "7",
+                "to_name": "Zone 7",
+                "to_class": "critical",
+                "relation": "critical-critical",
+                "is_boundary": false,
+                "run_kind": "path",
+                "run": 5,
+                "length_m": 1.55,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 4,
+                "from": "7",
+                "from_name": "Zone 7",
+                "from_class": "critical",
+                "to": "6",
+                "to_name": "Zone 6",
+                "to_class": "critical",
+                "relation": "critical-critical",
+                "is_boundary": false,
+                "run_kind": "path",
+                "run": 5,
+                "length_m": 1.55,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 8,
+                "from": "7",
+                "from_name": "Zone 7",
+                "from_class": "critical",
+                "to": "8",
+                "to_name": "Zone 8",
+                "to_class": "advantage",
+                "relation": "advantage-critical",
+                "is_boundary": true,
+                "run_kind": "track",
+                "run": "L11",
+                "length_m": 2.399,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 3,
+                "from": "8",
+                "from_name": "Zone 8",
+                "from_class": "advantage",
+                "to": "4",
+                "to_name": "Zone 4",
+                "to_class": "advantage",
+                "relation": "advantage-advantage",
+                "is_boundary": false,
+                "run_kind": "path",
+                "run": 3,
+                "length_m": 14.5,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 8,
+                "from": "8",
+                "from_name": "Zone 8",
+                "from_class": "advantage",
+                "to": "7",
+                "to_name": "Zone 7",
+                "to_class": "critical",
+                "relation": "advantage-critical",
+                "is_boundary": true,
+                "run_kind": "track",
+                "run": "L11",
+                "length_m": 2.399,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 9,
+                "from": "8",
+                "from_name": "Zone 8",
+                "from_class": "advantage",
+                "to": "9",
+                "to_name": "Zone 9",
+                "to_class": "advantage",
+                "relation": "advantage-advantage",
+                "is_boundary": false,
+                "run_kind": "track",
+                "run": "L12",
+                "length_m": 3.4,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 10,
+                "from": "9",
+                "from_name": "Zone 9",
+                "from_class": "advantage",
+                "to": "10",
+                "to_name": "Zone 10",
+                "to_class": "advantage",
+                "relation": "advantage-advantage",
+                "is_boundary": false,
+                "run_kind": "track",
+                "run": "L13",
+                "length_m": 2.47,
+                "width_m": 0.7
+            },
+            {
+                "undirected_id": 9,
+                "from": "9",
+                "from_name": "Zone 9",
+                "from_class": "advantage",
+                "to": "8",
+                "to_name": "Zone 8",
+                "to_class": "advantage",
+                "relation": "advantage-advantage",
+                "is_boundary": false,
+                "run_kind": "track",
+                "run": "L12",
+                "length_m": 3.4,
+                "width_m": 0.7
+            }
+        ]
+    },
+    "unreachable_runs": [],
+    "sequence_id": 1,
+    "sequence_name": "DISP1",
+    "map_name": "JKnew",
+    "map_id": "1",
+    "saved_at": "2026-08-22T11:08:01.231094"
+}

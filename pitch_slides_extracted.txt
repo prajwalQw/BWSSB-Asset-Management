@@ -1,0 +1,157 @@
+Total slides: 18
+
+=== SLIDE 1: <Company Name & Logo>Project Title  ===
+  - <Company Name & Logo>Project Title
+  - Template for Pitching
+
+=== SLIDE 2: Scoring Criteria ===
+  - Scoring Criteria
+  - 2
+  [TABLE DATA]:
+    | Parameter | Marks | Evaluation Criteria |
+    | Innovation & Differentiation | 20 | Novelty, uniqueness, use of emerging technologies |
+    | Technical Soundness | 15 | Architecture, reliability, robustness |
+    | Product Readiness (TRL ≥ 7) | 15 | Deployment readiness, maturity |
+    | Applicability to Government Use | 15 | Relevance, contextual fit, usability |
+    | Scalability | 10 | Potential to scale across geographies/departments |
+    | Integration Capability | 5 | Compatibility with existing systems |
+    | Socio-Economic Impact | 10 | Impact on governance, economy, and citizen services |
+    | Team Capability | 5 | Expertise and execution ability |
+    | Grants / Government Support Received | 5 | Prior grants, funding, or institutional support |
+    | Sustainability & Maintenance | 5 | Long-term viability and support |
+
+=== SLIDE 3: Important Submission Guidelines ===
+  - Important Submission Guidelines
+  - Please ensure that the Pitch Deck is submitted strictly in the prescribed format.
+  - The Pitch Deck must be submitted in PDF format only.
+  - The presentation must adhere to the prescribed slide sequence, slide numbering, font style (Arial), font size (11), layout (1.5 spacing), and overall formatting guidelines provided by the organizers.
+  - The final PDF file size must not exceed 10 MB.
+  - Applicants are advised to thoroughly review their submissions before uploading to ensure compliance with all specified requirements.
+  - Any deviation from the prescribed format, including non-adherence to the required slide structure, font specifications, formatting standards, file format, or file size limit, may result in the application being rejected without further consideration.
+  - Submission of the Pitch Deck shall be deemed as acceptance of the above conditions.
+  - 3
+
+=== SLIDE 4: Introduction about the Company ===
+  - Introduction about the Company
+  - Company Name (As per Incorporation only)
+  - Company Website/URL
+  - Contact details (city, e-mail, mobile)
+  - Date (DD/MM/YYYY) of Incorporation (CIN)/ Registration
+  - Name of the Director(s)/ Partner (s)
+  - Please add more rows if there are more Directors/ Partners
+  [TABLE DATA]:
+    | # | Name  (As per the RoC or Partnership Deed) | DIN Number    (In case of RoC Company) | No of Shares |
+    |  |  |  |  |
+    |  |  |  |  |
+
+=== SLIDE 5: Problem Statement ===
+  - Problem Statement
+  - How will you be solving the problem ?
+  - Use visuals and quantifiable data to make the explain the problem statement.
+  - Mention what they are currently doing and how your product/service is a better solution
+  - Any relevant data or reports or press clippings available  to support this assumption. Please mention the source
+  - 5
+
+=== SLIDE 6: 1. Product/ Solution - Innovation ===
+  - 1. Product/ Solution - Innovation
+  - Clearly explain about your innovation, and how it will solve the problems or issues.
+  - Is your innovation the 1st of its kind or is it an improvement/ incremental to existing product/ solutions?
+  - How is your innovation unique when compared to others?
+  - Clearly and visually demonstrate the product/solution, focusing on its innovative core.
+  - Who is the target customer for your product or service?
+  - What is their need / end-benefit / pain point they seek  to satisfy / relieve?
+  - How can your product or service deliver that?
+  - How is your product or service better than current and future competition?
+
+=== SLIDE 7: 2. Product/ Solution - Readiness Level ===
+  - 2. Product/ Solution - Readiness Level
+  - What is the current stage of your product?(Mention TRL LEVEL)
+  - Concept: The idea and market research phase.
+  - Prototype/MVP: A working model or Minimum Viable Product (MVP) has been developed.
+  - Live / Early Traction: The product is launched and has initial users or revenue.
+  - Growth Stage: The product has found market fit and is actively scaling.
+  - Technology Readiness Level
+  - Post the images of your product/ solution.
+  - Highlight the uniqueness of the product or service or technology and the technical details for each feature in the product/solution/service
+
+=== SLIDE 8: 3. Applicability to Government Use ===
+  - 3. Applicability to Government Use
+  - How clearly does your solution address the identified problem and user need?
+  - How well is the solution aligned with Government workflows and operational requirements?
+  - What level of effort is required for implementation, training, and adoption?
+  - How seamlessly can the solution integrate with existing Government systems and processes?
+  - What validation, user feedback, or pilot outcomes demonstrate the solution's practical applicability?
+
+=== SLIDE 9: 4. Scalability of the Solution  ===
+  - 4. Scalability of the Solution
+  - Multi-Department Applicability: Demonstrate how the solution can be adopted across multiple Government departments with minimal customization.
+  - Geographical Scalability: Explain how the solution can be effectively deployed across districts, cities, and rural or urban environments.
+  - Scalability Roadmap: Present the approach and timelines for scaling from pilot implementation to wider adoption.
+
+=== SLIDE 10: 5. Integration Capability of the Solution  ===
+  - 5. Integration Capability of the Solution
+  - Integration Readiness: Highlight the solution's ability to integrate with existing Government systems, platforms, and workflows.
+  - System Integration Compatibility: Explain how the solution integrates with existing Government applications, databases, APIs, and digital platforms.
+  - Interoperability & Data Exchange: Demonstrate the solution's ability to exchange data seamlessly with legacy and modern systems while maintaining security, reliability, and minimal disruption to existing workflows.
+
+=== SLIDE 11: 6. Socio-Economic Impact of the Project  ===
+  - 6. Socio-Economic Impact of the Project
+  - How is your innovation is trying to impact the society/ environment?
+  - Show direct social and economic benefits like job creation in Karnataka and improvements to citizens' quality of life.
+  - Highlight your environmental contribution, focusing on sustainability, resource efficiency, or alignment with UN Sustainable Development Goals (SDGs).
+  - Quantify your impact with specific numbers and data to make your claims credible and measurable.
+
+=== SLIDE 12: 7. Team Size, Background, Strength /Capability and Resources ===
+  - 7. Team Size, Background, Strength /Capability and Resources
+  - Director(s)/ Partner(s)
+  - Name
+  - Designation
+  - Exp/ Qualification
+  - Previous Co worked
+  - ---------------------------------------------------------------------------------------------
+  - Team Photos
+  - Highlight what each member of the team does/will do in the venture, and why he/she is best suited for the role
+  - Indicate if the person is a co-founder or founding team member or an employee
+
+=== SLIDE 13: 8. Revenue Model  ===
+  - 8. Revenue Model
+  - This section details the specifics of your income streams and how you will make money from this business opportunity.
+  - Revenue Model: Pricing and Revenue Forecast across years and how it will grow.
+  - Pricing Strategy: Explain your pricing logic (e.g., competitive, value-based) and state the price clearly (e.g., ₹499/month).
+  - Revenue Streams: List all the ways you generate income. Be specific.
+  - Examples: Subscription Fees, Direct Product Sales, Transaction Fees/Commission, Licensing, Freemium Model, Advertising.
+  - Customer Lifetime Value (LTV): Briefly estimate how much revenue you expect from a single customer over their entire relationship with your business.
+
+=== SLIDE 14: 9. Grants / Government Support Received - Financial Projections ===
+  - 9. Grants / Government Support Received - Financial Projections
+  - Provide a simple, high-level forecast to show the financial potential of your business.
+  - Grants, Funding & Institutional Support: Provide details of any grants, funding, accelerator/incubator support, research partnerships, or other institutional backing received by the startup, along with their contribution to product development, validation, or commercialization.
+  - 3-Year Revenue Forecast: Use a simple chart or table to show your projected revenue for the next three years. This demonstrates ambition and a clear vision for growth.
+
+=== SLIDE 15: 10. Sustainability & Maintenance - Business Model & Strategy ===
+  - 10. Sustainability & Maintenance - Business Model & Strategy
+  - This section explains the operational framework of your business. Be clear and concise.
+  - Target Customer: Define exactly who you are selling to (e.g., B2B - small manufacturers in Karnataka; B2C - urban working mothers).
+  - Value Proposition: What unique value do you provide to your target customer?
+  - Sales & Distribution Channels: How will you reach your customers and deliver your product/service? (e.g., Direct Sales Team, Online Store, Channel Partners, Mobile App).
+  - Long-Term Viability & Support: Describe the sustainability of the solution, including the Business Model, maintenance and support framework to ensure continued operation and effectiveness over the long term.
+
+=== SLIDE 16: Project Milestones ===
+  - Project Milestones
+  - Define two distinct milestones that align with the two tranches of the Government First Work Order.
+  - Milestone 1: Strategy -(First 45 to 60 days days)
+  - Milestone 2: Strategy - (90 days and till completion)
+  - 16
+
+=== SLIDE 17: Total Budget ===
+  - Total Budget
+  - Total Work Order amount you are requesting from the Government First program- INR 25 Lakhs (maximum)
+  - Provide a detailed budget breakdown across the proposed expenditure categories, along with a brief justification for each allocation.
+  - Explain how the proposed budget will support the development, deployment, testing, and validation of the solution within the identified government environment.
+  - Provide a tranche-wise fund utilization plan, outlining the activities, milestones, and deliverables proposed to be undertaken using the initial 25% advance payment.
+  - Describe how the remaining 75% of the project cost will be utilized to achieve pilot implementation, performance validation, project milestones, and final deliverables.
+  - Identify the key cost assumptions, milestones, expected outcomes, and measurable impact proposed to be achieved through the utilization of the project funds.
+
+=== SLIDE 18: No Title ===
+  - 18
+  - THANK YOU

@@ -131,8 +131,19 @@ class MonitoringAgent:
         if leak_alerts:
             first_leak = leak_alerts[0]
             loss_lps = first_leak.estimated_loss_lps or 45.0
+            from .leak_response import leak_response_sm, DemoState
+            inc_id = leak_response_sm.incident_id or f"INC-{int(time.time()) % 10000:04d}"
+            
+            steps = [
+                "1. Leak confirmed by pressure drop and flow imbalance.",
+                "2. Proposed action: switch OFF High-Lift Pump 1 and close isolation valve BFV-104 to stop supply into leaking section.",
+                "3. Impact if isolated: wards Basavanagudi, Hanumanthanagar, Chamarajpet lose supply from this line; fallback: Harohalli Stage V covers 65% for 4 hours (Simulated)."
+            ]
+            if leak_response_sm.agent_response and leak_response_sm.agent_response.get("steps"):
+                steps = [s["label"] for s in leak_response_sm.agent_response["steps"]]
+
             inc = Incident(
-                id=f"INC-{int(time.time()) % 10000:04d}",
+                id=inc_id,
                 title=f"Critical Transmission Line Integrity Loss ({first_leak.location})",
                 severity="CRITICAL",
                 detected_at=time.strftime("%H:%M:%S"),
@@ -146,11 +157,7 @@ class MonitoringAgent:
                     f"downstream pressure drawdown of 0.8 bar."
                 ),
                 what_may_be_affected="Mount Joy GLR storage replenishment, South Basavanagudi DMA evening supply window.",
-                advisory_next_steps=[
-                    "1. Dispatch South Division rapid leak isolation crew to chainage 4+200 on Pipeline Road.",
-                    "2. Throttle Tataguni HLP-01 delivery and activate Harohalli bypass manifold.",
-                    "3. Post emergency conservation advisory to Basavanagudi and Chamarajpet wards."
-                ]
+                advisory_next_steps=steps
             )
             # Template narrator
             if os.environ.get("LLM_NARRATOR") == "on":

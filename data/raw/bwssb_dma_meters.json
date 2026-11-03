@@ -1,0 +1,63 @@
+{
+  "survey_reference": "JICA Digital Architecture Report (Feb 2026) Table 2-31 & Yokogawa Case Study",
+  "total_bulk_meters_reported": 1500,
+  "total_dmas_reported": 500,
+  "average_city_nrw_loss_pct": 36.8,
+  "zones": [
+    {
+      "dma_id": "DMA-SOUTH-04",
+      "name": "Jayanagar 4th Block DMA",
+      "division": "South",
+      "inflow_mld": 14.8,
+      "billed_consumption_mld": 10.2,
+      "nrw_pct": 31.08,
+      "min_night_flow_m3_h": 42.0,
+      "vulnerability": "MEDIUM",
+      "provenance": "DOCUMENTED"
+    },
+    {
+      "dma_id": "DMA-EAST-12",
+      "name": "Indiranagar 100ft Road DMA",
+      "division": "East",
+      "inflow_mld": 18.4,
+      "billed_consumption_mld": 11.5,
+      "nrw_pct": 37.5,
+      "min_night_flow_m3_h": 68.5,
+      "vulnerability": "HIGH",
+      "provenance": "DOCUMENTED"
+    },
+    {
+      "dma_id": "DMA-CENTRAL-01",
+      "name": "Shivajinagar Commercial Core DMA",
+      "division": "Central",
+      "inflow_mld": 22.0,
+      "billed_consumption_mld": 12.1,
+      "nrw_pct": 45.0,
+      "min_night_flow_m3_h": 112.0,
+      "vulnerability": "CRITICAL",
+      "provenance": "DOCUMENTED"
+    },
+    {
+      "dma_id": "DMA-WEST-08",
+      "name": "Rajajinagar Industrial Area DMA",
+      "division": "West",
+      "inflow_mld": 16.5,
+      "billed_consumption_mld": 12.8,
+      "nrw_pct": 22.42,
+      "min_night_flow_m3_h": 31.0,
+      "vulnerability": "LOW",
+      "provenance": "DOCUMENTED"
+    },
+    {
+      "dma_id": "DMA-NORTH-15",
+      "name": "Hebbal Kempapura DMA",
+      "division": "North",
+      "inflow_mld": 19.2,
+      "billed_consumption_mld": 12.0,
+      "nrw_pct": 37.5,
+      "min_night_flow_m3_h": 74.0,
+      "vulnerability": "HIGH",
+      "provenance": "DOCUMENTED"
+    }
+  ]
+}

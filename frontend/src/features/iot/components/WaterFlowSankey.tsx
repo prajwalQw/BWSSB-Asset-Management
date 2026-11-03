@@ -74,23 +74,23 @@ export const WaterFlowSankey: React.FC<WaterFlowSankeyProps> = ({ corridors, bal
         <div className="p-2.5 rounded-xl border border-slate-800 bg-slate-900/80 flex items-center gap-4 text-xs">
           <div>
             <span className="text-slate-500 block text-[11px]">Inflow</span>
-            <span className="font-bold text-sky-400 font-mono tabular-nums">{balance.total_inflow_mld.toFixed(1)} MLD</span>
+            <span className="font-bold text-sky-400 font-mono tabular-nums">{((balance?.total_inflow_mld ?? 0)).toFixed(1)} MLD</span>
           </div>
           <div className="text-slate-600">-</div>
           <div>
             <span className="text-slate-500 block text-[11px]">Outflow</span>
-            <span className="font-bold text-emerald-400 font-mono tabular-nums">{balance.total_outflow_mld.toFixed(1)} MLD</span>
+            <span className="font-bold text-emerald-400 font-mono tabular-nums">{((balance?.total_outflow_mld ?? 0)).toFixed(1)} MLD</span>
           </div>
           <div className="text-slate-600">-</div>
           <div>
             <span className="text-slate-500 block text-[11px]">Δ Storage</span>
-            <span className="font-bold text-slate-300 font-mono tabular-nums">{balance.storage_change_mld.toFixed(1)} MLD</span>
+            <span className="font-bold text-slate-300 font-mono tabular-nums">{((balance?.storage_change_mld ?? 0)).toFixed(1)} MLD</span>
           </div>
           <div className="text-slate-600">=</div>
           <div className="pl-2 border-l border-slate-800">
             <span className="text-slate-500 block text-[11px]">Unaccounted (NRW)</span>
             <span className="font-bold text-amber-400 font-mono tabular-nums">
-              {balance.unaccounted_mld.toFixed(1)} MLD ({balance.unaccounted_pct.toFixed(1)}%)
+              {((balance?.unaccounted_mld ?? 0)).toFixed(1)} MLD ({((balance?.unaccounted_pct ?? 0)).toFixed(1)}%)
             </span>
           </div>
         </div>
@@ -139,7 +139,7 @@ export const WaterFlowSankey: React.FC<WaterFlowSankeyProps> = ({ corridors, bal
                       <div className="flex items-baseline justify-between mt-2 pt-1 border-t border-slate-800/60 font-mono">
                         <span className="text-[10px] text-slate-500">Flow:</span>
                         <span className="text-sm font-bold text-sky-400 tabular-nums">
-                          {node.mld.toFixed(1)} <span className="text-[10px] text-sky-600">MLD</span>
+                          {((node.mld ?? 0)).toFixed(1)} <span className="text-[10px] text-sky-600">MLD</span>
                         </span>
                       </div>
 

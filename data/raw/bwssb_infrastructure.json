@@ -1,0 +1,518 @@
+[
+  {
+    "asset_id": "BWSSB-WTP-TKHALLI-01",
+    "name": "Torekadanahalli (TK Halli) Water Treatment Plant Complex",
+    "category": "Water Treatment Plant",
+    "division": "Cauvery Water Supply Scheme (CWSS)",
+    "location": {
+      "name": "TK Halli, Mandya / Kanakapura Rd",
+      "lat": 12.5204,
+      "lng": 77.2155
+    },
+    "capacity_mld": 1400.0,
+    "commission_year": 1974,
+    "stages": [
+      "Stage I",
+      "Stage II",
+      "Stage III",
+      "Stage IV Phase 1 & 2"
+    ],
+    "parameters": [
+      {
+        "name": "raw_water_inflow",
+        "unit": "MLD",
+        "value": 1420.5,
+        "status": "NORMAL"
+      },
+      {
+        "name": "turbidity_raw",
+        "unit": "NTU",
+        "value": 14.2,
+        "status": "NORMAL"
+      },
+      {
+        "name": "turbidity_treated",
+        "unit": "NTU",
+        "value": 0.8,
+        "status": "OPTIMAL"
+      },
+      {
+        "name": "residual_chlorine",
+        "unit": "mg/L",
+        "value": 1.8,
+        "status": "OPTIMAL"
+      },
+      {
+        "name": "power_consumption",
+        "unit": "MW",
+        "value": 24.6,
+        "status": "NORMAL"
+      }
+    ],
+    "provenance": "DOCUMENTED",
+    "source_doc": "JICA DX Survey (Feb 2026) & Yokogawa SCADA Case Study (2015)"
+  },
+  {
+    "asset_id": "BWSSB-PS-TKHALLI-PUMP",
+    "name": "TK Halli Master Pumping Station (Stages I-IV)",
+    "category": "Pumping Station",
+    "division": "CWSS Transmission",
+    "location": {
+      "name": "TK Halli Pumping Head",
+      "lat": 12.522,
+      "lng": 77.217
+    },
+    "capacity_mld": 1450.0,
+    "head_meters": 450,
+    "installed_pumps": 18,
+    "active_pumps": 14,
+    "parameters": [
+      {
+        "name": "discharge_pressure",
+        "unit": "bar",
+        "value": 44.2,
+        "status": "NORMAL"
+      },
+      {
+        "name": "active_motor_load",
+        "unit": "MW",
+        "value": 68.4,
+        "status": "HIGH"
+      },
+      {
+        "name": "vibration_rms",
+        "unit": "mm/s",
+        "value": 2.1,
+        "status": "WATCH"
+      },
+      {
+        "name": "discharge_flow",
+        "unit": "MLD",
+        "value": 1390.0,
+        "status": "NORMAL"
+      }
+    ],
+    "provenance": "DOCUMENTED",
+    "source_doc": "Yokogawa SCADA 2015 Case Study & JICA Phase 3 Final Report"
+  },
+  {
+    "asset_id": "BWSSB-PS-HAROHALLI-01",
+    "name": "Harohalli Intermediate Pumping Station",
+    "category": "Pumping Station",
+    "division": "CWSS Transmission",
+    "location": {
+      "name": "Harohalli, Kanakapura Rd",
+      "lat": 12.6582,
+      "lng": 77.4421
+    },
+    "capacity_mld": 1400.0,
+    "head_meters": 125,
+    "installed_pumps": 12,
+    "active_pumps": 10,
+    "parameters": [
+      {
+        "name": "suction_pressure",
+        "unit": "bar",
+        "value": 3.8,
+        "status": "NORMAL"
+      },
+      {
+        "name": "discharge_pressure",
+        "unit": "bar",
+        "value": 16.5,
+        "status": "NORMAL"
+      },
+      {
+        "name": "pump_efficiency",
+        "unit": "%",
+        "value": 81.2,
+        "status": "OPTIMAL"
+      }
+    ],
+    "provenance": "DOCUMENTED",
+    "source_doc": "JICA Digital Architecture Report 2026, Fig 2-8"
+  },
+  {
+    "asset_id": "BWSSB-PS-TATAGUNI-01",
+    "name": "Tataguni Terminal Pumping Station",
+    "category": "Pumping Station",
+    "division": "South Division",
+    "location": {
+      "name": "Tataguni, South Bengaluru",
+      "lat": 12.8685,
+      "lng": 77.514
+    },
+    "capacity_mld": 1350.0,
+    "head_meters": 95,
+    "installed_pumps": 14,
+    "active_pumps": 11,
+    "parameters": [
+      {
+        "name": "discharge_flow",
+        "unit": "MLD",
+        "value": 1345.0,
+        "status": "NORMAL"
+      },
+      {
+        "name": "line_pressure",
+        "unit": "bar",
+        "value": 11.2,
+        "status": "NORMAL"
+      }
+    ],
+    "provenance": "DOCUMENTED",
+    "source_doc": "JICA 2026 Survey & BWSSB As-Is Architecture"
+  },
+  {
+    "asset_id": "BWSSB-GLR-HIGHGROUNDS",
+    "name": "High Grounds Master Balancing Reservoir (GLR)",
+    "category": "Ground Level Reservoir",
+    "division": "Central Division",
+    "location": {
+      "name": "High Grounds, Sheshadripuram",
+      "lat": 12.9912,
+      "lng": 77.5843
+    },
+    "capacity_mld": 45.0,
+    "current_level_m": 4.85,
+    "max_level_m": 6.0,
+    "parameters": [
+      {
+        "name": "water_level",
+        "unit": "m",
+        "value": 4.85,
+        "status": "NORMAL"
+      },
+      {
+        "name": "inflow_rate",
+        "unit": "MLD",
+        "value": 120.4,
+        "status": "NORMAL"
+      },
+      {
+        "name": "outflow_rate",
+        "unit": "MLD",
+        "value": 118.2,
+        "status": "NORMAL"
+      },
+      {
+        "name": "chlorine_residual",
+        "unit": "mg/L",
+        "value": 1.2,
+        "status": "OPTIMAL"
+      }
+    ],
+    "provenance": "DOCUMENTED",
+    "source_doc": "Yokogawa 2015 Case Study Table 2"
+  },
+  {
+    "asset_id": "BWSSB-GLR-MOUNTJOY",
+    "name": "Mount Joy Balancing Reservoir (GLR)",
+    "category": "Ground Level Reservoir",
+    "division": "South Division",
+    "location": {
+      "name": "Mount Joy, Basavanagudi",
+      "lat": 12.9372,
+      "lng": 77.5621
+    },
+    "capacity_mld": 35.0,
+    "current_level_m": 4.1,
+    "max_level_m": 5.5,
+    "parameters": [
+      {
+        "name": "water_level",
+        "unit": "m",
+        "value": 4.1,
+        "status": "NORMAL"
+      },
+      {
+        "name": "inflow_rate",
+        "unit": "MLD",
+        "value": 85.0,
+        "status": "NORMAL"
+      },
+      {
+        "name": "outflow_rate",
+        "unit": "MLD",
+        "value": 86.5,
+        "status": "NORMAL"
+      }
+    ],
+    "provenance": "DOCUMENTED",
+    "source_doc": "Yokogawa 2015 Case Study Table 2"
+  },
+  {
+    "asset_id": "BWSSB-GLR-BYATARAYANAPURA",
+    "name": "Byatarayanapura Service Reservoir (GLR)",
+    "category": "Ground Level Reservoir",
+    "division": "North Division",
+    "location": {
+      "name": "Byatarayanapura, Bellary Rd",
+      "lat": 13.0615,
+      "lng": 77.592
+    },
+    "capacity_mld": 25.0,
+    "current_level_m": 3.2,
+    "max_level_m": 5.0,
+    "parameters": [
+      {
+        "name": "water_level",
+        "unit": "m",
+        "value": 3.2,
+        "status": "WATCH"
+      },
+      {
+        "name": "inflow_rate",
+        "unit": "MLD",
+        "value": 42.0,
+        "status": "NORMAL"
+      }
+    ],
+    "provenance": "DOCUMENTED",
+    "source_doc": "BWSSB Zonal Infrastructure Ledger 2026"
+  },
+  {
+    "asset_id": "BWSSB-BW-MHD-042",
+    "name": "Mahadevapura Ward 82 Municipal Borewell #42",
+    "category": "Public Borewell",
+    "division": "Mahadevapura Division (East)",
+    "location": {
+      "name": "Hoodi Circle, Mahadevapura",
+      "lat": 12.9918,
+      "lng": 77.7162
+    },
+    "depth_meters": 285.0,
+    "pump_hp": 15.0,
+    "iot_installed": true,
+    "parameters": [
+      {
+        "name": "groundwater_depth",
+        "unit": "m",
+        "value": 242.0,
+        "status": "DEGRADED"
+      },
+      {
+        "name": "daily_extraction",
+        "unit": "kL",
+        "value": 78.5,
+        "status": "NORMAL"
+      },
+      {
+        "name": "pump_operating_hours",
+        "unit": "hrs/day",
+        "value": 14.2,
+        "status": "WATCH"
+      },
+      {
+        "name": "motor_current",
+        "unit": "A",
+        "value": 22.4,
+        "status": "NORMAL"
+      }
+    ],
+    "provenance": "PUBLIC_GOV",
+    "source_doc": "BWSSB IoT Borewell Portal & New Indian Express Report (Sep 2026)"
+  },
+  {
+    "asset_id": "BWSSB-BW-BMM-119",
+    "name": "Bommanahalli Ward 188 Municipal Borewell #119",
+    "category": "Public Borewell",
+    "division": "Bommanahalli Division (South-East)",
+    "location": {
+      "name": "Begur Road, Bommanahalli",
+      "lat": 12.8812,
+      "lng": 77.632
+    },
+    "depth_meters": 310.0,
+    "pump_hp": 20.0,
+    "iot_installed": true,
+    "parameters": [
+      {
+        "name": "groundwater_depth",
+        "unit": "m",
+        "value": 275.5,
+        "status": "DEGRADED"
+      },
+      {
+        "name": "daily_extraction",
+        "unit": "kL",
+        "value": 92.0,
+        "status": "NORMAL"
+      },
+      {
+        "name": "pump_operating_hours",
+        "unit": "hrs/day",
+        "value": 16.5,
+        "status": "CRITICAL"
+      },
+      {
+        "name": "motor_current",
+        "unit": "A",
+        "value": 26.8,
+        "status": "WATCH"
+      }
+    ],
+    "provenance": "PUBLIC_GOV",
+    "source_doc": "BWSSB IoT Borewell Portal & New Indian Express Report (Sep 2026)"
+  },
+  {
+    "asset_id": "BWSSB-BW-YEL-084",
+    "name": "Yelahanka Old Town Borewell #84",
+    "category": "Public Borewell",
+    "division": "Yelahanka Division (North)",
+    "location": {
+      "name": "Kogilu Cross, Yelahanka",
+      "lat": 13.112,
+      "lng": 77.5985
+    },
+    "depth_meters": 220.0,
+    "pump_hp": 12.5,
+    "iot_installed": true,
+    "parameters": [
+      {
+        "name": "groundwater_depth",
+        "unit": "m",
+        "value": 178.0,
+        "status": "NORMAL"
+      },
+      {
+        "name": "daily_extraction",
+        "unit": "kL",
+        "value": 65.0,
+        "status": "NORMAL"
+      },
+      {
+        "name": "pump_operating_hours",
+        "unit": "hrs/day",
+        "value": 10.5,
+        "status": "OPTIMAL"
+      }
+    ],
+    "provenance": "PUBLIC_GOV",
+    "source_doc": "BWSSB IoT Borewell Portal (Sep 2026)"
+  },
+  {
+    "asset_id": "BWSSB-BW-RRN-015",
+    "name": "Rajarajeshwari Nagar Ward 160 Borewell #15",
+    "category": "Public Borewell",
+    "division": "RR Nagar Division (West)",
+    "location": {
+      "name": "Kengeri Satellite Town",
+      "lat": 12.915,
+      "lng": 77.485
+    },
+    "depth_meters": 250.0,
+    "pump_hp": 15.0,
+    "iot_installed": true,
+    "parameters": [
+      {
+        "name": "groundwater_depth",
+        "unit": "m",
+        "value": 195.0,
+        "status": "NORMAL"
+      },
+      {
+        "name": "daily_extraction",
+        "unit": "kL",
+        "value": 72.0,
+        "status": "NORMAL"
+      },
+      {
+        "name": "pump_operating_hours",
+        "unit": "hrs/day",
+        "value": 11.8,
+        "status": "NORMAL"
+      }
+    ],
+    "provenance": "PUBLIC_GOV",
+    "source_doc": "BWSSB IoT Borewell Portal (Sep 2026)"
+  },
+  {
+    "asset_id": "BWSSB-STP-VRISH-01",
+    "name": "Vrishabhavathi Valley Sewage Treatment Plant",
+    "category": "Sewage Treatment Plant",
+    "division": "Wastewater West",
+    "location": {
+      "name": "Nayandahalli, Mysore Rd",
+      "lat": 12.942,
+      "lng": 77.518
+    },
+    "capacity_mld": 150.0,
+    "process_type": "Activated Sludge Process (ASP)",
+    "parameters": [
+      {
+        "name": "treated_flow",
+        "unit": "MLD",
+        "value": 146.0,
+        "status": "NORMAL"
+      },
+      {
+        "name": "effluent_bod",
+        "unit": "mg/L",
+        "value": 8.5,
+        "status": "OPTIMAL"
+      },
+      {
+        "name": "effluent_cod",
+        "unit": "mg/L",
+        "value": 42.0,
+        "status": "OPTIMAL"
+      },
+      {
+        "name": "dissolved_oxygen",
+        "unit": "mg/L",
+        "value": 2.4,
+        "status": "NORMAL"
+      },
+      {
+        "name": "blower_power",
+        "unit": "kW",
+        "value": 840.0,
+        "status": "NORMAL"
+      }
+    ],
+    "provenance": "DOCUMENTED",
+    "source_doc": "Yokogawa 2015 Case Study & JICA 2026 Digital Survey"
+  },
+  {
+    "asset_id": "BWSSB-STP-KCVALLEY-01",
+    "name": "K&C Valley Sewage Treatment Plant & Lift",
+    "category": "Sewage Treatment Plant",
+    "division": "Wastewater East",
+    "location": {
+      "name": "Bellandur Outfall, K&C Valley",
+      "lat": 12.9285,
+      "lng": 77.675
+    },
+    "capacity_mld": 248.0,
+    "process_type": "Sequencing Batch Reactor (SBR)",
+    "parameters": [
+      {
+        "name": "treated_flow",
+        "unit": "MLD",
+        "value": 242.0,
+        "status": "NORMAL"
+      },
+      {
+        "name": "effluent_bod",
+        "unit": "mg/L",
+        "value": 6.8,
+        "status": "OPTIMAL"
+      },
+      {
+        "name": "effluent_tss",
+        "unit": "mg/L",
+        "value": 12.0,
+        "status": "OPTIMAL"
+      },
+      {
+        "name": "total_nitrogen",
+        "unit": "mg/L",
+        "value": 9.2,
+        "status": "NORMAL"
+      }
+    ],
+    "provenance": "DOCUMENTED",
+    "source_doc": "Yokogawa 2015 Case Study & JICA 2026 Digital Survey"
+  }
+]

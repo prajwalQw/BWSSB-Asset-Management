@@ -41,9 +41,6 @@ class IgnoApiReadOnlyBridge:
         self.connected = False
         self.last_packet_time = 0.0
 
-    @property
-    def is_connected(self) -> bool:
-        return self.connected
         self.raw_telemetry: Dict[str, Any] = {}
         
         # Load sensor map and variables config
@@ -65,6 +62,10 @@ class IgnoApiReadOnlyBridge:
             "last_packet_time": time.time()
         }
         self._evaluate_all_sensor_health()
+
+    @property
+    def is_connected(self) -> bool:
+        return self.connected
 
     def send_command(self, action: str, *args, **kwargs):
         """Enforces read-only allowlist for bridge operations."""

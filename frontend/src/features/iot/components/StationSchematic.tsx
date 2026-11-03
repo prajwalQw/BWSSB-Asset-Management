@@ -34,8 +34,8 @@ export const StationSchematic: React.FC<StationSchematicProps> = ({
           </p>
         </div>
         <div className="text-right text-xs font-mono text-slate-400">
-          <div>Tank Level: <span className="text-emerald-400 font-bold">{tank.level_pct.toFixed(1)}%</span> ({tank.level_m.toFixed(2)} m)</div>
-          <div>Total Inflow: <span className="text-sky-400 font-bold">{tank.inflow_lps.toFixed(1)} L/s</span></div>
+          <div>Tank Level: <span className="text-emerald-400 font-bold">{(tank.level_pct ?? 0).toFixed(1)}%</span> ({((tank.level_m ?? 0)).toFixed(2)} m)</div>
+          <div>Total Inflow: <span className="text-sky-400 font-bold">{((tank.inflow_lps ?? 0)).toFixed(1)} L/s</span></div>
         </div>
       </div>
 
@@ -90,25 +90,25 @@ export const StationSchematic: React.FC<StationSchematicProps> = ({
                   <div className="grid grid-cols-2 gap-1 text-[11px] font-mono">
                     <div className="flex justify-between">
                       <span className="text-slate-500">I avg:</span>
-                      <span className="text-slate-200 font-bold tabular-nums">{p.current_avg.toFixed(1)} A</span>
+                      <span className="text-slate-200 font-bold tabular-nums">{(p.current_avg ?? 0).toFixed(1)} A</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">V avg:</span>
-                      <span className="text-slate-200 tabular-nums">{p.voltage_avg.toFixed(0)} V</span>
+                      <span className="text-slate-200 tabular-nums">{(p.voltage_avg ?? 0).toFixed(0)} V</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Power:</span>
-                      <span className="text-slate-200 tabular-nums">{p.active_power_kw.toFixed(1)} kW</span>
+                      <span className="text-slate-200 tabular-nums">{(p.active_power_kw ?? 0).toFixed(1)} kW</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">PF:</span>
-                      <span className="text-slate-200 tabular-nums">{p.power_factor.toFixed(2)}</span>
+                      <span className="text-slate-200 tabular-nums">{(p.power_factor ?? 0).toFixed(2)}</span>
                     </div>
                   </div>
 
                   <div className="text-[10px] text-slate-500 mt-1 flex justify-between border-t border-slate-800/60 pt-1">
                     <span>Mode: <strong className="text-slate-400">Automatic</strong></span>
-                    <span>Vib: {p.vibration_rms_mms.toFixed(1)} mm/s</span>
+                    <span>Vib: {(p.vibration_rms_mms ?? 0).toFixed(1)} mm/s</span>
                   </div>
                 </button>
 
@@ -129,7 +129,7 @@ export const StationSchematic: React.FC<StationSchematicProps> = ({
                     <Zap className={`w-5 h-5 ${isRunning ? 'text-emerald-400 animate-pulse' : 'text-slate-600'}`} />
                   </div>
                   <span className="font-mono text-xs font-bold text-slate-200 block">{p.tag} Pump</span>
-                  <span className="text-[10px] text-slate-400 font-mono">{p.head_m.toFixed(1)} m head</span>
+                  <span className="text-[10px] text-slate-400 font-mono">{(p.head_m ?? 0).toFixed(1)} m head</span>
                 </button>
 
                 {/* Pipe Line Connector */}
@@ -149,7 +149,7 @@ export const StationSchematic: React.FC<StationSchematicProps> = ({
                   <Activity className="w-4 h-4 text-sky-400 mx-auto mb-0.5" />
                   <span className="font-mono text-[10px] text-slate-400 block">Sensor</span>
                   <span className="font-mono text-[11px] font-bold text-sky-300">
-                    {p.flow_lps.toFixed(1)} <span className="text-[9px]">L/s</span>
+                    {(p.flow_lps ?? 0).toFixed(1)} <span className="text-[9px]">L/s</span>
                   </span>
                 </button>
 
@@ -170,10 +170,10 @@ export const StationSchematic: React.FC<StationSchematicProps> = ({
                   <Gauge className="w-4 h-4 text-emerald-400 mx-auto mb-0.5" />
                   <span className="font-mono text-[10px] text-slate-400 block">FIT-{p.tag}</span>
                   <span className="font-mono text-xs font-bold text-emerald-300">
-                    {p.flow_lps.toFixed(1)} L/s
+                    {(p.flow_lps ?? 0).toFixed(1)} L/s
                   </span>
                   <span className="text-[9px] text-slate-500 font-mono block">
-                    {((p.flow_lps * 86.4) / 1000).toFixed(2)} MLD
+                    {(((p.flow_lps ?? 0) * 86.4) / 1000).toFixed(2)} MLD
                   </span>
                 </button>
               </div>
@@ -215,14 +215,14 @@ export const StationSchematic: React.FC<StationSchematicProps> = ({
             {/* Setpoint Reference Marker Lines */}
             <div
               className="absolute left-0 right-0 border-t border-dashed border-amber-500/80 z-10"
-              style={{ bottom: `${tank.level_pct}%` }}
-              title={`Current: ${tank.level_pct}%`}
+              style={{ bottom: `${tank.level_pct ?? 0}%` }}
+              title={`Current: ${tank.level_pct ?? 0}%`}
             />
 
             {/* Animated Water Liquid */}
             <div
               className="w-full bg-gradient-to-t from-sky-700 to-sky-500 rounded-lg transition-all duration-700 relative overflow-hidden"
-              style={{ height: `${tank.level_pct}%` }}
+              style={{ height: `${tank.level_pct ?? 0}%` }}
             >
               <div className="absolute inset-0 bg-white/10 animate-pulse" />
             </div>
@@ -231,13 +231,13 @@ export const StationSchematic: React.FC<StationSchematicProps> = ({
           {/* Tank Level Figures */}
           <div className="w-full mt-3 text-center">
             <div className="font-mono text-xl font-bold text-slate-100">
-              {tank.level_pct.toFixed(1)}%
+              {(tank.level_pct ?? 0).toFixed(1)}%
             </div>
             <div className="text-[11px] font-mono text-slate-400">
-              {tank.level_m.toFixed(2)} m / {tank.height_m.toFixed(1)} m
+              {(tank.level_m ?? 0).toFixed(2)} m / {(tank.height_m ?? 0).toFixed(1)} m
             </div>
             <div className="text-[10px] text-slate-500 font-mono mt-1">
-              Vol: {Math.round(tank.volume_m3).toLocaleString()} m³ / {tank.capacity_m3.toLocaleString()} m³
+              Vol: {Math.round(tank.volume_m3 ?? 0).toLocaleString()} m³ / {(tank.capacity_m3 ?? 0).toLocaleString()} m³
             </div>
           </div>
         </div>

@@ -1,0 +1,15 @@
+Title: Using GIS in water management system: case study, BWSSB
+Publisher: India Water Portal & Arghyam
+URL: https://www.indiawaterportal.org/amp/story/environment/sustainability/using-gis-water-management-system-case-study-bangalore-water-supply-and-sewerage-board
+
+The Bangalore Water Supply and Sewerage Board (BWSSB) implemented the Bangalore Integrated System for Operation of Network (BISON) GIS platform to digitize its vast distribution and sanitary networks.
+
+Key Documented Network Parameters & GIS Feature Classes:
+1. Pipeline geometric alignment (centerline vector coordinates)
+2. Pipeline material (Cast Iron CI, Ductile Iron DI, Mild Steel MS, Reinforced Cement Concrete RCC, HDPE)
+3. Pipeline nominal diameter (mm)
+4. Sluice valve, scour valve, and air release valve spatial locations and operational status
+5. Underground drainage (UGD) manhole spatial locations, cover levels, and invert depths
+6. District Metered Area (DMA) boundary polygons and supply sub-zone delineations
+7. Service station jurisdictional boundaries
+8. Consumer water connection consumer identification number (RR Number) parcel associations

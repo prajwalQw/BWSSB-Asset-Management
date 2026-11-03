@@ -1,0 +1,17 @@
+Title: BWSSB turns to AI to cut power bills at pumping stations
+Publication Date: January 15, 2026
+Source: The New Indian Express, Bengaluru
+URL: https://www.newindianexpress.com/cities/bengaluru/2026/Jan/15/bwssb-turns-to-ai-to-cut-power-bills
+
+BENGALURU: Faced with monthly electricity bills exceeding Rs 65-70 crore for lifting Cauvery water, the Bangalore Water Supply and Sewerage Board (BWSSB) has deployed Artificial Intelligence (AI) and machine learning diagnostics to optimize high-tension pumping station operations.
+
+The pilot deployed at Cauvery Stage IV pumping stations (TK Halli, Harohalli, and Tataguni) evaluates pump operating efficiency, detects cavitation, and dynamically schedules pump dispatch to minimize peak-hour power tariff penalties.
+
+Documented Telemetry & Diagnostic Parameters:
+1. Pumping station power consumption (Active power kW, Apparent power kVA, Total energy kWh)
+2. Pump motor vibration (triaxial velocity and acceleration for bearing wear detection)
+3. Motor bearing temperature
+4. Pump discharge pressure
+5. Volumetric pump delivery rate / discharge flow
+6. Dynamic pump efficiency calculation (wire-to-water efficiency index)
+7. Peak-tariff load shift scheduling signals

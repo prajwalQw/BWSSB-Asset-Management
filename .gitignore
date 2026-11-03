@@ -1,13 +1,63 @@
-node_modules/
+# Python
 .venv/
+venv/
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
 dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+
+# Python cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# SQLite temporary files
+*.db-shm
+*.db-wal
+*.sqlite-shm
+*.sqlite-wal
+
+# Logs
+*.log
+logs/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp 
+
+# Databases
 *.db
 *.db-journal
-temp.bin
-temp.inp
-temp.rpt
-.vite/
-tsconfig.tsbuildinfo
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Temporary / simulation files
+*.bin
+*.inp
+*.rpt
+
+# TypeScript build cache
+*.tsbuildinfo
+
+# Large BWSSB GeoJSON datasets
+data/raw/geojson/bwssb_manholes.geojson
+data/raw/geojson/bwssb_sewerage_lines_150_300mm.geojson
+data/raw/geojson/bwssb_water_lines_lte_300mm.geojson

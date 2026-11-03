@@ -127,7 +127,7 @@ class SSEManager {
       es.onmessage = (e) => handleRawMessage(e, 'message');
 
       // Typed SSE listeners
-      const typedEvents = ['heartbeat', 'telemetry', 'alert', 'leak', 'plan', 'agent'];
+      const typedEvents = ['heartbeat', 'telemetry', 'alert', 'leak', 'plan', 'agent', 'demo'];
       typedEvents.forEach((eventType) => {
         es.addEventListener(eventType, (e: any) => {
           this.resetWatchdog();
